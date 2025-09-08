@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Lectura de Capacitación</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      background-color: #f5f6fa;
+    }
+    .chart-container {
+      height: 300px; 
+      width: 300px;
+      margin: auto;
+    }
+    .bar-container {
+      height: 300px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col p-6 text-white" style="background-color:#f5f6fa;">
+
+  <!-- Header -->
+  <header class="w-full flex items-center justify-center mb-6 bg-[#1e2146] p-4 rounded-xl shadow-md">
+    <img src="resources/AMB.svg" alt="Logo" class="h-12 mr-4">
+    <h1 class="text-2xl font-bold text-[#f28a1a]">DATA - SST UNIVERSITY</h1>
+  </header>
+
+  <!-- Layout principal -->
+  <div class="w-full flex flex-col lg:flex-row gap-6">
+    <!-- Panel izquierdo -->
+    <div class="lg:w-1/2">
+      <!-- Inputs -->
+      <div class="bg-white p-6 rounded-2xl shadow-lg w-full text-black">
+        <label class="block mb-2 font-semibold text-[#1e2146]">Empresa</label>
+        <input id="empresaInput" type="text" placeholder="Ej: NIXUS" 
+              class="w-full p-2 border rounded-md mb-4 uppercase">
+        
+        <button onclick="leerData()" 
+                class="w-full bg-[#f28a1a] text-white px-4 py-2 rounded-xl shadow-md hover:bg-[#d97706] transition">
+          Leer Data
+        </button>
+      </div>
+
+      <!-- Resultado -->
+      <div id="resultado" class="mt-6 w-full hidden">
+        <div id="dispositivosList" class="mb-4"></div>
+        <div id="detalleDispositivo" class="bg-white text-black p-4 rounded-xl shadow"></div>
+      </div>
+    </div>
+
+    <!-- Panel derecho (Reporte BI) -->
+    <div class="lg:w-1/2 bg-white p-6 rounded-2xl shadow-lg text-black">
+      <h2 class="text-lg font-bold text-[#1e2146] mb-4">📊 Reporte BI</h2>
+      
+      <!-- Gráficos en paralelo -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+       <!-- Torta -->
+<div>
+  <h3 class="font-semibold text-[#f28a1a] mb-2 text-center">Distribución de tiempo</h3>
+  <div class="chart-container">
+    <canvas id="useTimeChart"></canvas>
+  </div>
+  <!-- Lista de leyenda personalizada -->
+  <div id="customLegend" class="mt-4 max-h-40 overflow-y-auto border rounded p-2 bg-gray-50 text-black text-sm"></div>
+</div>
+        <!-- Barras -->
+        <div>
+          <h3 class="font-semibold text-[#f28a1a] mb-2 text-center">Comparativa de uso</h3>
+          <div class="bar-container">
+            <canvas id="barChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const firebaseURL = "https://sst-university-default-rtdb.firebaseio.com/";
+    let useTimeChartInstance = null;
+    let barChartInstance = null;
+
+    // 🔥 Formatear a horas, minutos, segundos
+    function formatTiempo(segundos) {
+      const horas = Math.floor(segundos / 3600);
+      const minutos = Math.floor((segundos % 3600) / 60);
+      const segundosRestantes = segundos % 60;
+
+      let resultado = "";
+      if (horas > 0) resultado += `${horas} h `;
+      if (minutos > 0) resultado += `${minutos} min `;
+      resultado += `${segundosRestantes} seg`;
+
+      return resultado.trim();
+    }
+
+    async function leerData() {
+      const empresaInput = document.getElementById("empresaInput").value.trim();
+      const empresa = empresaInput.toUpperCase(); 
+      const resultadoDiv = document.getElementById("resultado");
+      const dispositivosDiv = document.getElementById("dispositivosList");
+      const detalleDiv = document.getElementById("detalleDispositivo");
+
+      if (!empresa) {
+        alert("Por favor ingresa la empresa");
+        return;
+      }
+
+      try {
+        const response = await fetch(`${firebaseURL}${empresa}.json`);
+        const data = await response.json();
+
+        if (!data) {
+          alert("❌ Empresa no encontrada");
+          return;
+        }
+
+        const dispositivos = data.Dispositivo || [];
+        resultadoDiv.classList.remove("hidden");
+
+        dispositivosDiv.innerHTML = "";
+        detalleDiv.innerHTML = "";
+
+        if (dispositivos.length === 1) {
+          mostrarDispositivo(dispositivos[0], detalleDiv);
+        } else {
+          dispositivos.forEach(d => {
+            const btn = document.createElement("button");
+            btn.textContent = `📌 Dispositivo ID: ${d.ID}`;
+            btn.classList.add(
+              "bg-[#1e2146]", "text-white", "px-4", "py-2", "rounded-xl", "shadow-md", "mb-2", "w-full", "text-left", "hover:bg-[#f28a1a]", "transition"
+            );
+            btn.onclick = () => mostrarDispositivo(d, detalleDiv);
+            dispositivosDiv.appendChild(btn);
+          });
+        }
+
+      } catch (error) {
+        console.error("Error al leer Firebase:", error);
+        alert("⚠️ Ocurrió un error al leer los datos");
+      }
+    }
+
+    function mostrarDispositivo(dispositivo, container) {
+      container.innerHTML = `
+        <h2 class="text-lg font-bold text-[#1e2146]">📌 Dispositivo ID: ${dispositivo.ID}</h2>
+        <p class="text-sm text-gray-700">⏱️ Tiempo de uso: ${formatTiempo(dispositivo.UseTime)}</p>
+        <p class="text-sm text-gray-500">Licencia: ${dispositivo.LimitLicence || "Sin definir"}</p>
+        <h3 class="mt-2 font-semibold text-[#f28a1a]">Capacitaciones:</h3>
+        <div id="capacitacionesList" class="max-h-40 overflow-y-auto border p-2 rounded bg-gray-50"></div>
+      `;
+
+      const capacitacionesList = container.querySelector("#capacitacionesList");
+      if (dispositivo.Capacitaciones && dispositivo.Capacitaciones.length > 0) {
+        dispositivo.Capacitaciones.forEach(cap => {
+          const item = document.createElement("p");
+          item.textContent = `${cap.Nombre} - ${formatTiempo(cap.Tiempo)}`;
+          item.classList.add("text-sm", "text-gray-700", "border-b", "py-1");
+          capacitacionesList.appendChild(item);
+        });
+      } else {
+        capacitacionesList.innerHTML = "<p class='text-gray-500'>No hay capacitaciones</p>";
+      }
+
+      generarGraficos(dispositivo);
+    }
+
+  function generarGraficos(dispositivo) {
+  const labels = dispositivo.Capacitaciones.map(cap => cap.Nombre);
+  const tiempos = dispositivo.Capacitaciones.map(cap => cap.Tiempo);
+  const tiemposFormateados = tiempos.map(t => formatTiempo(t));
+
+  const colors = [
+    '#f28a1a', '#1e2146', '#4caf50', '#2196f3', '#9c27b0',
+    '#ff5722', '#00bcd4', '#8bc34a', '#ffc107', '#e91e63',
+    '#795548', '#3f51b5', '#009688', '#cddc39'
+  ];
+
+  // --- Torta ---
+  const ctx = document.getElementById("useTimeChart").getContext("2d");
+  if (useTimeChartInstance) useTimeChartInstance.destroy();
+  useTimeChartInstance = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: tiempos,
+        backgroundColor: colors.slice(0, labels.length)
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false } // 🔥 Quitamos la leyenda por defecto
+      }
+    }
+  });
+
+  // --- Leyenda personalizada debajo de la torta ---
+  const legendContainer = document.getElementById("customLegend");
+  legendContainer.innerHTML = ""; // limpiar
+
+  labels.forEach((label, i) => {
+    const item = document.createElement("div");
+    item.classList.add("flex", "items-center", "mb-1");
+
+    const colorBox = document.createElement("span");
+    colorBox.style.backgroundColor = colors[i % colors.length];
+    colorBox.classList.add("w-4", "h-4", "inline-block", "mr-2", "rounded");
+
+    const text = document.createElement("span");
+    text.textContent = `${label} - ${tiemposFormateados[i]}`;
+
+    item.appendChild(colorBox);
+    item.appendChild(text);
+    legendContainer.appendChild(item);
+  });
+
+// --- Barras ---
+const barCtx = document.getElementById("barChart").getContext("2d");
+if (barChartInstance) barChartInstance.destroy();
+barChartInstance = new Chart(barCtx, {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [{
+      label: 'Tiempo de uso',
+      data: tiempos,
+      backgroundColor: colors.slice(0, labels.length) // 🔥 mismo set de colores que la torta
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            return formatTiempo(context.raw);
+          }
+        }
+      },
+      legend: { display: false }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: function(value) {
+            return formatTiempo(value);
+          }
+        }
+      }
+    }
+  }
+});
+}
+
+  </script>
+</body>
+</html>
+
