@@ -48,6 +48,7 @@
       <div id="resultado" class="mt-6 w-full hidden">
         <div id="dispositivosList" class="mb-4"></div>
         <div id="detalleDispositivo" class="bg-white text-black p-4 rounded-xl shadow"></div>
+        <div id="graficoMensualContainer" class="mt-6 bg-white p-4 rounded-xl shadow text-black"></div>
       </div>
     </div>
 
@@ -57,15 +58,15 @@
       
       <!-- Gráficos en paralelo -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-       <!-- Torta -->
-<div>
-  <h3 class="font-semibold text-[#f28a1a] mb-2 text-center">Distribución de tiempo</h3>
-  <div class="chart-container">
-    <canvas id="useTimeChart"></canvas>
-  </div>
-  <!-- Lista de leyenda personalizada -->
-  <div id="customLegend" class="mt-4 max-h-40 overflow-y-auto border rounded p-2 bg-gray-50 text-black text-sm"></div>
-</div>
+        <!-- Torta -->
+        <div>
+          <h3 class="font-semibold text-[#f28a1a] mb-2 text-center">Distribución de tiempo</h3>
+          <div class="chart-container">
+            <canvas id="useTimeChart"></canvas>
+          </div>
+          <div id="customLegend" class="mt-4 max-h-40 overflow-y-auto border rounded p-2 bg-gray-50 text-black text-sm"></div>
+        </div>
+
         <!-- Barras -->
         <div>
           <h3 class="font-semibold text-[#f28a1a] mb-2 text-center">Comparativa de uso</h3>
@@ -81,6 +82,7 @@
     const firebaseURL = "https://sst-university-default-rtdb.firebaseio.com/";
     let useTimeChartInstance = null;
     let barChartInstance = null;
+    let graficoMensualInstance = null;
 
     // 🔥 Formatear a horas, minutos, segundos
     function formatTiempo(segundos) {
@@ -122,6 +124,7 @@
 
         dispositivosDiv.innerHTML = "";
         detalleDiv.innerHTML = "";
+        document.getElementById("graficoMensualContainer").innerHTML = "";
 
         if (dispositivos.length === 1) {
           mostrarDispositivo(dispositivos[0], detalleDiv);
@@ -130,7 +133,8 @@
             const btn = document.createElement("button");
             btn.textContent = `📌 Dispositivo ID: ${d.ID}`;
             btn.classList.add(
-              "bg-[#1e2146]", "text-white", "px-4", "py-2", "rounded-xl", "shadow-md", "mb-2", "w-full", "text-left", "hover:bg-[#f28a1a]", "transition"
+              "bg-[#1e2146]", "text-white", "px-4", "py-2", "rounded-xl", 
+              "shadow-md", "mb-2", "w-full", "text-left", "hover:bg-[#f28a1a]", "transition"
             );
             btn.onclick = () => mostrarDispositivo(d, detalleDiv);
             dispositivosDiv.appendChild(btn);
@@ -149,15 +153,43 @@
         <p class="text-sm text-gray-700">⏱️ Tiempo de uso: ${formatTiempo(dispositivo.UseTime)}</p>
         <p class="text-sm text-gray-500">Licencia: ${dispositivo.LimitLicence || "Sin definir"}</p>
         <h3 class="mt-2 font-semibold text-[#f28a1a]">Capacitaciones:</h3>
-        <div id="capacitacionesList" class="max-h-40 overflow-y-auto border p-2 rounded bg-gray-50"></div>
+        <div id="capacitacionesList" class="max-h-60 overflow-y-auto border p-2 rounded bg-gray-50"></div>
       `;
 
       const capacitacionesList = container.querySelector("#capacitacionesList");
+      const graficoMensualContainer = document.getElementById("graficoMensualContainer");
+      graficoMensualContainer.innerHTML = "";
+
       if (dispositivo.Capacitaciones && dispositivo.Capacitaciones.length > 0) {
         dispositivo.Capacitaciones.forEach(cap => {
-          const item = document.createElement("p");
-          item.textContent = `${cap.Nombre} - ${formatTiempo(cap.Tiempo)}`;
-          item.classList.add("text-sm", "text-gray-700", "border-b", "py-1");
+          const item = document.createElement("div");
+          item.classList.add("mb-3", "border-b", "pb-2");
+
+          const texto = `${cap.Nombre} - ${formatTiempo(cap.TiempoTotal || cap.Tiempo || 0)}`;
+          item.innerHTML = `<p class="text-sm font-semibold text-[#1e2146]">${texto}</p>`;
+
+          // ✅ Mostrar detalle por mes
+          if (cap.Meses) {
+            const mesesDiv = document.createElement("div");
+            mesesDiv.classList.add("ml-4", "text-sm", "text-gray-700");
+            Object.entries(cap.Meses).forEach(([mes, valor]) => {
+              const p = document.createElement("p");
+              p.textContent = `• ${mes}: ${formatTiempo(valor)}`;
+              mesesDiv.appendChild(p);
+            });
+            item.appendChild(mesesDiv);
+
+            // 🔘 Botón para ver gráfico mensual
+            const btnGrafico = document.createElement("button");
+            btnGrafico.textContent = "📊 Ver gráfico mensual";
+            btnGrafico.classList.add("mt-2", "bg-[#1e2146]", "text-white", "px-3", "py-1", "rounded-md", "hover:bg-[#f28a1a]", "transition");
+            btnGrafico.onclick = () => {
+              graficoMensualContainer.innerHTML = "";
+              generarGraficoMensual(cap);
+            };
+            item.appendChild(btnGrafico);
+          }
+
           capacitacionesList.appendChild(item);
         });
       } else {
@@ -167,99 +199,126 @@
       generarGraficos(dispositivo);
     }
 
-  function generarGraficos(dispositivo) {
-  const labels = dispositivo.Capacitaciones.map(cap => cap.Nombre);
-  const tiempos = dispositivo.Capacitaciones.map(cap => cap.Tiempo);
-  const tiemposFormateados = tiempos.map(t => formatTiempo(t));
+    function generarGraficoMensual(capacitacion) {
+      if (!capacitacion.Meses) return;
+      const container = document.getElementById("graficoMensualContainer");
 
-  const colors = [
-    '#f28a1a', '#1e2146', '#4caf50', '#2196f3', '#9c27b0',
-    '#ff5722', '#00bcd4', '#8bc34a', '#ffc107', '#e91e63',
-    '#795548', '#3f51b5', '#009688', '#cddc39'
-  ];
+      const labels = Object.keys(capacitacion.Meses);
+      const valores = Object.values(capacitacion.Meses);
 
-  // --- Torta ---
-  const ctx = document.getElementById("useTimeChart").getContext("2d");
-  if (useTimeChartInstance) useTimeChartInstance.destroy();
-  useTimeChartInstance = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: labels,
-      datasets: [{
-        data: tiempos,
-        backgroundColor: colors.slice(0, labels.length)
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false } // 🔥 Quitamos la leyenda por defecto
-      }
-    }
-  });
+      const canvas = document.createElement("canvas");
+      canvas.classList.add("w-full", "h-64");
+      container.appendChild(canvas);
 
-  // --- Leyenda personalizada debajo de la torta ---
-  const legendContainer = document.getElementById("customLegend");
-  legendContainer.innerHTML = ""; // limpiar
+      if (graficoMensualInstance) graficoMensualInstance.destroy();
 
-  labels.forEach((label, i) => {
-    const item = document.createElement("div");
-    item.classList.add("flex", "items-center", "mb-1");
-
-    const colorBox = document.createElement("span");
-    colorBox.style.backgroundColor = colors[i % colors.length];
-    colorBox.classList.add("w-4", "h-4", "inline-block", "mr-2", "rounded");
-
-    const text = document.createElement("span");
-    text.textContent = `${label} - ${tiemposFormateados[i]}`;
-
-    item.appendChild(colorBox);
-    item.appendChild(text);
-    legendContainer.appendChild(item);
-  });
-
-// --- Barras ---
-const barCtx = document.getElementById("barChart").getContext("2d");
-if (barChartInstance) barChartInstance.destroy();
-barChartInstance = new Chart(barCtx, {
-  type: 'bar',
-  data: {
-    labels,
-    datasets: [{
-      label: 'Tiempo de uso',
-      data: tiempos,
-      backgroundColor: colors.slice(0, labels.length) // 🔥 mismo set de colores que la torta
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      tooltip: {
-        callbacks: {
-          label: function(context) {
-            return formatTiempo(context.raw);
+      graficoMensualInstance = new Chart(canvas, {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [{
+            label: `Tiempo por mes - ${capacitacion.Nombre}`,
+            data: valores,
+            backgroundColor: "#f28a1a"
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: context => formatTiempo(context.raw)
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { callback: value => formatTiempo(value) }
+            }
           }
         }
-      },
-      legend: { display: false }
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: {
-          callback: function(value) {
-            return formatTiempo(value);
+      });
+    }
+
+    function generarGraficos(dispositivo) {
+      const labels = dispositivo.Capacitaciones.map(cap => cap.Nombre);
+      const tiempos = dispositivo.Capacitaciones.map(cap => cap.TiempoTotal || cap.Tiempo || 0);
+      const tiemposFormateados = tiempos.map(t => formatTiempo(t));
+
+      const colors = [
+        '#f28a1a', '#1e2146', '#4caf50', '#2196f3', '#9c27b0',
+        '#ff5722', '#00bcd4', '#8bc34a', '#ffc107', '#e91e63',
+        '#795548', '#3f51b5', '#009688', '#cddc39'
+      ];
+
+      // --- Torta ---
+      const ctx = document.getElementById("useTimeChart").getContext("2d");
+      if (useTimeChartInstance) useTimeChartInstance.destroy();
+      useTimeChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: tiempos,
+            backgroundColor: colors.slice(0, labels.length)
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } }
+        }
+      });
+
+      // --- Leyenda personalizada ---
+      const legendContainer = document.getElementById("customLegend");
+      legendContainer.innerHTML = "";
+      labels.forEach((label, i) => {
+        const item = document.createElement("div");
+        item.classList.add("flex", "items-center", "mb-1");
+        const colorBox = document.createElement("span");
+        colorBox.style.backgroundColor = colors[i % colors.length];
+        colorBox.classList.add("w-4", "h-4", "inline-block", "mr-2", "rounded");
+        const text = document.createElement("span");
+        text.textContent = `${label} - ${tiemposFormateados[i]}`;
+        item.appendChild(colorBox);
+        item.appendChild(text);
+        legendContainer.appendChild(item);
+      });
+
+      // --- Barras ---
+      const barCtx = document.getElementById("barChart").getContext("2d");
+      if (barChartInstance) barChartInstance.destroy();
+      barChartInstance = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Tiempo de uso',
+            data: tiempos,
+            backgroundColor: colors.slice(0, labels.length)
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            tooltip: {
+              callbacks: { label: context => formatTiempo(context.raw) }
+            },
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { callback: value => formatTiempo(value) }
+            }
           }
         }
-      }
+      });
     }
-  }
-});
-}
-
   </script>
 </body>
 </html>
-
