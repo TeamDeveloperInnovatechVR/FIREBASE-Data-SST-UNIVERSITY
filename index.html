@@ -148,56 +148,122 @@
     }
 
     function mostrarDispositivo(dispositivo, container) {
-      container.innerHTML = `
-        <h2 class="text-lg font-bold text-[#1e2146]">📌 Dispositivo ID: ${dispositivo.ID}</h2>
-        <p class="text-sm text-gray-700">⏱️ Tiempo de uso: ${formatTiempo(dispositivo.UseTime)}</p>
-        <p class="text-sm text-gray-500">Licencia: ${dispositivo.LimitLicence || "Sin definir"}</p>
-        <h3 class="mt-2 font-semibold text-[#f28a1a]">Capacitaciones:</h3>
-        <div id="capacitacionesList" class="max-h-60 overflow-y-auto border p-2 rounded bg-gray-50"></div>
-      `;
+    container.innerHTML = `
+      <h2 class="text-lg font-bold text-[#1e2146]">📌 Dispositivo ID: ${dispositivo.ID}</h2>
+      <p class="text-sm text-gray-700">⏱️ Tiempo de uso: ${formatTiempo(dispositivo.UseTime)}</p>
+      <p class="text-sm text-gray-500">Licencia: ${dispositivo.LimitLicence || "Sin definir"}</p>
+      <h3 class="mt-2 font-semibold text-[#f28a1a]">Capacitaciones:</h3>
+      <div id="capacitacionesList" class="max-h-60 overflow-y-auto border p-2 rounded bg-gray-50"></div>
+    `;
 
-      const capacitacionesList = container.querySelector("#capacitacionesList");
-      const graficoMensualContainer = document.getElementById("graficoMensualContainer");
-      graficoMensualContainer.innerHTML = "";
+    const capacitacionesList = container.querySelector("#capacitacionesList");
+    const graficoMensualContainer = document.getElementById("graficoMensualContainer");
+    graficoMensualContainer.innerHTML = "";
 
-      if (dispositivo.Capacitaciones && dispositivo.Capacitaciones.length > 0) {
-        dispositivo.Capacitaciones.forEach(cap => {
-          const item = document.createElement("div");
-          item.classList.add("mb-3", "border-b", "pb-2");
+    if (dispositivo.Capacitaciones && dispositivo.Capacitaciones.length > 0) {
+      dispositivo.Capacitaciones.forEach(cap => {
+        const item = document.createElement("div");
+        item.classList.add("mb-3", "border-b", "pb-2");
 
-          const texto = `${cap.Nombre} - ${formatTiempo(cap.TiempoTotal || cap.Tiempo || 0)}`;
-          item.innerHTML = `<p class="text-sm font-semibold text-[#1e2146]">${texto}</p>`;
+        const texto = `${cap.Nombre} - ${formatTiempo(cap.TiempoTotal || 0)}`;
+        item.innerHTML = `<p class="text-sm font-semibold text-[#1e2146]">${texto}</p>`;
 
-          // ✅ Mostrar detalle por mes
-          if (cap.Meses) {
+        // ✅ NUEVO: Años y meses
+        if (cap.Años) {
+          const añosDiv = document.createElement("div");
+          añosDiv.classList.add("ml-4", "text-sm");
+
+          Object.entries(cap.Años).forEach(([año, meses]) => {
+            const añoBtn = document.createElement("button");
+            añoBtn.textContent = `📅 ${año}`;
+            añoBtn.classList.add(
+              "mt-2", "bg-[#1e2146]", "text-white", "px-3", "py-1", "rounded-md",
+              "hover:bg-[#f28a1a]", "transition", "block", "w-full", "text-left"
+            );
+
             const mesesDiv = document.createElement("div");
-            mesesDiv.classList.add("ml-4", "text-sm", "text-gray-700");
-            Object.entries(cap.Meses).forEach(([mes, valor]) => {
+            mesesDiv.classList.add("ml-6", "hidden", "mt-1", "text-gray-700", "bg-gray-100", "rounded", "p-2");
+
+            Object.entries(meses).forEach(([mes, valor]) => {
               const p = document.createElement("p");
               p.textContent = `• ${mes}: ${formatTiempo(valor)}`;
               mesesDiv.appendChild(p);
             });
-            item.appendChild(mesesDiv);
 
-            // 🔘 Botón para ver gráfico mensual
+            // Botón gráfico mensual (por año)
             const btnGrafico = document.createElement("button");
             btnGrafico.textContent = "📊 Ver gráfico mensual";
-            btnGrafico.classList.add("mt-2", "bg-[#1e2146]", "text-white", "px-3", "py-1", "rounded-md", "hover:bg-[#f28a1a]", "transition");
+            btnGrafico.classList.add("mt-2", "bg-[#f28a1a]", "text-white", "px-3", "py-1", "rounded-md", "hover:bg-[#d97706]", "transition");
             btnGrafico.onclick = () => {
               graficoMensualContainer.innerHTML = "";
-              generarGraficoMensual(cap);
+              generarGraficoMensualPorAño(cap, año);
             };
-            item.appendChild(btnGrafico);
-          }
+            mesesDiv.appendChild(btnGrafico);
 
-          capacitacionesList.appendChild(item);
-        });
-      } else {
-        capacitacionesList.innerHTML = "<p class='text-gray-500'>No hay capacitaciones</p>";
-      }
+            añoBtn.onclick = () => {
+              mesesDiv.classList.toggle("hidden");
+            };
 
-      generarGraficos(dispositivo);
+            añosDiv.appendChild(añoBtn);
+            añosDiv.appendChild(mesesDiv);
+          });
+
+          item.appendChild(añosDiv);
+        }
+
+        capacitacionesList.appendChild(item);
+      });
+    } else {
+      capacitacionesList.innerHTML = "<p class='text-gray-500'>No hay capacitaciones</p>";
     }
+
+    generarGraficos(dispositivo);
+  }
+
+    // ✅ NUEVA FUNCIÓN: gráfico mensual por año
+  function generarGraficoMensualPorAño(capacitacion, año) {
+    const dataAño = capacitacion.Años[año];
+    if (!dataAño) return;
+    const container = document.getElementById("graficoMensualContainer");
+
+    const labels = Object.keys(dataAño);
+    const valores = Object.values(dataAño);
+
+    const canvas = document.createElement("canvas");
+    canvas.classList.add("w-full", "h-64");
+    container.appendChild(canvas);
+
+    if (graficoMensualInstance) graficoMensualInstance.destroy();
+
+    graficoMensualInstance = new Chart(canvas, {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [{
+          label: `Tiempo por mes (${año}) - ${capacitacion.Nombre}`,
+          data: valores,
+          backgroundColor: "#f28a1a"
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: context => formatTiempo(context.raw)
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { callback: value => formatTiempo(value) }
+          }
+        }
+      }
+    });
+  }
 
     function generarGraficoMensual(capacitacion) {
       if (!capacitacion.Meses) return;
