@@ -35,7 +35,7 @@
       <!-- Inputs -->
       <div class="bg-white p-6 rounded-2xl shadow-lg w-full text-black">
         <label class="block mb-2 font-semibold text-[#1e2146]">Empresa</label>
-        <input id="empresaInput" type="text" placeholder="Ej: NIXUS" 
+        <input id="empresaInput" type="text" placeholder="Ej: REVIVE" 
               class="w-full p-2 border rounded-md mb-4 uppercase">
         
         <button onclick="leerData()" 
@@ -79,10 +79,66 @@
   </div>
 
   <script>
-    const firebaseURL = "https://sst-university-default-rtdb.firebaseio.com/";
+    const firebaseURL = "https://sst-university-default-rtdb.firebaseio.com/Companies/";
     let useTimeChartInstance = null;
     let barChartInstance = null;
     let graficoMensualInstance = null;
+
+    // 🔥 Diccionarios de traducción
+    const traduccionesMeses = {
+      "January": "Enero",
+      "February": "Febrero",
+      "March": "Marzo",
+      "April": "Abril",
+      "May": "Mayo",
+      "June": "Junio",
+      "July": "Julio",
+      "August": "Agosto",
+      "September": "Septiembre",
+      "October": "Octubre",
+      "November": "Noviembre",
+      "December": "Diciembre"
+    };
+
+    const traduccionesEntrenamientos = {
+      "RoadSecurity": "Seguridad Vial",
+      "ConfinedSpaces": "Espacios Confinados",
+      "Mines": "Minería",
+      "PsychologicalHelp": "Ayuda Psicológica",
+      "Hydrocarbons": "Hidrocarburos",
+      "Quimic": "Químico",
+      "RCP": "RCP",
+      "ChemicalRisks": "Riesgos Químicos",
+      "PsychoactiveSubstances": "Sustancias Psicoactivas",
+      "EmergencyPlanAndExtinguishers": "Plan de Emergencia y Extintores",
+      "WeaponsHandling": "Manejo de Armas",
+      "HealthyLifestyleHabits": "Hábitos de Vida Saludable",
+      "WorkingAtHeights": "Trabajo en Alturas",
+      "PlantRisks": "Riesgos en Planta",
+      "ExtinguisherAirport": "Extintores Aeropuerto",
+      "MentalHealth": "Salud Mental",
+      "ElectricalRiskLOTO": "Riesgo Eléctrico - LOTO",
+      "Ergonomics": "Ergonomía",
+      "PosturalHygiene": "Higiene Postural",
+      "Scooter": "Patineta",
+      "Bicycle": "Bicicleta",
+      "TukTuk": "Tuk Tuk",
+      "HandRisks": "Riesgos en Manos",
+      "SameLevelFalls": "Caídas al Mismo Nivel",
+      "ElevatedPlatforms": "Plataformas Elevadoras",
+      "BiologicalRisk": "Riesgo Biológico",
+      "Recycling": "Reciclaje",
+      "PublicRisk": "Riesgo Público",
+      "AirSafety": "Seguridad Aérea",
+      "AirportVisualSafety": "Seguridad Vial Aeropuerto",
+      "Machinery": "Maquinaria",
+      "RoadSafety": "Seguridad Vial",
+      "LoadHoisting": "Izado de Cargas",
+      "TEST": "PRUEBA",
+      "Tutorial": "Tutorial",
+      "Nixus": "Nixus",
+      "Nixus_RoadActors": "Actores Viales Nixus"
+    };
 
     // 🔥 Formatear a horas, minutos, segundos
     function formatTiempo(segundos) {
@@ -96,6 +152,16 @@
       resultado += `${segundosRestantes} seg`;
 
       return resultado.trim();
+    }
+
+    // 🔥 Traducir nombre del entrenamiento
+    function traducirEntrenamiento(nombreIngles) {
+      return traduccionesEntrenamientos[nombreIngles] || nombreIngles;
+    }
+
+    // 🔥 Traducir nombre del mes
+    function traducirMes(mesIngles) {
+      return traduccionesMeses[mesIngles] || mesIngles;
     }
 
     async function leerData() {
@@ -119,7 +185,8 @@
           return;
         }
 
-        const dispositivos = data.Dispositivo || [];
+        // Adaptación para la estructura de datos JSON proporcionada
+        const dispositivos = data.Devices ? Object.values(data.Devices) : [];
         resultadoDiv.classList.remove("hidden");
 
         dispositivosDiv.innerHTML = "";
@@ -148,129 +215,94 @@
     }
 
     function mostrarDispositivo(dispositivo, container) {
-    container.innerHTML = `
-      <h2 class="text-lg font-bold text-[#1e2146]">📌 Dispositivo ID: ${dispositivo.ID}</h2>
-      <p class="text-sm text-gray-700">⏱️ Tiempo de uso: ${formatTiempo(dispositivo.UseTime)}</p>
-      <p class="text-sm text-gray-500">Licencia: ${dispositivo.LimitLicence || "Sin definir"}</p>
-      <h3 class="mt-2 font-semibold text-[#f28a1a]">Capacitaciones:</h3>
-      <div id="capacitacionesList" class="max-h-60 overflow-y-auto border p-2 rounded bg-gray-50"></div>
-    `;
+      container.innerHTML = `
+        <h2 class="text-lg font-bold text-[#1e2146]">📌 Dispositivo ID: ${dispositivo.ID}</h2>
+        <p class="text-sm text-gray-700">⏱️ Tiempo de uso: ${formatTiempo(dispositivo.UsageTime)}</p>
+        <p class="text-sm text-gray-500">Licencia: ${dispositivo.LicenseLimit || "Sin definir"}</p>
+        <h3 class="mt-2 font-semibold text-[#f28a1a]">Capacitaciones:</h3>
+        <div id="capacitacionesList" class="max-h-60 overflow-y-auto border p-2 rounded bg-gray-50"></div>
+      `;
 
-    const capacitacionesList = container.querySelector("#capacitacionesList");
-    const graficoMensualContainer = document.getElementById("graficoMensualContainer");
-    graficoMensualContainer.innerHTML = "";
+      const capacitacionesList = container.querySelector("#capacitacionesList");
+      const graficoMensualContainer = document.getElementById("graficoMensualContainer");
+      graficoMensualContainer.innerHTML = "";
 
-    if (dispositivo.Capacitaciones && dispositivo.Capacitaciones.length > 0) {
-      dispositivo.Capacitaciones.forEach(cap => {
-        const item = document.createElement("div");
-        item.classList.add("mb-3", "border-b", "pb-2");
+      if (dispositivo.Trainings && dispositivo.Trainings.length > 0) {
+        dispositivo.Trainings.forEach(cap => {
+          const item = document.createElement("div");
+          item.classList.add("mb-3", "border-b", "pb-2");
 
-        const texto = `${cap.Nombre} - ${formatTiempo(cap.TiempoTotal || 0)}`;
-        item.innerHTML = `<p class="text-sm font-semibold text-[#1e2146]">${texto}</p>`;
+          const nombreTraducido = traducirEntrenamiento(cap.TrainingName);
+          const texto = `${nombreTraducido} - ${formatTiempo(cap.TotalTime || 0)}`;
+          item.innerHTML = `<p class="text-sm font-semibold text-[#1e2146]">${texto}</p>`;
 
-        // ✅ NUEVO: Años y meses
-        if (cap.Años) {
-          const añosDiv = document.createElement("div");
-          añosDiv.classList.add("ml-4", "text-sm");
+          // ✅ Años y meses
+          if (cap.YearList && cap.YearList.length > 0) {
+            const añosDiv = document.createElement("div");
+            añosDiv.classList.add("ml-4", "text-sm");
 
-          Object.entries(cap.Años).forEach(([año, meses]) => {
-            const añoBtn = document.createElement("button");
-            añoBtn.textContent = `📅 ${año}`;
-            añoBtn.classList.add(
-              "mt-2", "bg-[#1e2146]", "text-white", "px-3", "py-1", "rounded-md",
-              "hover:bg-[#f28a1a]", "transition", "block", "w-full", "text-left"
-            );
+            cap.YearList.forEach(yearData => {
+              const año = yearData.Year;
+              const meses = yearData.Months;
+              
+              const añoBtn = document.createElement("button");
+              añoBtn.textContent = `📅 ${año}`;
+              añoBtn.classList.add(
+                "mt-2", "bg-[#1e2146]", "text-white", "px-3", "py-1", "rounded-md",
+                "hover:bg-[#f28a1a]", "transition", "block", "w-full", "text-left"
+              );
 
-            const mesesDiv = document.createElement("div");
-            mesesDiv.classList.add("ml-6", "hidden", "mt-1", "text-gray-700", "bg-gray-100", "rounded", "p-2");
+              const mesesDiv = document.createElement("div");
+              mesesDiv.classList.add("ml-6", "hidden", "mt-1", "text-gray-700", "bg-gray-100", "rounded", "p-2");
 
-            Object.entries(meses).forEach(([mes, valor]) => {
-              const p = document.createElement("p");
-              p.textContent = `• ${mes}: ${formatTiempo(valor)}`;
-              mesesDiv.appendChild(p);
+              Object.entries(meses).forEach(([mes, valor]) => {
+                const p = document.createElement("p");
+                const mesTraducido = traducirMes(mes);
+                p.textContent = `• ${mesTraducido}: ${formatTiempo(valor)}`;
+                mesesDiv.appendChild(p);
+              });
+
+              // Botón gráfico mensual (por año)
+              const btnGrafico = document.createElement("button");
+              btnGrafico.textContent = "📊 Ver gráfico mensual";
+              btnGrafico.classList.add("mt-2", "bg-[#f28a1a]", "text-white", "px-3", "py-1", "rounded-md", "hover:bg-[#d97706]", "transition");
+              btnGrafico.onclick = () => {
+                graficoMensualContainer.innerHTML = "";
+                generarGraficoMensualPorAño(cap, año);
+              };
+              mesesDiv.appendChild(btnGrafico);
+
+              añoBtn.onclick = () => {
+                mesesDiv.classList.toggle("hidden");
+              };
+
+              añosDiv.appendChild(añoBtn);
+              añosDiv.appendChild(mesesDiv);
             });
 
-            // Botón gráfico mensual (por año)
-            const btnGrafico = document.createElement("button");
-            btnGrafico.textContent = "📊 Ver gráfico mensual";
-            btnGrafico.classList.add("mt-2", "bg-[#f28a1a]", "text-white", "px-3", "py-1", "rounded-md", "hover:bg-[#d97706]", "transition");
-            btnGrafico.onclick = () => {
-              graficoMensualContainer.innerHTML = "";
-              generarGraficoMensualPorAño(cap, año);
-            };
-            mesesDiv.appendChild(btnGrafico);
+            item.appendChild(añosDiv);
+          }
 
-            añoBtn.onclick = () => {
-              mesesDiv.classList.toggle("hidden");
-            };
+          capacitacionesList.appendChild(item);
+        });
+      } else {
+        capacitacionesList.innerHTML = "<p class='text-gray-500'>No hay capacitaciones</p>";
+      }
 
-            añosDiv.appendChild(añoBtn);
-            añosDiv.appendChild(mesesDiv);
-          });
-
-          item.appendChild(añosDiv);
-        }
-
-        capacitacionesList.appendChild(item);
-      });
-    } else {
-      capacitacionesList.innerHTML = "<p class='text-gray-500'>No hay capacitaciones</p>";
+      generarGraficos(dispositivo);
     }
 
-    generarGraficos(dispositivo);
-  }
-
-    // ✅ NUEVA FUNCIÓN: gráfico mensual por año
-  function generarGraficoMensualPorAño(capacitacion, año) {
-    const dataAño = capacitacion.Años[año];
-    if (!dataAño) return;
-    const container = document.getElementById("graficoMensualContainer");
-
-    const labels = Object.keys(dataAño);
-    const valores = Object.values(dataAño);
-
-    const canvas = document.createElement("canvas");
-    canvas.classList.add("w-full", "h-64");
-    container.appendChild(canvas);
-
-    if (graficoMensualInstance) graficoMensualInstance.destroy();
-
-    graficoMensualInstance = new Chart(canvas, {
-      type: "bar",
-      data: {
-        labels,
-        datasets: [{
-          label: `Tiempo por mes (${año}) - ${capacitacion.Nombre}`,
-          data: valores,
-          backgroundColor: "#f28a1a"
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: context => formatTiempo(context.raw)
-            }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { callback: value => formatTiempo(value) }
-          }
-        }
-      }
-    });
-  }
-
-    function generarGraficoMensual(capacitacion) {
-      if (!capacitacion.Meses) return;
+    // ✅ FUNCIÓN: gráfico mensual por año
+    function generarGraficoMensualPorAño(capacitacion, año) {
+      const yearData = capacitacion.YearList.find(y => y.Year === año);
+      if (!yearData) return;
+      
       const container = document.getElementById("graficoMensualContainer");
+      const meses = yearData.Months;
 
-      const labels = Object.keys(capacitacion.Meses);
-      const valores = Object.values(capacitacion.Meses);
+      // Traducir labels de meses
+      const labels = Object.keys(meses).map(mes => traducirMes(mes));
+      const valores = Object.values(meses);
 
       const canvas = document.createElement("canvas");
       canvas.classList.add("w-full", "h-64");
@@ -278,12 +310,14 @@
 
       if (graficoMensualInstance) graficoMensualInstance.destroy();
 
+      const nombreTraducido = traducirEntrenamiento(capacitacion.TrainingName);
+      
       graficoMensualInstance = new Chart(canvas, {
         type: "bar",
         data: {
           labels,
           datasets: [{
-            label: `Tiempo por mes - ${capacitacion.Nombre}`,
+            label: `Tiempo por mes (${año}) - ${nombreTraducido}`,
             data: valores,
             backgroundColor: "#f28a1a"
           }]
@@ -309,8 +343,18 @@
     }
 
     function generarGraficos(dispositivo) {
-      const labels = dispositivo.Capacitaciones.map(cap => cap.Nombre);
-      const tiempos = dispositivo.Capacitaciones.map(cap => cap.TiempoTotal || cap.Tiempo || 0);
+      if (!dispositivo.Trainings || dispositivo.Trainings.length === 0) {
+        // Limpiar gráficos si no hay datos
+        if (useTimeChartInstance) useTimeChartInstance.destroy();
+        if (barChartInstance) barChartInstance.destroy();
+        
+        document.getElementById("customLegend").innerHTML = "<p class='text-gray-500'>No hay datos para mostrar</p>";
+        return;
+      }
+
+      // Traducir nombres de entrenamientos
+      const labels = dispositivo.Trainings.map(cap => traducirEntrenamiento(cap.TrainingName));
+      const tiempos = dispositivo.Trainings.map(cap => cap.TotalTime || 0);
       const tiemposFormateados = tiempos.map(t => formatTiempo(t));
 
       const colors = [
