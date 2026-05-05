@@ -1034,6 +1034,98 @@
     document.getElementById("ambienteFacebook")?.setAttribute("href", socialUrls.ambiente.facebook);
     document.getElementById("ambienteWeb")?.setAttribute("href", socialUrls.ambiente.web);
   }, 100);
+
+   // ==============================================
+  // FORZAR ZOOM AL 80% Y BLOQUEAR TECLA CTRL
+  // ==============================================
+  
+  (function() {
+    // 1. Forzar zoom al 80% usando CSS transform en el body
+    function aplicarZoom80() {
+      // Método 1: Usar zoom CSS (funciona en la mayoría de navegadores)
+      document.body.style.zoom = "0.9";
+      document.body.style.transform = "scale(0.8)";
+      document.body.style.transformOrigin = "top left";
+      document.body.style.width = "125%"; // Compensa el scale (100/0.8 = 125)
+      
+      // Método 2: También intentar con viewport meta (para móviles/tablets)
+      const viewport = document.querySelector('meta[name="viewport"]');
+      if (viewport) {
+        viewport.setAttribute('content', 'width=device-width, initial-scale=0.8, user-scalable=no, maximum-scale=0.8, minimum-scale=0.8');
+      }
+      
+      console.log('✅ Zoom forzado al 80%');
+    }
+    
+    // Aplicar zoom inmediatamente
+    aplicarZoom80();
+    
+    // También aplicar después de un pequeño retraso (por si hay otros scripts)
+    setTimeout(aplicarZoom80, 100);
+    setTimeout(aplicarZoom80, 500);
+    
+    // 2. Bloquear la tecla Ctrl por completo
+    document.addEventListener('keydown', function(e) {
+      const ctrl = e.ctrlKey || e.metaKey;
+      
+      // Si se presiona Ctrl sola o con cualquier otra tecla
+      if (ctrl || e.key === 'Control' || e.key === 'Meta') {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+      
+      // También bloquear Ctrl + más, Ctrl + menos, Ctrl + 0 (zoom)
+      if (e.key === '+' || e.key === '-' || e.key === '0' || 
+          e.key === '=' || e.key === '_' || e.key === ')' && ctrl) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    });
+    
+    // 3. También bloquear el evento wheel con Ctrl (zoom con rueda del mouse)
+    document.addEventListener('wheel', function(e) {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    }, { passive: false });
+    
+    // 4. Prevenir el gestor de zoom táctil (pinch-to-zoom)
+    document.addEventListener('touchstart', function(e) {
+      if (e.touches.length >= 2) {
+        e.preventDefault();
+        return false;
+      }
+    }, { passive: false });
+    
+    // 5. Monitorear cambios de zoom y forzarlo de vuelta al 80%
+    let ultimoAncho = window.innerWidth;
+    function verificarZoom() {
+      const anchoActual = window.innerWidth;
+      const escalaActual = anchoActual / ultimoAncho;
+      
+      // Si la escala cambió significativamente, reaplicar zoom
+      if (Math.abs(escalaActual - 0.8) > 0.05) {
+        aplicarZoom80();
+        ultimoAncho = window.innerWidth;
+      }
+      ultimoAncho = window.innerWidth;
+    }
+    
+    // Verificar cada segundo si el zoom cambió
+    setInterval(verificarZoom, 1000);
+    
+    // También verificar en resize
+    window.addEventListener('resize', function() {
+      setTimeout(verificarZoom, 50);
+    });
+    
+    console.log('✅ Tecla CTRL bloqueada y zoom forzado al 80%');
+  })();
+
 </script>
 </body>
 </html>
