@@ -342,40 +342,76 @@
       color: #0D0E12;
       transform: translateY(-2px);
     }
-
     .contact-info {
-      font-size: 0.8rem;
-      line-height: 1.8;
-    }
+  font-size: 0.8rem;
+  line-height: 1.8;
+}
 
-    .contact-info a {
-      color: #A0D8EF;
-      text-decoration: none;
-    }
+.contact-info p {
+  margin: 12px 0;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 6px 12px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 
-    .contact-info a:hover {
-      color: #00F2FF;
-    }
+.contact-info p i {
+  color: #00F2FF;
+  font-size: 1rem;
+  width: 24px;
+}
 
-    .whatsapp-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: #25D366;
-      color: white;
-      padding: 8px 20px;
-      border-radius: 30px;
-      text-decoration: none;
-      font-family: 'Orbitron', monospace;
-      font-size: 0.8rem;
-      margin-top: 10px;
-      transition: all 0.3s ease;
-    }
+.contact-info a {
+  color: #FFFFFF;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
 
-    .whatsapp-btn:hover {
-      background: #128C7E;
-      transform: scale(1.05);
-    }
+.contact-info a:hover {
+  color: #00F2FF;
+  text-shadow: 0 0 5px rgba(0, 242, 255, 0.5);
+}
+
+.whatsapp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #25D366;
+  color: #0D0E12 !important;
+  font-weight: 800 !important;
+  padding: 10px 24px;
+  border-radius: 40px;
+  text-decoration: none;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.85rem;
+  margin-top: 15px;
+  transition: all 0.3s ease;
+  border: none;
+  width: 100%;
+  max-width: 220px;
+  letter-spacing: 0.5px;
+}
+
+.whatsapp-btn i {
+  color: #0D0E12;
+  font-size: 1.2rem;
+}
+
+.whatsapp-btn:hover {
+  background: #128C7E;
+  transform: scale(1.02);
+  color: #FFFFFF !important;
+}
+
+.whatsapp-btn:hover i {
+  color: #FFFFFF;
+}
 
     .copyright {
       text-align: center;
@@ -502,16 +538,18 @@
           </div>
         </div>
 
-        <div class="footer-col">
-          <h4>📧 CONTACTO</h4>
-          <div class="contact-info">
-            <p><i class="fas fa-envelope"></i> <a href="mailto:Developer@innovatechvr.com">Developer@innovatechvr.com</a></p>
-            <p><i class="fas fa-briefcase"></i> <a href="mailto:lvera@ambienteconsultores.com">lvera@ambienteconsultores.com</a></p>
-            <a href="https://wa.me/+573165274370" class="whatsapp-btn" target="_blank">
-              <i class="fab fa-whatsapp"></i> +57 316 5274370
-            </a>
-          </div>
-        </div>
+       <div class="footer-col">
+  <h4>📧 CONTACTO</h4>
+  <div class="contact-info">
+    <p><i class="fas fa-envelope"></i> <a href="mailto:Developer@innovatechvr.com">Developer@innovatechvr.com</a></p>
+    <p><i class="fas fa-briefcase"></i> <a href="mailto:lvera@ambienteconsultores.com">lvera@ambienteconsultores.com</a></p>
+    <div style="display: flex; justify-content: center;">
+      <a href="https://wa.me/573165274370" class="whatsapp-btn" target="_blank">
+        <i class="fab fa-whatsapp"></i> +57 316 5274370
+      </a>
+    </div>
+  </div>
+</div>
       </div>
       <div class="copyright">
         <span>© 2026 SST UNIVERSITY · INNOVATECH VR · AMBIENTE CONSULTORES · TODOS LOS DERECHOS RESERVADOS</span>
