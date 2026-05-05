@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>ADMIN DASHBOARD · SST UNIVERSITY</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0D0E12;
+      min-height: 100vh;
+      color: #FFFFFF;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 30%, rgba(22, 27, 51, 0.6) 0%, #0D0E12 90%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .admin-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Login Panel */
+    .login-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(13, 14, 18, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-card {
+      background: rgba(22, 27, 51, 0.9);
+      border: 1px solid #00F2FF;
+      padding: 40px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 40px rgba(0, 242, 255, 0.2);
+    }
+
+    .login-card h2 {
+      font-family: 'Orbitron', monospace;
+      text-align: center;
+      margin-bottom: 30px;
+      background: linear-gradient(135deg, #00F2FF, #7000FF);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      background: rgba(13, 14, 18, 0.8);
+      border: 1px solid #00F2FF;
+      color: #fff;
+      font-family: 'Inter', monospace;
+    }
+
+    .login-input:focus {
+      outline: none;
+      box-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: #00F2FF;
+      border: none;
+      color: #0D0E12;
+      font-family: 'Orbitron', monospace;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .login-btn:hover {
+      background: #7000FF;
+      color: white;
+      box-shadow: 0 0 20px rgba(112, 0, 255, 0.5);
+    }
+
+    .error-msg {
+      color: #ff4444;
+      text-align: center;
+      margin-top: 15px;
+      font-size: 0.8rem;
+    }
+
+    /* Dashboard Content */
+    .dashboard-content {
+      display: none;
+    }
+
+    /* Top Navigation */
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      background: rgba(22, 27, 51, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 242, 255, 0.3);
+      padding: 12px 24px;
+      margin-bottom: 30px;
+      border-radius: 0px;
+    }
+
+    .logo-area h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.1rem;
+      background: linear-gradient(135deg, #00F2FF, #7000FF);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      background: rgba(22, 27, 51, 0.6);
+      border: 1px solid #00F2FF;
+      color: #A0D8EF;
+      padding: 8px 20px;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover,
+    .nav-btn.active {
+      background: #00F2FF;
+      color: #0D0E12;
+      box-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
+    }
+
+    .logout-nav {
+      background: rgba(220, 38, 38, 0.3);
+      border-color: #dc2626;
+      color: #dc2626;
+    }
+
+    .logout-nav:hover {
+      background: #dc2626;
+      color: white;
+    }
+
+    /* Paneles de gestión */
+    .panel {
+      background: rgba(22, 27, 51, 0.6);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(0, 242, 255, 0.2);
+      padding: 25px;
+      margin-bottom: 30px;
+      border-radius: 0px;
+    }
+
+    .panel h2 {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.2rem;
+      color: #00F2FF;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(0, 242, 255, 0.3);
+      padding-bottom: 8px;
+    }
+
+    /* Tablas y listas */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(0, 242, 255, 0.2);
+      font-size: 0.8rem;
+    }
+
+    .data-table th {
+      color: #00F2FF;
+      font-family: 'Orbitron', monospace;
+    }
+
+    .edit-btn, .delete-btn, .add-btn {
+      background: transparent;
+      border: 1px solid;
+      padding: 4px 12px;
+      margin: 0 3px;
+      cursor: pointer;
+      font-size: 0.7rem;
+      transition: all 0.2s ease;
+    }
+
+    .edit-btn {
+      border-color: #00F2FF;
+      color: #00F2FF;
+    }
+
+    .edit-btn:hover {
+      background: #00F2FF;
+      color: #0D0E12;
+    }
+
+    .delete-btn {
+      border-color: #dc2626;
+      color: #dc2626;
+    }
+
+    .delete-btn:hover {
+      background: #dc2626;
+      color: white;
+    }
+
+    .add-btn {
+      border-color: #10b981;
+      color: #10b981;
+      margin-bottom: 15px;
+    }
+
+    .add-btn:hover {
+      background: #10b981;
+      color: white;
+    }
+
+    /* Formularios modales */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(13, 14, 18, 0.95);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: #1a1f2e;
+      border: 1px solid #00F2FF;
+      padding: 30px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    .modal-content h3 {
+      font-family: 'Orbitron', monospace;
+      margin-bottom: 20px;
+      color: #00F2FF;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      background: rgba(13, 14, 18, 0.8);
+      border: 1px solid #00F2FF;
+      color: white;
+    }
+
+    .modal-checkbox {
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .save-btn {
+      background: #10b981;
+      border: none;
+      padding: 10px 20px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .cancel-btn {
+      background: #dc2626;
+      border: none;
+      padding: 10px 20px;
+      color: white;
+      cursor: pointer;
+    }
+
+    /* Tags para trainings */
+    .trainings-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 15px 0;
+    }
+
+    .training-tag {
+      background: rgba(0, 242, 255, 0.2);
+      border: 1px solid #00F2FF;
+      padding: 4px 12px;
+      font-size: 0.7rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .remove-tag {
+      cursor: pointer;
+      color: #dc2626;
+      font-weight: bold;
+    }
+
+    .grid-2col {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 25px;
+    }
+
+    @media (max-width: 768px) {
+      .admin-container { padding: 15px; }
+      .top-nav { flex-direction: column; gap: 15px; }
+      .grid-2col { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <h2>🔐 ADMIN ACCESS</h2>
+    <input type="text" id="adminUser" class="login-input" placeholder="USUARIO" value="">
+    <input type="password" id="adminPass" class="login-input" placeholder="CONTRASEÑA" value="">
+    <button id="adminLoginBtn" class="login-btn">INGRESAR AL DASHBOARD</button>
+    <div id="loginError" class="error-msg"></div>
+  </div>
+</div>
+
+<div class="dashboard-content" id="dashboardContent">
+  <div class="admin-container">
+    <!-- Top Navigation -->
+    <div class="top-nav">
+      <div class="logo-area">
+        <h1>SST UNIVERSITY · ADMIN DASHBOARD</h1>
+      </div>
+      <div class="nav-buttons">
+        <button class="nav-btn active" data-section="companies">🏢 EMPRESAS</button>
+        <button class="nav-btn" data-section="trainings">📚 TRAININGS GLOBALES</button>
+        <button class="nav-btn" data-section="users">👥 USUARIOS</button>
+        <button class="nav-btn" id="logoutDashboard">🚪 CERRAR SESIÓN</button>
+      </div>
+    </div>
+
+    <!-- Sección Empresas -->
+    <div id="companiesSection" class="panel">
+      <h2>🏢 GESTIÓN DE EMPRESAS</h2>
+      <button class="add-btn" id="addCompanyBtn">+ NUEVA EMPRESA</button>
+      <div id="companiesList"></div>
+    </div>
+
+    <!-- Sección Trainings Globales -->
+    <div id="trainingsSection" class="panel" style="display:none;">
+      <h2>📚 TRAININGS GLOBALES</h2>
+      <div class="trainings-list" id="globalTrainingsList"></div>
+      <button class="add-btn" id="addTrainingBtn">+ AGREGAR TRAINING</button>
+    </div>
+
+    <!-- Sección Usuarios (credentiales) -->
+    <div id="usersSection" class="panel" style="display:none;">
+      <h2>👥 CREDENCIALES DE USUARIOS</h2>
+      <div id="usersList"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, get, set, update, remove, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD3WLsNvfPX5NLF891p6zKBHZhaFA_Wpls",
+    authDomain: "sst-university.firebaseapp.com",
+    databaseURL: "https://sst-university-default-rtdb.firebaseio.com",
+    projectId: "sst-university"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  let currentAdmin = null;
+
+  // Elementos DOM
+  const loginOverlay = document.getElementById('loginOverlay');
+  const dashboardContent = document.getElementById('dashboardContent');
+  const sections = {
+    companies: document.getElementById('companiesSection'),
+    trainings: document.getElementById('trainingsSection'),
+    users: document.getElementById('usersSection')
+  };
+
+  // URLs de Firebase
+  const COMPANIES_REF = 'Companies';
+  const TRAININGS_REF = 'https://licencessstuniversity-default-rtdb.firebaseio.com/TRAININGS';
+  
+  let globalTrainings = [];
+
+  // Cargar trainings globales desde la otra DB
+  async function loadGlobalTrainings() {
+    try {
+      const response = await fetch('https://licencessstuniversity-default-rtdb.firebaseio.com/TRAININGS.json');
+      const data = await response.json();
+      globalTrainings = Array.isArray(data) ? data : Object.values(data || {});
+      renderGlobalTrainings();
+    } catch (error) {
+      console.error('Error cargando trainings globales:', error);
+    }
+  }
+
+  async function saveGlobalTrainings(trainings) {
+    try {
+      const response = await fetch('https://licencessstuniversity-default-rtdb.firebaseio.com/TRAININGS.json', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(trainings)
+      });
+      if (response.ok) {
+        globalTrainings = trainings;
+        renderGlobalTrainings();
+        renderAllCompanies(); // Refrescar empresas que usan trainings
+      }
+    } catch (error) {
+      alert('Error guardando trainings');
+    }
+  }
+
+  function renderGlobalTrainings() {
+    const container = document.getElementById('globalTrainingsList');
+    if (!container) return;
+    container.innerHTML = globalTrainings.map((training, idx) => `
+      <div class="training-tag">
+        ${training}
+        <span class="remove-tag" onclick="window.removeGlobalTraining(${idx})">✖</span>
+      </div>
+    `).join('');
+  }
+
+  window.removeGlobalTraining = async (idx) => {
+    const newList = [...globalTrainings];
+    newList.splice(idx, 1);
+    await saveGlobalTrainings(newList);
+  };
+
+  // Cargar empresas
+  async function renderAllCompanies() {
+    const snapshot = await get(ref(db, COMPANIES_REF));
+    const companies = snapshot.val() || {};
+    const container = document.getElementById('companiesList');
+    if (!container) return;
+    
+    container.innerHTML = Object.entries(companies).map(([companyName, companyData]) => `
+      <div class="panel" style="margin-bottom: 20px; padding: 15px;">
+        <h3 style="color:#00F2FF;">🏢 ${companyName}</h3>
+        <button class="edit-btn" onclick="editCompany('${companyName}')">EDITAR EMPRESA</button>
+        <button class="delete-btn" onclick="deleteCompany('${companyName}')">ELIMINAR EMPRESA</button>
+        <button class="add-btn" onclick="addDevice('${companyName}')">+ AGREGAR DISPOSITIVO</button>
+        <div id="devices-${companyName}"></div>
+      </div>
+    `).join('');
+    
+    // Renderizar dispositivos por empresa
+    for (const [companyName, companyData] of Object.entries(companies)) {
+      const devicesContainer = document.getElementById(`devices-${companyName}`);
+      if (devicesContainer && companyData.devices) {
+        devicesContainer.innerHTML = `
+          <h4 style="margin-top: 15px; color:#A0D8EF;">📱 DISPOSITIVOS</h4>
+          ${Object.entries(companyData.devices).map(([deviceId, deviceData]) => `
+            <div style="border:1px solid rgba(0,242,255,0.2); padding:12px; margin:8px 0;">
+              <strong>🔑 ${deviceId}</strong>
+              <button class="edit-btn" onclick="editDevice('${companyName}', '${deviceId}')">EDITAR</button>
+              <button class="delete-btn" onclick="deleteDevice('${companyName}', '${deviceId}')">ELIMINAR</button>
+              <div style="font-size:0.75rem; margin-top:5px;">
+                Licencia: ${deviceData.license?.type || 'N/A'} | Expira: ${deviceData.license?.expirationDate || 'N/A'}
+              </div>
+            </div>
+          `).join('')}
+        `;
+      } else if (devicesContainer) {
+        devicesContainer.innerHTML = '<div style="margin-top:15px;">📱 No hay dispositivos registrados</div>';
+      }
+    }
+  }
+
+  // Funciones globales para edición
+  window.editCompany = async (companyName) => {
+    const snapshot = await get(ref(db, `${COMPANIES_REF}/${companyName}`));
+    const companyData = snapshot.val();
+    if (!companyData) return;
+    
+    showModal('Editar Empresa', `
+      <input id="editCompanyUser" class="modal-input" placeholder="Usuario" value="${companyData.credentiales?.user || ''}">
+      <input id="editCompanyPass" class="modal-input" placeholder="Password" value="${companyData.credentiales?.password || ''}">
+      <label>Trainings asignados (desde lista global):</label>
+      <div class="trainings-list" id="editTrainingsList"></div>
+    `, async () => {
+      const newUser = document.getElementById('editCompanyUser').value;
+      const newPass = document.getElementById('editCompanyPass').value;
+      const selectedTrainings = window.selectedTrainingsTemp || [];
+      
+      await update(ref(db, `${COMPANIES_REF}/${companyName}/credentiales`), {
+        user: newUser,
+        password: parseInt(newPass) || newPass,
+        TRAININGS: selectedTrainings
+      });
+      renderAllCompanies();
+    });
+    
+    // Mostrar trainings actuales
+    const currentTrainings = companyData.credentiales?.TRAININGS || [];
+    const container = document.getElementById('editTrainingsList');
+    window.selectedTrainingsTemp = [...currentTrainings];
+    
+    function renderEditTrainings() {
+      if (!container) return;
+      container.innerHTML = globalTrainings.map(training => `
+        <div class="training-tag" style="cursor:pointer; ${window.selectedTrainingsTemp.includes(training) ? 'background:#00F2FF;color:#0D0E12;' : ''}"
+             onclick="toggleTrainingTemp('${training}')">
+          ${training}
+        </div>
+      `).join('');
+    }
+    
+    window.toggleTrainingTemp = (training) => {
+      const idx = window.selectedTrainingsTemp.indexOf(training);
+      if (idx === -1) window.selectedTrainingsTemp.push(training);
+      else window.selectedTrainingsTemp.splice(idx, 1);
+      renderEditTrainings();
+    };
+    
+    renderEditTrainings();
+  };
+
+  window.deleteCompany = async (companyName) => {
+    if (confirm(`¿Eliminar empresa ${companyName}?`)) {
+      await remove(ref(db, `${COMPANIES_REF}/${companyName}`));
+      renderAllCompanies();
+    }
+  };
+
+  window.addDevice = (companyName) => {
+    const newDeviceId = prompt('Ingrese ID del dispositivo (ej: 789WE):', 'DEV' + Math.floor(Math.random() * 10000));
+    if (!newDeviceId) return;
+    
+    showModal('Agregar Dispositivo', `
+      <input id="deviceAccessCode" class="modal-input" placeholder="Código de acceso" value="${Math.floor(Math.random() * 999999)}">
+      <input id="deviceType" class="modal-input" placeholder="Tipo licencia (PRO/PREMIUM/STANDARD)" value="STANDARD">
+      <input id="deviceActivation" class="modal-input" placeholder="Fecha activación (YYYY-MM-DD)" value="${new Date().toISOString().split('T')[0]}">
+      <input id="deviceExpiration" class="modal-input" placeholder="Fecha expiración (YYYY-MM-DD)" value="${new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0]}">
+      <label>Trainings activos:</label>
+      <div class="trainings-list" id="deviceTrainingsList"></div>
+    `, async () => {
+      const accessCode = document.getElementById('deviceAccessCode').value;
+      const licenseType = document.getElementById('deviceType').value;
+      const activationDate = document.getElementById('deviceActivation').value;
+      const expirationDate = document.getElementById('deviceExpiration').value;
+      const selectedActiveTrainings = window.selectedDeviceTrainings || [];
+      
+      const newDevice = {
+        accessCode: accessCode,
+        data: { monthlyUsage: {}, totalTrainingsCompleted: 0, totalUsageHours: 0 },
+        license: {
+          activationDate: activationDate,
+          expirationDate: expirationDate,
+          type: licenseType,
+          updateLicense: false,
+          yearRenovation: false
+        },
+        trainingsActive: selectedActiveTrainings
+      };
+      
+      await update(ref(db, `${COMPANIES_REF}/${companyName}/devices/${newDeviceId}`), newDevice);
+      renderAllCompanies();
+    });
+    
+    // Mostrar trainings globales para seleccionar
+    window.selectedDeviceTrainings = [];
+    function renderDeviceTrainings() {
+      const container = document.getElementById('deviceTrainingsList');
+      if (!container) return;
+      container.innerHTML = globalTrainings.map(training => `
+        <div class="training-tag" style="cursor:pointer; ${window.selectedDeviceTrainings.includes(training) ? 'background:#00F2FF;color:#0D0E12;' : ''}"
+             onclick="toggleDeviceTraining('${training}')">
+          ${training}
+        </div>
+      `).join('');
+    }
+    window.toggleDeviceTraining = (training) => {
+      const idx = window.selectedDeviceTrainings.indexOf(training);
+      if (idx === -1) window.selectedDeviceTrainings.push(training);
+      else window.selectedDeviceTrainings.splice(idx, 1);
+      renderDeviceTrainings();
+    };
+    setTimeout(renderDeviceTrainings, 100);
+  };
+
+  window.editDevice = async (companyName, deviceId) => {
+    const snapshot = await get(ref(db, `${COMPANIES_REF}/${companyName}/devices/${deviceId}`));
+    const deviceData = snapshot.val();
+    if (!deviceData) return;
+    
+    showModal('Editar Dispositivo', `
+      <input id="deviceAccessCode" class="modal-input" value="${deviceData.accessCode || ''}">
+      <input id="deviceType" class="modal-input" value="${deviceData.license?.type || ''}">
+      <input id="deviceActivation" class="modal-input" value="${deviceData.license?.activationDate || ''}">
+      <input id="deviceExpiration" class="modal-input" value="${deviceData.license?.expirationDate || ''}">
+      <label>Trainings activos:</label>
+      <div class="trainings-list" id="deviceTrainingsList"></div>
+    `, async () => {
+      const accessCode = document.getElementById('deviceAccessCode').value;
+      const licenseType = document.getElementById('deviceType').value;
+      const activationDate = document.getElementById('deviceActivation').value;
+      const expirationDate = document.getElementById('deviceExpiration').value;
+      const selectedTrainings = window.selectedDeviceTrainings || [];
+      
+      await update(ref(db, `${COMPANIES_REF}/${companyName}/devices/${deviceId}`), {
+        accessCode: accessCode,
+        license: {
+          activationDate: activationDate,
+          expirationDate: expirationDate,
+          type: licenseType,
+          updateLicense: deviceData.license?.updateLicense || false,
+          yearRenovation: deviceData.license?.yearRenovation || false
+        },
+        trainingsActive: selectedTrainings,
+        data: deviceData.data || { monthlyUsage: {}, totalTrainingsCompleted: 0, totalUsageHours: 0 }
+      });
+      renderAllCompanies();
+    });
+    
+    window.selectedDeviceTrainings = deviceData.trainingsActive || [];
+    function renderDeviceEditTrainings() {
+      const container = document.getElementById('deviceTrainingsList');
+      if (!container) return;
+      container.innerHTML = globalTrainings.map(training => `
+        <div class="training-tag" style="cursor:pointer; ${window.selectedDeviceTrainings.includes(training) ? 'background:#00F2FF;color:#0D0E12;' : ''}"
+             onclick="toggleDeviceEditTraining('${training}')">
+          ${training}
+        </div>
+      `).join('');
+    }
+    window.toggleDeviceEditTraining = (training) => {
+      const idx = window.selectedDeviceTrainings.indexOf(training);
+      if (idx === -1) window.selectedDeviceTrainings.push(training);
+      else window.selectedDeviceTrainings.splice(idx, 1);
+      renderDeviceEditTrainings();
+    };
+    setTimeout(renderDeviceEditTrainings, 100);
+  };
+
+  window.deleteDevice = async (companyName, deviceId) => {
+    if (confirm(`¿Eliminar dispositivo ${deviceId}?`)) {
+      await remove(ref(db, `${COMPANIES_REF}/${companyName}/devices/${deviceId}`));
+      renderAllCompanies();
+    }
+  };
+
+  // Agregar nueva empresa
+  document.getElementById('addCompanyBtn')?.addEventListener('click', () => {
+    const newCompany = prompt('Nombre de la nueva empresa:', 'NEW_COMPANY');
+    if (!newCompany) return;
+    
+    showModal('Crear Empresa', `
+      <input id="newCompanyUser" class="modal-input" placeholder="Usuario" value="ADMIN">
+      <input id="newCompanyPass" class="modal-input" placeholder="Password" value="123456">
+      <label>Trainings asignados:</label>
+      <div class="trainings-list" id="newCompanyTrainings"></div>
+    `, async () => {
+      const user = document.getElementById('newCompanyUser').value;
+      const pass = document.getElementById('newCompanyPass').value;
+      const selectedTrainings = window.selectedNewCompanyTrainings || [];
+      
+      const newCompanyData = {
+        RCP: [12343],
+        credentiales: {
+          TRAININGS: selectedTrainings,
+          password: parseInt(pass) || pass,
+          user: user
+        },
+        devices: {}
+      };
+      
+      await set(ref(db, `${COMPANIES_REF}/${newCompany}`), newCompanyData);
+      renderAllCompanies();
+    });
+    
+    window.selectedNewCompanyTrainings = [];
+    function renderNewCompanyTrainings() {
+      const container = document.getElementById('newCompanyTrainings');
+      if (!container) return;
+      container.innerHTML = globalTrainings.map(training => `
+        <div class="training-tag" style="cursor:pointer; ${window.selectedNewCompanyTrainings.includes(training) ? 'background:#00F2FF;color:#0D0E12;' : ''}"
+             onclick="toggleNewCompanyTraining('${training}')">
+          ${training}
+        </div>
+      `).join('');
+    }
+    window.toggleNewCompanyTraining = (training) => {
+      const idx = window.selectedNewCompanyTrainings.indexOf(training);
+      if (idx === -1) window.selectedNewCompanyTrainings.push(training);
+      else window.selectedNewCompanyTrainings.splice(idx, 1);
+      renderNewCompanyTrainings();
+    };
+    setTimeout(renderNewCompanyTrainings, 100);
+  });
+
+  // Agregar training global
+  document.getElementById('addTrainingBtn')?.addEventListener('click', () => {
+    const newTraining = prompt('Nuevo training (ej: ConfinedSpaces):');
+    if (newTraining && !globalTrainings.includes(newTraining)) {
+      saveGlobalTrainings([...globalTrainings, newTraining]);
+    }
+  });
+
+  function showModal(title, contentHtml, onSave) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <h3>${title}</h3>
+        ${contentHtml}
+        <div class="modal-buttons">
+          <button class="save-btn" id="modalSave">GUARDAR</button>
+          <button class="cancel-btn" id="modalCancel">CANCELAR</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    
+    document.getElementById('modalSave').onclick = () => {
+      onSave();
+      modal.remove();
+    };
+    document.getElementById('modalCancel').onclick = () => modal.remove();
+  }
+
+  // Navegación entre secciones
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const section = e.target.dataset.section;
+      if (section) {
+        Object.keys(sections).forEach(s => sections[s].style.display = 'none');
+        sections[section].style.display = 'block';
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+      }
+    });
+  });
+
+  document.getElementById('logoutDashboard')?.addEventListener('click', () => {
+    currentAdmin = null;
+    dashboardContent.style.display = 'none';
+    loginOverlay.style.display = 'flex';
+  });
+
+  // Login Admin
+  async function loginAdmin(username, password) {
+    try {
+      const snapshot = await get(ref(db, 'ADMIN'));
+      const adminData = snapshot.val();
+      if (adminData && adminData.user === username && adminData.password == parseInt(password)) {
+        currentAdmin = username;
+        loginOverlay.style.display = 'none';
+        dashboardContent.style.display = 'block';
+        await loadGlobalTrainings();
+        await renderAllCompanies();
+        renderUsersList();
+        return true;
+      } else {
+        document.getElementById('loginError').textContent = 'ERROR: Credenciales incorrectas';
+        return false;
+      }
+    } catch (error) {
+      document.getElementById('loginError').textContent = 'ERROR DE CONEXIÓN';
+      return false;
+    }
+  }
+
+  async function renderUsersList() {
+    const snapshot = await get(ref(db, COMPANIES_REF));
+    const companies = snapshot.val() || {};
+    const container = document.getElementById('usersList');
+    if (!container) return;
+    
+    container.innerHTML = Object.entries(companies).map(([companyName, companyData]) => `
+      <div style="border:1px solid rgba(0,242,255,0.2); padding:15px; margin-bottom:15px;">
+        <h3 style="color:#00F2FF;">🏢 ${companyName}</h3>
+        <p><strong>Usuario:</strong> ${companyData.credentiales?.user || 'N/A'}</p>
+        <p><strong>Password:</strong> ${companyData.credentiales?.password || 'N/A'}</p>
+        <p><strong>Trainings asignados:</strong> ${(companyData.credentiales?.TRAININGS || []).length} trainings</p>
+        <button class="edit-btn" onclick="editCompany('${companyName}')">EDITAR CREDENCIALES</button>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('adminLoginBtn').addEventListener('click', () => {
+    const user = document.getElementById('adminUser').value.trim();
+    const pass = document.getElementById('adminPass').value.trim();
+    loginAdmin(user, pass);
+  });
+
+  document.getElementById('adminUser').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') document.getElementById('adminLoginBtn').click();
+  });
+  document.getElementById('adminPass').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') document.getElementById('adminLoginBtn').click();
+  });
+
+  // Exponer funciones globales
+  window.editCompany = editCompany;
+  window.deleteCompany = deleteCompany;
+  window.addDevice = addDevice;
+  window.editDevice = editDevice;
+  window.deleteDevice = deleteDevice;
+  window.renderAllCompanies = renderAllCompanies;
+  window.renderUsersList = renderUsersList;
+</script>
+</body>
+</html>

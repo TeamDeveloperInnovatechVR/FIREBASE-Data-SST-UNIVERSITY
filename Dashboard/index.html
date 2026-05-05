@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Lectura de Capacitación</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      background-color: #f5f6fa;
+    }
+    .chart-container {
+      height: 300px; 
+      width: 300px;
+      margin: auto;
+    }
+    .bar-container {
+      height: 300px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col p-6 text-white" style="background-color:#f5f6fa;">
+
+  <!-- Header -->
+  <header class="w-full flex items-center justify-center mb-6 bg-[#1e2146] p-4 rounded-xl shadow-md">
+    <img src="Resources/AMB.svg" alt="Logo" class="h-12 mr-4">
+    <h1 class="text-2xl font-bold text-[#f28a1a]">DATA - SST UNIVERSITY</h1>
+  </header>
+
+  <!-- Layout principal -->
+  <div class="w-full flex flex-col lg:flex-row gap-6">
+    <!-- Panel izquierdo -->
+    <div class="lg:w-1/2">
+      <!-- Inputs -->
+      <div class="bg-white p-6 rounded-2xl shadow-lg w-full text-black">
+        <label class="block mb-2 font-semibold text-[#1e2146]">Empresa</label>
+        <input id="empresaInput" type="text" placeholder="Ej: REVIVE" 
+              class="w-full p-2 border rounded-md mb-4 uppercase">
+        
+        <button onclick="leerData()" 
+                class="w-full bg-[#f28a1a] text-white px-4 py-2 rounded-xl shadow-md hover:bg-[#d97706] transition">
+          Leer Data
+        </button>
+      </div>
+
+      <!-- Resultado -->
+      <div id="resultado" class="mt-6 w-full hidden">
+        <div id="dispositivosList" class="mb-4"></div>
+        <div id="detalleDispositivo" class="bg-white text-black p-4 rounded-xl shadow"></div>
+        <div id="graficoMensualContainer" class="mt-6 bg-white p-4 rounded-xl shadow text-black"></div>
+      </div>
+    </div>
+
+    <!-- Panel derecho (Reporte BI) -->
+    <div class="lg:w-1/2 bg-white p-6 rounded-2xl shadow-lg text-black">
+      <h2 class="text-lg font-bold text-[#1e2146] mb-4">📊 Reporte BI</h2>
+      
+      <!-- Gráficos en paralelo -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+        <!-- Torta -->
+        <div>
+          <h3 class="font-semibold text-[#f28a1a] mb-2 text-center">Distribución de tiempo</h3>
+          <div class="chart-container">
+            <canvas id="useTimeChart"></canvas>
+          </div>
+          <div id="customLegend" class="mt-4 max-h-40 overflow-y-auto border rounded p-2 bg-gray-50 text-black text-sm"></div>
+        </div>
+
+        <!-- Barras -->
+        <div>
+          <h3 class="font-semibold text-[#f28a1a] mb-2 text-center">Comparativa de uso</h3>
+          <div class="bar-container">
+            <canvas id="barChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const firebaseURL = "https://sst-university-default-rtdb.firebaseio.com/Companies/";
+    let useTimeChartInstance = null;
+    let barChartInstance = null;
+    let graficoMensualInstance = null;
+
+    // 🔥 Diccionarios de traducción
+    const traduccionesMeses = {
+      "January": "Enero",
+      "February": "Febrero",
+      "March": "Marzo",
+      "April": "Abril",
+      "May": "Mayo",
+      "June": "Junio",
+      "July": "Julio",
+      "August": "Agosto",
+      "September": "Septiembre",
+      "October": "Octubre",
+      "November": "Noviembre",
+      "December": "Diciembre"
+    };
+
+    const traduccionesEntrenamientos = {
+      "RoadSecurity": "Seguridad Vial",
+      "ConfinedSpaces": "Espacios Confinados",
+      "Mines": "Minería",
+      "PsychologicalHelp": "Ayuda Psicológica",
+      "Hydrocarbons": "Hidrocarburos",
+      "Quimic": "Químico",
+      "RCP": "RCP",
+      "ChemicalRisks": "Riesgos Químicos",
+      "PsychoactiveSubstances": "Sustancias Psicoactivas",
+      "EmergencyPlanAndExtinguishers": "Plan de Emergencia y Extintores",
+      "WeaponsHandling": "Manejo de Armas",
+      "HealthyLifestyleHabits": "Hábitos de Vida Saludable",
+      "WorkingAtHeights": "Trabajo en Alturas",
+      "PlantRisks": "Riesgos en Planta",
+      "ExtinguisherAirport": "Extintores Aeropuerto",
+      "MentalHealth": "Salud Mental",
+      "ElectricalRiskLOTO": "Riesgo Eléctrico - LOTO",
+      "Ergonomics": "Ergonomía",
+      "PosturalHygiene": "Higiene Postural",
+      "Scooter": "Patineta",
+      "Bicycle": "Bicicleta",
+      "TukTuk": "Tuk Tuk",
+      "HandRisks": "Riesgos en Manos",
+      "SameLevelFalls": "Caídas al Mismo Nivel",
+      "ElevatedPlatforms": "Plataformas Elevadoras",
+      "BiologicalRisk": "Riesgo Biológico",
+      "Recycling": "Reciclaje",
+      "PublicRisk": "Riesgo Público",
+      "AirSafety": "Seguridad Aérea",
+      "AirportVisualSafety": "Seguridad Vial Aeropuerto",
+      "Machinery": "Maquinaria",
+      "RoadSafety": "Seguridad Vial",
+      "LoadHoisting": "Izado de Cargas",
+      "TEST": "PRUEBA",
+      "Tutorial": "Tutorial",
+      "Nixus": "Nixus",
+      "Nixus_RoadActors": "Actores Viales Nixus"
+    };
+
+    // 🔥 Formatear a horas, minutos, segundos
+    function formatTiempo(segundos) {
+      const horas = Math.floor(segundos / 3600);
+      const minutos = Math.floor((segundos % 3600) / 60);
+      const segundosRestantes = segundos % 60;
+
+      let resultado = "";
+      if (horas > 0) resultado += `${horas} h `;
+      if (minutos > 0) resultado += `${minutos} min `;
+      resultado += `${segundosRestantes} seg`;
+
+      return resultado.trim();
+    }
+
+    // 🔥 Traducir nombre del entrenamiento
+    function traducirEntrenamiento(nombreIngles) {
+      return traduccionesEntrenamientos[nombreIngles] || nombreIngles;
+    }
+
+    // 🔥 Traducir nombre del mes
+    function traducirMes(mesIngles) {
+      return traduccionesMeses[mesIngles] || mesIngles;
+    }
+
+    async function leerData() {
+      const empresaInput = document.getElementById("empresaInput").value.trim();
+      const empresa = empresaInput.toUpperCase(); 
+      const resultadoDiv = document.getElementById("resultado");
+      const dispositivosDiv = document.getElementById("dispositivosList");
+      const detalleDiv = document.getElementById("detalleDispositivo");
+
+      if (!empresa) {
+        alert("Por favor ingresa la empresa");
+        return;
+      }
+
+      try {
+        const response = await fetch(`${firebaseURL}${empresa}.json`);
+        const data = await response.json();
+
+        if (!data) {
+          alert("❌ Empresa no encontrada");
+          return;
+        }
+
+        // Adaptación para la estructura de datos JSON proporcionada
+        const dispositivos = data.Devices ? Object.values(data.Devices) : [];
+        resultadoDiv.classList.remove("hidden");
+
+        dispositivosDiv.innerHTML = "";
+        detalleDiv.innerHTML = "";
+        document.getElementById("graficoMensualContainer").innerHTML = "";
+
+        if (dispositivos.length === 1) {
+          mostrarDispositivo(dispositivos[0], detalleDiv);
+        } else {
+          dispositivos.forEach(d => {
+            const btn = document.createElement("button");
+            btn.textContent = `📌 Dispositivo ID: ${d.ID}`;
+            btn.classList.add(
+              "bg-[#1e2146]", "text-white", "px-4", "py-2", "rounded-xl", 
+              "shadow-md", "mb-2", "w-full", "text-left", "hover:bg-[#f28a1a]", "transition"
+            );
+            btn.onclick = () => mostrarDispositivo(d, detalleDiv);
+            dispositivosDiv.appendChild(btn);
+          });
+        }
+
+      } catch (error) {
+        console.error("Error al leer Firebase:", error);
+        alert("⚠️ Ocurrió un error al leer los datos");
+      }
+    }
+
+    function mostrarDispositivo(dispositivo, container) {
+      container.innerHTML = `
+        <h2 class="text-lg font-bold text-[#1e2146]">📌 Dispositivo ID: ${dispositivo.ID}</h2>
+        <p class="text-sm text-gray-700">⏱️ Tiempo de uso: ${formatTiempo(dispositivo.UsageTime)}</p>
+        <p class="text-sm text-gray-500">Licencia: ${dispositivo.LicenseLimit || "Sin definir"}</p>
+        <h3 class="mt-2 font-semibold text-[#f28a1a]">Capacitaciones:</h3>
+        <div id="capacitacionesList" class="max-h-60 overflow-y-auto border p-2 rounded bg-gray-50"></div>
+      `;
+
+      const capacitacionesList = container.querySelector("#capacitacionesList");
+      const graficoMensualContainer = document.getElementById("graficoMensualContainer");
+      graficoMensualContainer.innerHTML = "";
+
+      if (dispositivo.Trainings && dispositivo.Trainings.length > 0) {
+        dispositivo.Trainings.forEach(cap => {
+          const item = document.createElement("div");
+          item.classList.add("mb-3", "border-b", "pb-2");
+
+          const nombreTraducido = traducirEntrenamiento(cap.TrainingName);
+          const texto = `${nombreTraducido} - ${formatTiempo(cap.TotalTime || 0)}`;
+          item.innerHTML = `<p class="text-sm font-semibold text-[#1e2146]">${texto}</p>`;
+
+          // ✅ Años y meses
+          if (cap.YearList && cap.YearList.length > 0) {
+            const añosDiv = document.createElement("div");
+            añosDiv.classList.add("ml-4", "text-sm");
+
+            cap.YearList.forEach(yearData => {
+              const año = yearData.Year;
+              const meses = yearData.Months;
+              
+              const añoBtn = document.createElement("button");
+              añoBtn.textContent = `📅 ${año}`;
+              añoBtn.classList.add(
+                "mt-2", "bg-[#1e2146]", "text-white", "px-3", "py-1", "rounded-md",
+                "hover:bg-[#f28a1a]", "transition", "block", "w-full", "text-left"
+              );
+
+              const mesesDiv = document.createElement("div");
+              mesesDiv.classList.add("ml-6", "hidden", "mt-1", "text-gray-700", "bg-gray-100", "rounded", "p-2");
+
+              Object.entries(meses).forEach(([mes, valor]) => {
+                const p = document.createElement("p");
+                const mesTraducido = traducirMes(mes);
+                p.textContent = `• ${mesTraducido}: ${formatTiempo(valor)}`;
+                mesesDiv.appendChild(p);
+              });
+
+              // Botón gráfico mensual (por año)
+              const btnGrafico = document.createElement("button");
+              btnGrafico.textContent = "📊 Ver gráfico mensual";
+              btnGrafico.classList.add("mt-2", "bg-[#f28a1a]", "text-white", "px-3", "py-1", "rounded-md", "hover:bg-[#d97706]", "transition");
+              btnGrafico.onclick = () => {
+                graficoMensualContainer.innerHTML = "";
+                generarGraficoMensualPorAño(cap, año);
+              };
+              mesesDiv.appendChild(btnGrafico);
+
+              añoBtn.onclick = () => {
+                mesesDiv.classList.toggle("hidden");
+              };
+
+              añosDiv.appendChild(añoBtn);
+              añosDiv.appendChild(mesesDiv);
+            });
+
+            item.appendChild(añosDiv);
+          }
+
+          capacitacionesList.appendChild(item);
+        });
+      } else {
+        capacitacionesList.innerHTML = "<p class='text-gray-500'>No hay capacitaciones</p>";
+      }
+
+      generarGraficos(dispositivo);
+    }
+
+    // ✅ FUNCIÓN: gráfico mensual por año
+    function generarGraficoMensualPorAño(capacitacion, año) {
+      const yearData = capacitacion.YearList.find(y => y.Year === año);
+      if (!yearData) return;
+      
+      const container = document.getElementById("graficoMensualContainer");
+      const meses = yearData.Months;
+
+      // Traducir labels de meses
+      const labels = Object.keys(meses).map(mes => traducirMes(mes));
+      const valores = Object.values(meses);
+
+      const canvas = document.createElement("canvas");
+      canvas.classList.add("w-full", "h-64");
+      container.appendChild(canvas);
+
+      if (graficoMensualInstance) graficoMensualInstance.destroy();
+
+      const nombreTraducido = traducirEntrenamiento(capacitacion.TrainingName);
+      
+      graficoMensualInstance = new Chart(canvas, {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [{
+            label: `Tiempo por mes (${año}) - ${nombreTraducido}`,
+            data: valores,
+            backgroundColor: "#f28a1a"
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: context => formatTiempo(context.raw)
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { callback: value => formatTiempo(value) }
+            }
+          }
+        }
+      });
+    }
+
+    function generarGraficos(dispositivo) {
+      if (!dispositivo.Trainings || dispositivo.Trainings.length === 0) {
+        // Limpiar gráficos si no hay datos
+        if (useTimeChartInstance) useTimeChartInstance.destroy();
+        if (barChartInstance) barChartInstance.destroy();
+        
+        document.getElementById("customLegend").innerHTML = "<p class='text-gray-500'>No hay datos para mostrar</p>";
+        return;
+      }
+
+      // Traducir nombres de entrenamientos
+      const labels = dispositivo.Trainings.map(cap => traducirEntrenamiento(cap.TrainingName));
+      const tiempos = dispositivo.Trainings.map(cap => cap.TotalTime || 0);
+      const tiemposFormateados = tiempos.map(t => formatTiempo(t));
+
+      const colors = [
+        '#f28a1a', '#1e2146', '#4caf50', '#2196f3', '#9c27b0',
+        '#ff5722', '#00bcd4', '#8bc34a', '#ffc107', '#e91e63',
+        '#795548', '#3f51b5', '#009688', '#cddc39'
+      ];
+
+      // --- Torta ---
+      const ctx = document.getElementById("useTimeChart").getContext("2d");
+      if (useTimeChartInstance) useTimeChartInstance.destroy();
+      useTimeChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: tiempos,
+            backgroundColor: colors.slice(0, labels.length)
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } }
+        }
+      });
+
+      // --- Leyenda personalizada ---
+      const legendContainer = document.getElementById("customLegend");
+      legendContainer.innerHTML = "";
+      labels.forEach((label, i) => {
+        const item = document.createElement("div");
+        item.classList.add("flex", "items-center", "mb-1");
+        const colorBox = document.createElement("span");
+        colorBox.style.backgroundColor = colors[i % colors.length];
+        colorBox.classList.add("w-4", "h-4", "inline-block", "mr-2", "rounded");
+        const text = document.createElement("span");
+        text.textContent = `${label} - ${tiemposFormateados[i]}`;
+        item.appendChild(colorBox);
+        item.appendChild(text);
+        legendContainer.appendChild(item);
+      });
+
+      // --- Barras ---
+      const barCtx = document.getElementById("barChart").getContext("2d");
+      if (barChartInstance) barChartInstance.destroy();
+      barChartInstance = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Tiempo de uso',
+            data: tiempos,
+            backgroundColor: colors.slice(0, labels.length)
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            tooltip: {
+              callbacks: { label: context => formatTiempo(context.raw) }
+            },
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { callback: value => formatTiempo(value) }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+
+</html>
