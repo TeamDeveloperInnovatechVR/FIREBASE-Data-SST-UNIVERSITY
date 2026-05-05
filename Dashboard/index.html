@@ -54,7 +54,6 @@
       padding: 30px 24px 40px;
     }
 
-    /* Login Panel */
     .login-overlay {
       position: fixed;
       top: 0;
@@ -133,7 +132,6 @@
       display: none;
     }
 
-    /* Mensaje para móvil */
     .mobile-blocker {
       display: none;
       text-align: center;
@@ -272,7 +270,6 @@
       pointer-events: auto;
     }
 
-    /* Capas de bloqueo - Solo visibles en desktop */
     .blocker-layer {
       position: absolute;
       background: transparent;
@@ -281,7 +278,6 @@
       pointer-events: auto;
     }
 
-    /* Footer */
     .footer {
       margin-top: 50px;
       padding-top: 30px;
@@ -435,7 +431,6 @@
 </head>
 <body>
 
-<!-- DETECTOR DE MÓVIL - Mensaje de bloqueo -->
 <div id="mobileWarning" style="display: none;" class="mobile-blocker">
   <i class="fas fa-mobile-alt"></i>
   <h3>📱 ACCESO SOLO EN PC</h3>
@@ -473,7 +468,6 @@
     <div class="video-wrapper">
       <div class="video-container" id="videoContainer">
         <iframe id="securePlayer" title="Reproductor seguro" allow="accelerometer; autoplay; encrypted-media; gyroscope" allowfullscreen="false" frameborder="0" src="about:blank"></iframe>
-        <!-- Capas de bloqueo - Se generan dinámicamente solo en desktop -->
         <div id="desktopBlockers"></div>
       </div>
     </div>
@@ -532,7 +526,6 @@
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
   }
 
-  // Si es móvil, mostrar mensaje de bloqueo y ocultar el contenido
   if (isMobileDevice()) {
     document.getElementById('mobileWarning').style.display = 'block';
     document.getElementById('loginOverlay').style.display = 'none';
@@ -573,9 +566,7 @@
     return null;
   }
 
-  // Crear capas de bloqueo SOLO para desktop
   function crearBloquesDesktop() {
-    const container = document.getElementById('videoContainer');
     const blockersContainer = document.getElementById('desktopBlockers');
     if (!blockersContainer) return;
     
@@ -606,22 +597,18 @@
       capa.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        showBlockerMessage(e);
+        const tooltip = document.createElement('div');
+        tooltip.className = 'blocker-tooltip';
+        tooltip.textContent = '⛔ ZONA BLOQUEADA · NO SE PUEDE ABRIR YOUTUBE';
+        tooltip.style.left = (e.clientX + 15) + 'px';
+        tooltip.style.top = (e.clientY - 35) + 'px';
+        document.body.appendChild(tooltip);
+        setTimeout(() => tooltip.remove(), 1500);
         return false;
       });
       
       blockersContainer.appendChild(capa);
     });
-  }
-
-  function showBlockerMessage(event) {
-    const tooltip = document.createElement('div');
-    tooltip.className = 'blocker-tooltip';
-    tooltip.textContent = '⛔ ZONA BLOQUEADA · NO SE PUEDE ABRIR YOUTUBE';
-    tooltip.style.left = (event.clientX + 15) + 'px';
-    tooltip.style.top = (event.clientY - 35) + 'px';
-    document.body.appendChild(tooltip);
-    setTimeout(() => tooltip.remove(), 1500);
   }
 
   async function cargarCapacitaciones() {
@@ -636,20 +623,14 @@
       let tutoriales = Array.isArray(data) ? data : Object.values(data);
       
       const tutorialObligatorio = tutoriales.find(item => item && item.ID_TRAINING === "Tutorial");
-      
       const trainingsUsuario = tutoriales.filter(item => {
-        return item && 
-               item.ID_TRAINING && 
-               item.ID_TRAINING !== "Tutorial" && 
-               currentTrainings.includes(item.ID_TRAINING);
+        return item && item.ID_TRAINING && item.ID_TRAINING !== "Tutorial" && currentTrainings.includes(item.ID_TRAINING);
       });
       
       let videosFinales = [];
-      
       if (tutorialObligatorio && extractYouTubeID(tutorialObligatorio.videoId)) {
         videosFinales.push(tutorialObligatorio);
       }
-      
       videosFinales = [...videosFinales, ...trainingsUsuario];
       const conVideo = videosFinales.filter(item => extractYouTubeID(item.videoId));
       
@@ -700,7 +681,6 @@
         playerFrame.src = `https://www.youtube.com/embed/${primerId}?modestbranding=1&rel=0&playsinline=1&controls=1&origin=${encodeURIComponent(origin)}`;
       }
 
-      // Crear bloques de bloqueo SOLO si NO es móvil
       if (!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
         crearBloquesDesktop();
       }
@@ -782,7 +762,6 @@
     if (e.key === 'Enter') document.getElementById('loginBtn').click();
   });
 
-  // Convertir a mayúsculas
   const companyInput = document.getElementById('companyInput');
   const userInput = document.getElementById('userInput');
   
@@ -791,14 +770,12 @@
       this.value = this.value.toUpperCase();
     });
   }
-  
   if (userInput) {
     userInput.addEventListener('input', function(e) {
       this.value = this.value.toUpperCase();
     });
   }
 
-  // Redes sociales
   setTimeout(() => {
     const socialUrls = {
       innovatech: {
@@ -827,18 +804,23 @@
   }, 100);
 </script>
 
+<!-- PROTECCIONES COMPLETAS - CORREGIDAS -->
 <script>
   (function() {
-    document.addEventListener('contextmenu', (e) => {
+    // 1. Bloquear clic derecho (context menu)
+    document.addEventListener('contextmenu', function(e) {
       e.preventDefault();
       return false;
     });
 
-    document.addEventListener('keydown', (e) => {
+    // 2. Bloquear todas las teclas de desarrollador
+    document.addEventListener('keydown', function(e) {
       const key = e.key;
       const ctrl = e.ctrlKey || e.metaKey;
       const shift = e.shiftKey;
+      const alt = e.altKey;
 
+      // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
       if (key === 'F12' ||
           (ctrl && shift && (key === 'I' || key === 'J' || key === 'C')) ||
           (ctrl && key === 'u') ||
@@ -846,28 +828,65 @@
           (ctrl && key === 'p') ||
           (ctrl && key === 'c') ||
           (ctrl && key === 'x') ||
-          (ctrl && key === 'v')) {
+          (ctrl && key === 'v') ||
+          (ctrl && shift && key === 'K') ||
+          (ctrl && shift && key === 'S') ||
+          (ctrl && alt && key === 'I') ||
+          (key === 'Insert' && shift) ||
+          (ctrl && key === 'E')) {
         e.preventDefault();
         e.stopPropagation();
         return false;
       }
 
+      // PrintScreen
       if (key === 'PrintScreen') {
         e.preventDefault();
-        alert('CAPTURA DE PANTALLA DESHABILITADA');
+        alert('📸 CAPTURA DE PANTALLA DESHABILITADA');
+        navigator.clipboard.writeText('').catch(() => {});
         return false;
       }
     });
 
-    window.addEventListener('dragstart', (e) => {
+    // 3. Prevenir arrastrar imágenes o elementos
+    window.addEventListener('dragstart', function(e) {
       e.preventDefault();
       return false;
     });
 
-    document.addEventListener('copy', (e) {
+    // 4. Bloquear copia (CORREGIDO: faltaba la arrow function)
+    document.addEventListener('copy', function(e) {
+      e.preventDefault();
+      e.clipboardData.setData('text/plain', '⚠️ CONTENIDO PROTEGIDO');
+      alert('🔒 NO SE PERMITE COPIAR INFORMACIÓN');
+      return false;
+    });
+
+    // 5. Bloquear selección de texto
+    document.addEventListener('selectstart', function(e) {
       e.preventDefault();
       return false;
     });
+
+    // 6. Bloquear que el iframe entre en pantalla completa
+    const iframe = document.getElementById('securePlayer');
+    if (iframe) {
+      iframe.addEventListener('fullscreenchange', function() {
+        if (document.fullscreenElement === iframe) {
+          document.exitFullscreen();
+        }
+      });
+      iframe.removeAttribute('allowfullscreen');
+      iframe.setAttribute('allowfullscreen', 'false');
+    }
+
+    // 7. Detectar apertura de DevTools (método adicional)
+    let devtools = /./;
+    devtools.toString = function() {
+      alert('🔒 HERRAMIENTAS DE DESARROLLO BLOQUEADAS');
+      return '';
+    };
+    console.log('%c🔒 SST UNIVERSITY - CONTENIDO PROTEGIDO', 'color: #00F2FF; font-size: 16px;');
   })();
 </script>
 </body>
