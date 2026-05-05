@@ -468,11 +468,10 @@
 <body>
 
 <div id="mobileWarning" style="display: none;" class="mobile-blocker">
-  <i class="fas fa-desktop"></i>
-  <h3>🖥️ ACCESO SOLO EN PC</h3>
+  <i class="fas fa-mobile-alt"></i>
+  <h3>📱 ACCESO SOLO EN PC</h3>
   <p>Este contenido solo está disponible en <strong>computadoras de escritorio</strong>.</p>
-  <p>Resolución mínima requerida: <strong>1100 x 1100 píxeles</strong></p>
-  <p>Por favor, amplía la ventana del navegador o accede desde una PC.</p>
+  <p>Por favor, accede desde una PC para ver los videotutoriales.</p>
   <p style="margin-top: 20px; font-size: 0.8rem;">🔒 SST UNIVERSITY · INNOVATECH VR</p>
 </div>
 
@@ -560,205 +559,16 @@
 </div>
 
 <script>
-  // ==============================================
-  // PROTECCIONES DE SEGURIDAD (CLIC DERECHO, COPIAR, TECLAS)
-  // ==============================================
-  
-  // 1. Bloquear clic derecho
-  document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-    return false;
-  });
-
-  // 2. Bloquear teclas de desarrollador y copiar/pegar
-  document.addEventListener('keydown', function(e) {
-    const key = e.key;
-    const ctrl = e.ctrlKey || e.metaKey;
-    const shift = e.shiftKey;
-    const alt = e.altKey;
-
-    // Bloquear F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U, Ctrl+S, etc.
-    if (key === 'F12' ||
-        (ctrl && shift && (key === 'I' || key === 'J' || key === 'C')) ||
-        (ctrl && key === 'u') ||
-        (ctrl && key === 's') ||
-        (ctrl && key === 'p') ||
-        (ctrl && key === 'c') ||
-        (ctrl && key === 'x') ||
-        (ctrl && key === 'v') ||
-        (ctrl && shift && key === 'K') ||
-        (ctrl && shift && key === 'S') ||
-        (ctrl && alt && key === 'I') ||
-        (key === 'Insert' && shift) ||
-        (ctrl && key === 'E')) {
-      e.preventDefault();
-      e.stopPropagation();
-      return false;
-    }
-
-    // Bloquear tecla PrintScreen (captura de pantalla)
-    if (key === 'PrintScreen') {
-      e.preventDefault();
-      alert('📸 CAPTURA DE PANTALLA DESHABILITADA');
-      return false;
-    }
-  });
-
-  // 3. Bloquear arrastrar elementos
-  window.addEventListener('dragstart', function(e) {
-    e.preventDefault();
-    return false;
-  });
-
-  // 4. Bloquear copiar
-  document.addEventListener('copy', function(e) {
-    e.preventDefault();
-    e.clipboardData.setData('text/plain', '⚠️ CONTENIDO PROTEGIDO');
-    alert('🔒 NO SE PERMITE COPIAR INFORMACIÓN');
-    return false;
-  });
-
-  // 5. Bloquear selección de texto
-  document.addEventListener('selectstart', function(e) {
-    e.preventDefault();
-    return false;
-  });
-
-  // 6. Bloquear pantalla completa del iframe
-  const iframeSecure = document.getElementById('securePlayer');
-  if (iframeSecure) {
-    iframeSecure.removeAttribute('allowfullscreen');
-    iframeSecure.setAttribute('allowfullscreen', 'false');
+  // DETECTAR DISPOSITIVO MÓVIL
+  function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
   }
 
-  console.log('✅ Protecciones de seguridad activadas');
-</script>
-
-<script>
-  // ==============================================
-  // DETECTOR DE RESOLUCIÓN - MÍNIMO 1100 x 1100
-  // ==============================================
-  
-  let resolutionWarningActive = false;
-  let loginCompleted = false;
-  const ANCHO_MINIMO = 1100;
-  const ALTO_MINIMO = 900;
-  
-  function verificarResolucionEnTiempoReal() {
-    const mobileWarning = document.getElementById('mobileWarning');
-    const loginOverlay = document.getElementById('loginOverlay');
-    const mainContent = document.getElementById('mainContent');
-    const videoContainer = document.getElementById('videoContainer');
-    const securePlayer = document.getElementById('securePlayer');
-    
-    const anchoActual = window.innerWidth;
-    const altoActual = window.innerHeight;
-    const esTamanoValido = anchoActual >= ANCHO_MINIMO && altoActual >= ALTO_MINIMO;
-    
-    // Actualizar mensaje con dimensiones actuales
-    if (mobileWarning) {
-      const msgDiv = mobileWarning.querySelector('.dimensiones-actuales');
-      if (msgDiv) {
-        msgDiv.innerHTML = `Ancho actual: ${anchoActual}px | Alto actual: ${altoActual}px`;
-      } else {
-        const p = mobileWarning.querySelector('p:nth-child(3)');
-        if (p) p.innerHTML = `Resolución mínima requerida: <strong>${ANCHO_MINIMO} x ${ALTO_MINIMO} píxeles</strong><br><span class="dimensiones-actuales">Ancho actual: ${anchoActual}px | Alto actual: ${altoActual}px</span>`;
-      }
-    }
-    
-    // Si el login ya se completó y detectamos tamaño inválido
-    if (loginCompleted && !esTamanoValido && !resolutionWarningActive) {
-      resolutionWarningActive = true;
-      
-      if (mobileWarning) mobileWarning.style.display = 'block';
-      if (mainContent) mainContent.style.display = 'none';
-      if (loginOverlay) loginOverlay.style.display = 'none';
-      if (securePlayer) securePlayer.src = 'about:blank';
-      
-      // Mensaje en el contenedor del video
-      if (videoContainer && !document.getElementById('resolutionOverlayMsg')) {
-        const msgDiv = document.createElement('div');
-        msgDiv.id = 'resolutionOverlayMsg';
-        msgDiv.style.position = 'absolute';
-        msgDiv.style.top = '0';
-        msgDiv.style.left = '0';
-        msgDiv.style.width = '100%';
-        msgDiv.style.height = '100%';
-        msgDiv.style.backgroundColor = '#0D0E12';
-        msgDiv.style.display = 'flex';
-        msgDiv.style.alignItems = 'center';
-        msgDiv.style.justifyContent = 'center';
-        msgDiv.style.flexDirection = 'column';
-        msgDiv.style.zIndex = '100000';
-        msgDiv.style.color = '#dc2626';
-        msgDiv.style.fontFamily = 'Orbitron, monospace';
-        msgDiv.style.textAlign = 'center';
-        msgDiv.style.padding = '20px';
-        msgDiv.innerHTML = `
-          <i class="fas fa-desktop" style="font-size: 48px; margin-bottom: 20px;"></i>
-          <h3>🔒 ACCESO RESTRINGIDO</h3>
-          <p>Este contenido solo está disponible en<br><strong>computadoras de escritorio</strong></p>
-          <p style="font-size: 12px; margin-top: 20px;">Resolución mínima requerida: ${ANCHO_MINIMO} x ${ALTO_MINIMO} px<br>Resolución actual: ${anchoActual} x ${altoActual} px</p>
-          <p style="font-size: 11px; margin-top: 15px;">Amplía la ventana del navegador para continuar</p>
-        `;
-        videoContainer.appendChild(msgDiv);
-      }
-      console.log('🔴 BLOQUEADO: Resolución insuficiente - Ancho:', anchoActual, 'Alto:', altoActual);
-    }
-    // Si el login se completó y el tamaño es válido Y estaba bloqueado
-    else if (loginCompleted && esTamanoValido && resolutionWarningActive) {
-      resolutionWarningActive = false;
-      
-      if (mobileWarning) mobileWarning.style.display = 'none';
-      if (mainContent) mainContent.style.display = 'block';
-      if (loginOverlay) loginOverlay.style.display = 'none';
-      
-      // Eliminar mensaje overlay del video
-      const msgOverlay = document.getElementById('resolutionOverlayMsg');
-      if (msgOverlay) msgOverlay.remove();
-      
-      // Recargar el primer video
-      const primerBoton = document.querySelector('.cyber-btn');
-      if (primerBoton) primerBoton.click();
-      
-      console.log('🟢 DESBLOQUEADO: Resolución válida - Ancho:', anchoActual, 'Alto:', altoActual);
-    }
-    // Si el login NO se ha completado aún
-    else if (!loginCompleted) {
-      const esMovilInicial = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || !esTamanoValido;
-      
-      if (esMovilInicial) {
-        if (mobileWarning) mobileWarning.style.display = 'block';
-        if (loginOverlay) loginOverlay.style.display = 'none';
-        if (mainContent) mainContent.style.display = 'none';
-      } else {
-        if (mobileWarning) mobileWarning.style.display = 'none';
-        if (loginOverlay) loginOverlay.style.display = 'flex';
-        if (mainContent) mainContent.style.display = 'none';
-      }
-    }
+  if (isMobileDevice()) {
+    document.getElementById('mobileWarning').style.display = 'block';
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'none';
   }
-  
-  function marcarLoginCompletado() {
-    loginCompleted = true;
-    verificarResolucionEnTiempoReal();
-  }
-  
-  // Escuchar cambios de resolución
-  let resizeTimeout;
-  window.addEventListener('resize', function() {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(verificarResolucionEnTiempoReal, 200);
-  });
-  
-  // Detectar cambio de orientación
-  window.addEventListener('orientationchange', function() {
-    setTimeout(verificarResolucionEnTiempoReal, 100);
-  });
-  
-  // Ejecutar al cargar
-  window.addEventListener('DOMContentLoaded', verificarResolucionEnTiempoReal);
-  verificarResolucionEnTiempoReal();
 </script>
 
 <script type="module">
@@ -964,15 +774,12 @@
   function logout() {
     currentUser = null;
     currentTrainings = [];
-    loginCompleted = false;
-    resolutionWarningActive = false;
     loginOverlay.style.display = 'flex';
     mainContent.style.display = 'none';
     document.getElementById('companyInput').value = '';
     document.getElementById('userInput').value = '';
     document.getElementById('passwordInput').value = '';
     document.getElementById('loginError').textContent = '';
-    verificarResolucionEnTiempoReal();
   }
 
   document.getElementById('loginBtn').addEventListener('click', () => {
@@ -1034,6 +841,148 @@
     document.getElementById("ambienteFacebook")?.setAttribute("href", socialUrls.ambiente.facebook);
     document.getElementById("ambienteWeb")?.setAttribute("href", socialUrls.ambiente.web);
   }, 100);
+</script>
+
+<!-- PROTECCIONES COMPLETAS - CORREGIDAS -->
+<script>
+  // ==============================================
+  // DETECTOR DE RESOLUCIÓN EN TIEMPO REAL
+  // ==============================================
+  
+  let mobileWarningActive = false;
+  let loginCompleted = false;
+  
+  // Función para mostrar/ocultar el bloqueo por tamaño
+  function verificarResolucionEnTiempoReal() {
+    const mobileWarning = document.getElementById('mobileWarning');
+    const loginOverlay = document.getElementById('loginOverlay');
+    const mainContent = document.getElementById('mainContent');
+    const videoContainer = document.getElementById('videoContainer');
+    const securePlayer = document.getElementById('securePlayer');
+    
+    const anchoActual = window.innerWidth;
+    const esTamanoMovil = anchoActual <= 768;
+    
+    // Si el login ya se completó y detectamos tamaño móvil
+    if (loginCompleted && esTamanoMovil && !mobileWarningActive) {
+      // ACTIVAR BLOQUEO
+      mobileWarningActive = true;
+      
+      // Mostrar advertencia
+      if (mobileWarning) mobileWarning.style.display = 'block';
+      if (mainContent) mainContent.style.display = 'none';
+      if (loginOverlay) loginOverlay.style.display = 'none';
+      
+      // Limpiar el video para que no se vea nada
+      if (securePlayer) securePlayer.src = 'about:blank';
+      
+      // Opcional: mostrar alerta
+      if (securePlayer) {
+  securePlayer.src = 'about:blank';
+  // Opcional: mostrar un mensaje dentro del contenedor del video
+  const videoContainer = document.getElementById('videoContainer');
+  if (videoContainer && !document.getElementById('mobileOverlayMsg')) {
+    const msgDiv = document.createElement('div');
+    msgDiv.id = 'mobileOverlayMsg';
+    msgDiv.style.position = 'absolute';
+    msgDiv.style.top = '0';
+    msgDiv.style.left = '0';
+    msgDiv.style.width = '100%';
+    msgDiv.style.height = '100%';
+    msgDiv.style.backgroundColor = '#0D0E12';
+    msgDiv.style.display = 'flex';
+    msgDiv.style.alignItems = 'center';
+    msgDiv.style.justifyContent = 'center';
+    msgDiv.style.flexDirection = 'column';
+    msgDiv.style.zIndex = '100000';
+    msgDiv.style.color = '#dc2626';
+    msgDiv.style.fontFamily = 'Orbitron, monospace';
+    msgDiv.style.textAlign = 'center';
+    msgDiv.style.padding = '20px';
+    msgDiv.innerHTML = `
+      <i class="fas fa-desktop" style="font-size: 48px; margin-bottom: 20px;"></i>
+      <h3>🔒 ACCESO RESTRINGIDO</h3>
+      <p>Este contenido solo está disponible en<br><strong>computadoras de escritorio</strong></p>
+      <p style="font-size: 12px; margin-top: 20px;">Ancho mínimo requerido: 769px<br>Ancho actual: ${window.innerWidth}px</p>
+    `;
+    videoContainer.appendChild(msgDiv);
+  }
+}
+      console.log('🔴 BLOQUEADO: Resolución móvil detectada - Ancho:', anchoActual);
+    }
+    // Si el login se completó y el tamaño es mayor a 768 (PC) Y estaba bloqueado
+    else if (loginCompleted && !esTamanoMovil && mobileWarningActive) {
+      // DESACTIVAR BLOQUEO (volver a PC)
+      mobileWarningActive = false;
+      
+      // Ocultar advertencia
+      if (mobileWarning) mobileWarning.style.display = 'none';
+      if (mainContent) mainContent.style.display = 'block';
+      if (loginOverlay) loginOverlay.style.display = 'none';
+      
+      // Recargar el primer video automáticamente (opcional)
+      const primerBoton = document.querySelector('.cyber-btn');
+      if (primerBoton) {
+        primerBoton.click();
+      }
+      
+      console.log('🟢 DESBLOQUEADO: Resolución PC detectada - Ancho:', anchoActual);
+    }
+    // Si el login NO se ha completado aún, solo validar para el overlay de login
+    else if (!loginCompleted) {
+      const esMovilInicial = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || esTamanoMovil;
+      
+      if (esMovilInicial) {
+        if (mobileWarning) mobileWarning.style.display = 'block';
+        if (loginOverlay) loginOverlay.style.display = 'none';
+        if (mainContent) mainContent.style.display = 'none';
+      } else {
+        if (mobileWarning) mobileWarning.style.display = 'none';
+        if (loginOverlay) loginOverlay.style.display = 'flex';
+        if (mainContent) mainContent.style.display = 'none';
+      }
+    }
+  }
+  
+  // Función especial para cuando se completa el login
+  function marcarLoginCompletado() {
+    loginCompleted = true;
+    verificarResolucionEnTiempoReal();
+  }
+  
+  // Escuchar cambios de resolución (cada 300ms para ser reactivo)
+  let resizeTimeout;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(function() {
+      verificarResolucionEnTiempoReal();
+      
+      // Si estamos en modo PC y hay bloqueos activos, los reaplicamos
+      if (loginCompleted && !mobileWarningActive && window.innerWidth > 768) {
+        // Pequeño retraso para que YouTube reaccione
+        setTimeout(function() {
+          if (typeof aplicarBloqueosSelectivos === 'function') {
+            aplicarBloqueosSelectivos();
+          } else if (typeof crearBloquesDesktop === 'function') {
+            crearBloquesDesktop();
+          }
+        }, 200);
+      }
+    }, 300);
+  });
+  
+  // También detectar cambios de orientación (rotación de celular/tablet)
+  window.addEventListener('orientationchange', function() {
+    setTimeout(verificarResolucionEnTiempoReal, 100);
+  });
+  
+  // Ejecutar al cargar la página
+  window.addEventListener('DOMContentLoaded', function() {
+    verificarResolucionEnTiempoReal();
+  });
+  
+  // Ejecutar inmediatamente también
+  verificarResolucionEnTiempoReal();
 </script>
 </body>
 </html>
