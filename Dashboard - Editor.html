@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>SST University · Editor de Bloques para YouTube</title>
+  <style>
+    * {
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      background: #0b1120;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      color: #e2e8f0;
+    }
+
+    h2 {
+      font-weight: 500;
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 1.9rem;
+      background: linear-gradient(135deg, #c084fc, #60a5fa);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .controls-panel {
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 15px;
+      margin-bottom: 20px;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+      border: 1px solid #334155;
+    }
+
+    .controls-panel h3 {
+      margin: 0 0 10px 0;
+      font-size: 1rem;
+      color: #94a3b8;
+    }
+
+    .mode-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .mode-btn {
+      background: #2d3a5e;
+      border: none;
+      color: white;
+      padding: 6px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .mode-btn.active {
+      background: #60a5fa;
+      color: #0b1120;
+      font-weight: bold;
+    }
+
+    .mode-btn.danger {
+      background: #dc2626;
+    }
+
+    .mode-btn.success {
+      background: #10b981;
+    }
+
+    .coord-panel {
+      background: #0f172a;
+      border-radius: 12px;
+      padding: 10px;
+      margin-top: 10px;
+      font-family: monospace;
+      font-size: 0.7rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .coord-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: space-between;
+      background: #1e293b;
+      padding: 5px 10px;
+      border-radius: 8px;
+    }
+
+    .coord-item label {
+      font-size: 0.7rem;
+      color: #94a3b8;
+    }
+
+    .coord-item input {
+      background: #0b1120;
+      border: 1px solid #334155;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 6px;
+      width: 55px;
+      font-size: 0.7rem;
+      font-family: monospace;
+    }
+
+    .buttons-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f1f5f9;
+      padding: 10px 24px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border-radius: 40px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .video-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+      padding: 0 10px;
+    }
+
+    .video-container {
+      position: relative;
+      width: 1000px;
+      max-width: 100%;
+      background: #000;
+      border-radius: 20px;
+      overflow: visible;
+      box-shadow: 0 20px 35px -10px rgba(0,0,0,0.5);
+      border: 1px solid rgba(96, 165, 250, 0.3);
+    }
+
+    .video-container iframe {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: none;
+      background: #000;
+      border-radius: 20px;
+    }
+
+    .blocker {
+      position: absolute;
+      background: rgba(220, 38, 38, 0.6);
+      border: 2px solid #ef4444;
+      border-radius: 8px;
+      z-index: 100;
+      cursor: move;
+      box-sizing: border-box;
+    }
+
+    .blocker:hover {
+      background: rgba(220, 38, 38, 0.8);
+    }
+
+    .blocker-label {
+      position: absolute;
+      top: -20px;
+      left: 0;
+      background: #dc2626;
+      color: white;
+      font-size: 9px;
+      padding: 2px 5px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .secure-badge {
+      font-size: 0.7rem;
+      margin-top: 20px;
+      background: rgba(0,0,0,0.5);
+      display: inline-block;
+      padding: 6px 15px;
+      border-radius: 30px;
+      color: #94a3b8;
+    }
+
+    .info-text {
+      background: #1e293b;
+      padding: 10px;
+      border-radius: 10px;
+      margin-top: 15px;
+      font-size: 0.75rem;
+      color: #cbd5e1;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .export-area {
+      margin-top: 15px;
+      padding: 12px;
+      background: #0f172a;
+      border-radius: 10px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .export-area textarea {
+      background: #0b1120;
+      border: 1px solid #334155;
+      color: #e2e8f0;
+      padding: 8px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 11px;
+      width: 100%;
+      max-width: 500px;
+      height: 80px;
+      resize: vertical;
+    }
+
+    .copy-btn {
+      background: #10b981;
+      padding: 8px 20px;
+    }
+
+    .import-btn {
+      background: #6366f1;
+      padding: 8px 20px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>📘 Capacitaciones exclusivas</h2>
+<div id="lista" class="buttons-container"></div>
+
+<div class="controls-panel">
+  <h3>🎮 Editor de bloqueo de elementos de YouTube</h3>
+  <div class="mode-buttons">
+    <button id="toggleEditBtn" class="mode-btn danger active">✏️ Modo Edición</button>
+    <button id="toggleBlockBtn" class="mode-btn">🔒 Modo Producción</button>
+    <button id="resetBlocksBtn" class="mode-btn">🔄 Resetear bloques</button>
+  </div>
+  
+  <div id="coordPanel" class="coord-panel"></div>
+  
+  <div class="export-area">
+    <textarea id="exportData" placeholder="Aquí aparecerán las coordenadas para copiar..."></textarea>
+    <button id="copyToClipboard" class="copy-btn">📋 Copiar coordenadas</button>
+    <button id="importFromClipboard" class="import-btn">📥 Pegar coordenadas</button>
+  </div>
+  
+  <button id="saveCoordsBtn" class="save-btn" style="margin-top: 10px; background:#10b981;">💾 Guardar en localStorage</button>
+</div>
+
+<div class="video-wrapper">
+  <div class="video-container" id="videoContainer">
+    <iframe id="securePlayer" title="Reproductor seguro" allow="accelerometer; autoplay; encrypted-media; gyroscope" allowfullscreen="false" frameborder="0" src="about:blank"></iframe>
+  </div>
+</div>
+<div class="secure-badge">🔒 Protección activa · Ajusta los cuadros rojos para bloquear clics en YouTube</div>
+<div class="info-text">
+  💡 INSTRUCCIONES: Arrastra los cuadros ROJOS para moverlos → Haz clic en esquina inferior derecha para redimensionar → Usa "Copiar coordenadas" para enviarme los datos.
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD3WLsNvfPX5NLF891p6zKBHZhaFA_Wpls",
+    authDomain: "sst-university.firebaseapp.com",
+    databaseURL: "https://sst-university-default-rtdb.firebaseio.com",
+    projectId: "sst-university"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const listaDiv = document.getElementById("lista");
+  const playerFrame = document.getElementById("securePlayer");
+
+  function extractYouTubeID(urlOrId) {
+    if (!urlOrId) return null;
+    const str = String(urlOrId).trim();
+    if (/^[a-zA-Z0-9_-]{11}$/.test(str)) return str;
+    let match = str.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([^&?#]+)/);
+    if (match) return match[1];
+    match = str.match(/youtube\.com\/embed\/([^?&]+)/);
+    if (match) return match[1];
+    return null;
+  }
+
+  async function cargarCapacitaciones() {
+    try {
+      const snapshot = await get(ref(db, "VideoTutoriales"));
+      if (!snapshot.exists()) {
+        listaDiv.innerHTML = '<p>⚠️ No hay capacitaciones disponibles.</p>';
+        return;
+      }
+      let data = snapshot.val();
+      let tutoriales = Array.isArray(data) ? data : Object.values(data);
+      const validos = tutoriales.filter(item => item && item.titulo && item.videoId);
+      if (!validos.length) {
+        listaDiv.innerHTML = '<p>❌ No se encontraron videos válidos.</p>';
+        return;
+      }
+      validos.forEach(cap => {
+        const btn = document.createElement("button");
+        btn.innerText = cap.titulo;
+        btn.onclick = () => {
+          const videoID = extractYouTubeID(cap.videoId);
+          if (!videoID) { alert("ID de video inválido."); return; }
+          const origin = window.location.origin;
+          playerFrame.src = `https://www.youtube.com/embed/${videoID}?modestbranding=1&rel=0&playsinline=1&controls=1&origin=${encodeURIComponent(origin)}`;
+        };
+        listaDiv.appendChild(btn);
+      });
+      const primerId = extractYouTubeID(validos[0].videoId);
+      if (primerId) {
+        const origin = window.location.origin;
+        playerFrame.src = `https://www.youtube.com/embed/${primerId}?modestbranding=1&rel=0&playsinline=1&controls=1&origin=${encodeURIComponent(origin)}`;
+      }
+    } catch (error) {
+      console.error(error);
+      listaDiv.innerHTML = '<p>⚠️ Error al cargar datos.</p>';
+    }
+  }
+  cargarCapacitaciones();
+</script>
+
+<script>
+  (function() {
+    // Bloqueos básicos
+    document.addEventListener('contextmenu', (e) => { e.preventDefault(); return false; });
+    document.addEventListener('keydown', (e) => {
+      const key = e.key, ctrl = e.ctrlKey || e.metaKey, shift = e.shiftKey;
+      if (key === 'F12' || (ctrl && shift && (key === 'I' || key === 'J' || key === 'C')) ||
+          (ctrl && key === 'u') || (ctrl && key === 's') || (ctrl && key === 'p') ||
+          (ctrl && key === 'c') || (ctrl && key === 'x') || (ctrl && key === 'v')) {
+        e.preventDefault(); e.stopPropagation(); return false;
+      }
+      if (key === 'PrintScreen') {
+        e.preventDefault();
+        alert('Captura de pantalla deshabilitada');
+        navigator.clipboard.writeText('').catch(() => {});
+        return false;
+      }
+    });
+    window.addEventListener('dragstart', (e) => { e.preventDefault(); return false; });
+    document.addEventListener('copy', (e) => { e.preventDefault(); return false; });
+
+    // ========== EDITOR DE BLOQUES ==========
+    let blocks = [
+      { id: 'logo', name: 'Logo YouTube', top: 0, left: 0, width: 12, height: 8, active: true },
+      { id: 'title', name: 'Título del video', top: 0, left: 35, width: 30, height: 8, active: true },
+      { id: 'share-buttons', name: 'Botones Compartir', top: 88, left: 70, width: 28, height: 10, active: true },
+      { id: 'end-logo', name: 'Botón YouTube final', top: 75, left: 85, width: 12, height: 7, active: true },
+      { id: 'subscribe', name: 'Botón Suscribirse', top: 8, left: 80, width: 15, height: 7, active: true },
+      { id: 'more-info', name: 'Más información', top: 85, left: 5, width: 20, height: 7, active: true }
+    ];
+
+    let editMode = true;
+    let currentBlock = null;
+    let isResizing = false;
+    let startX, startY, startWidth, startHeight, startTop, startLeft;
+
+    const saved = localStorage.getItem('youtubeBlockerCoords');
+    if (saved) {
+      try {
+        const savedBlocks = JSON.parse(saved);
+        if (Array.isArray(savedBlocks) && savedBlocks.length === blocks.length) {
+          blocks = savedBlocks;
+        }
+      } catch(e) {}
+    }
+
+    function updateExportTextarea() {
+      const textarea = document.getElementById('exportData');
+      if (textarea) {
+        textarea.value = JSON.stringify(blocks, null, 2);
+      }
+    }
+
+    function updateCoordPanel() {
+      const panel = document.getElementById('coordPanel');
+      if (!panel) return;
+      panel.innerHTML = blocks.map(block => `
+        <div class="coord-item">
+          <label>${block.name}</label>
+          <input type="number" step="0.5" data-id="${block.id}" data-prop="top" value="${block.top}" style="width:45px">%
+          <input type="number" step="0.5" data-id="${block.id}" data-prop="left" value="${block.left}" style="width:45px">%
+          <input type="number" step="0.5" data-id="${block.id}" data-prop="width" value="${block.width}" style="width:45px">%
+          <input type="number" step="0.5" data-id="${block.id}" data-prop="height" value="${block.height}" style="width:45px">%
+        </div>
+      `).join('');
+      
+      document.querySelectorAll('.coord-item input').forEach(input => {
+        input.addEventListener('change', (e) => {
+          const blockId = input.dataset.id;
+          const prop = input.dataset.prop;
+          const value = parseFloat(input.value);
+          const block = blocks.find(b => b.id === blockId);
+          if (block && !isNaN(value)) {
+            block[prop] = Math.min(Math.max(value, 0), 100);
+            if (prop === 'left' && block.left + block.width > 100) block.width = 100 - block.left;
+            if (prop === 'top' && block.top + block.height > 100) block.height = 100 - block.top;
+            renderBlocks();
+            updateCoordPanel();
+            updateExportTextarea();
+            saveCoords();
+          }
+        });
+      });
+    }
+
+    function renderBlocks() {
+      const container = document.getElementById('videoContainer');
+      if (!container) return;
+      document.querySelectorAll('.blocker').forEach(el => el.remove());
+      
+      blocks.forEach(block => {
+        if (!block.active) return;
+        const blockerDiv = document.createElement('div');
+        blockerDiv.className = 'blocker';
+        if (!editMode) blockerDiv.style.display = 'none';
+        blockerDiv.setAttribute('data-id', block.id);
+        blockerDiv.style.top = block.top + '%';
+        blockerDiv.style.left = block.left + '%';
+        blockerDiv.style.width = block.width + '%';
+        blockerDiv.style.height = block.height + '%';
+        
+        const label = document.createElement('div');
+        label.className = 'blocker-label';
+        label.textContent = block.name;
+        blockerDiv.appendChild(label);
+        
+        blockerDiv.addEventListener('mousedown', (e) => {
+          if (e.target === label || e.target === blockerDiv) {
+            e.preventDefault();
+            e.stopPropagation();
+            currentBlock = block;
+            startX = e.clientX;
+            startY = e.clientY;
+            startLeft = block.left;
+            startTop = block.top;
+            
+            const onMouseMove = (moveEvent) => {
+              if (!currentBlock) return;
+              const dx = (moveEvent.clientX - startX) / container.offsetWidth * 100;
+              const dy = (moveEvent.clientY - startY) / container.offsetHeight * 100;
+              let newLeft = startLeft + dx;
+              let newTop = startTop + dy;
+              newLeft = Math.min(Math.max(newLeft, 0), 100 - currentBlock.width);
+              newTop = Math.min(Math.max(newTop, 0), 100 - currentBlock.height);
+              currentBlock.left = newLeft;
+              currentBlock.top = newTop;
+              renderBlocks();
+              updateCoordPanel();
+              updateExportTextarea();
+            };
+            
+            const onMouseUp = () => {
+              currentBlock = null;
+              document.removeEventListener('mousemove', onMouseMove);
+              document.removeEventListener('mouseup', onMouseUp);
+              saveCoords();
+            };
+            
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+          }
+        });
+        
+        const resizeHandle = document.createElement('div');
+        resizeHandle.style.position = 'absolute';
+        resizeHandle.style.bottom = '0';
+        resizeHandle.style.right = '0';
+        resizeHandle.style.width = '15px';
+        resizeHandle.style.height = '15px';
+        resizeHandle.style.backgroundColor = '#ff6666';
+        resizeHandle.style.cursor = 'se-resize';
+        resizeHandle.style.borderRadius = '0 0 8px 0';
+        resizeHandle.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          isResizing = true;
+          startX = e.clientX;
+          startY = e.clientY;
+          startWidth = block.width;
+          startHeight = block.height;
+          
+          const onResizeMove = (moveEvent) => {
+            if (!isResizing) return;
+            const dx = (moveEvent.clientX - startX) / container.offsetWidth * 100;
+            const dy = (moveEvent.clientY - startY) / container.offsetHeight * 100;
+            let newWidth = startWidth + dx;
+            let newHeight = startHeight + dy;
+            newWidth = Math.min(Math.max(newWidth, 5), 100 - block.left);
+            newHeight = Math.min(Math.max(newHeight, 5), 100 - block.top);
+            block.width = newWidth;
+            block.height = newHeight;
+            renderBlocks();
+            updateCoordPanel();
+            updateExportTextarea();
+          };
+          
+          const onResizeUp = () => {
+            isResizing = false;
+            document.removeEventListener('mousemove', onResizeMove);
+            document.removeEventListener('mouseup', onResizeUp);
+            saveCoords();
+          };
+          
+          document.addEventListener('mousemove', onResizeMove);
+          document.addEventListener('mouseup', onResizeUp);
+        });
+        blockerDiv.appendChild(resizeHandle);
+        
+        blockerDiv.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!editMode) {
+            const tooltip = document.createElement('div');
+            tooltip.textContent = '🔒 Zona bloqueada';
+            tooltip.style.cssText = 'position:fixed;left:'+(e.clientX+15)+'px;top:'+(e.clientY-30)+'px;background:#dc2626;color:white;padding:4px 10px;border-radius:8px;font-size:11px;z-index:9999;pointer-events:none';
+            document.body.appendChild(tooltip);
+            setTimeout(() => tooltip.remove(), 800);
+          }
+          return false;
+        });
+        
+        container.appendChild(blockerDiv);
+      });
+    }
+
+    function saveCoords() {
+      localStorage.setItem('youtubeBlockerCoords', JSON.stringify(blocks));
+      updateExportTextarea();
+    }
+
+    // Eventos de UI
+    document.getElementById('toggleEditBtn')?.addEventListener('click', () => {
+      editMode = true;
+      document.getElementById('toggleEditBtn')?.classList.add('active');
+      document.getElementById('toggleBlockBtn')?.classList.remove('active');
+      renderBlocks();
+    });
+    
+    document.getElementById('toggleBlockBtn')?.addEventListener('click', () => {
+      editMode = false;
+      document.getElementById('toggleBlockBtn')?.classList.add('active');
+      document.getElementById('toggleEditBtn')?.classList.remove('active');
+      renderBlocks();
+    });
+    
+    document.getElementById('resetBlocksBtn')?.addEventListener('click', () => {
+      blocks = [
+        { id: 'logo', name: 'Logo YouTube', top: 0, left: 0, width: 12, height: 8, active: true },
+        { id: 'title', name: 'Título del video', top: 0, left: 35, width: 30, height: 8, active: true },
+        { id: 'share-buttons', name: 'Botones Compartir', top: 88, left: 70, width: 28, height: 10, active: true },
+        { id: 'end-logo', name: 'Botón YouTube final', top: 75, left: 85, width: 12, height: 7, active: true },
+        { id: 'subscribe', name: 'Botón Suscribirse', top: 8, left: 80, width: 15, height: 7, active: true },
+        { id: 'more-info', name: 'Más información', top: 85, left: 5, width: 20, height: 7, active: true }
+      ];
+      renderBlocks();
+      updateCoordPanel();
+      updateExportTextarea();
+      saveCoords();
+    });
+    
+    document.getElementById('saveCoordsBtn')?.addEventListener('click', () => {
+      saveCoords();
+      alert('✅ Coordenadas guardadas en localStorage');
+    });
+    
+    document.getElementById('copyToClipboard')?.addEventListener('click', async () => {
+      const data = JSON.stringify(blocks, null, 2);
+      await navigator.clipboard.writeText(data);
+      alert('📋 Coordenadas copiadas al portapapeles!\n\nPégalas aquí o envíamelas.');
+    });
+    
+    document.getElementById('importFromClipboard')?.addEventListener('click', async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        const imported = JSON.parse(text);
+        if (Array.isArray(imported) && imported.length === blocks.length) {
+          blocks = imported;
+          renderBlocks();
+          updateCoordPanel();
+          updateExportTextarea();
+          saveCoords();
+          alert('✅ Coordenadas importadas correctamente');
+        } else {
+          alert('❌ Formato inválido');
+        }
+      } catch(e) {
+        alert('❌ Error al leer el portapapeles');
+      }
+    });
+    
+    renderBlocks();
+    updateCoordPanel();
+    updateExportTextarea();
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>SST University · Videotutoriales</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * {
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0D0E12;
+      min-height: 100vh;
+      color: #FFFFFF;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 30%, rgba(22, 27, 51, 0.6) 0%, #0D0E12 90%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 30px 24px 40px;
+    }
+
+    /* Login Panel */
+    .login-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(13, 14, 18, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-card {
+      background: rgba(22, 27, 51, 0.8);
+      border: 1px solid #00F2FF;
+      padding: 40px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 40px rgba(0, 242, 255, 0.2);
+    }
+
+    .login-card h2 {
+      font-family: 'Orbitron', monospace;
+      text-align: center;
+      margin-bottom: 30px;
+      background: linear-gradient(135deg, #00F2FF, #7000FF);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .login-input {
+    text-transform: uppercase;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    background: rgba(13, 14, 18, 0.8);
+    border: 1px solid #00F2FF;
+    color: #fff;
+    font-family: 'Inter', monospace;
+  }
+
+    .login-input:focus {
+      outline: none;
+      box-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: #00F2FF;
+      border: none;
+      color: #0D0E12;
+      font-family: 'Orbitron', monospace;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .login-btn:hover {
+      background: #7000FF;
+      color: white;
+      box-shadow: 0 0 20px rgba(112, 0, 255, 0.5);
+    }
+
+    .error-msg {
+      color: #ff4444;
+      text-align: center;
+      margin-top: 15px;
+      font-size: 0.8rem;
+    }
+
+    /* Contenido principal (oculto hasta login) */
+    .main-content {
+      display: none;
+    }
+
+    .main-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .main-header h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #FFFFFF 0%, #00F2FF 50%, #7000FF 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .main-header .sub {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.75rem;
+      color: #A0D8EF;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .hud-line {
+      width: 120px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #00F2FF, #7000FF, transparent);
+      margin: 15px auto 0;
+    }
+
+    .user-info {
+      text-align: right;
+      margin-bottom: 20px;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.8rem;
+      color: #00F2FF;
+    }
+
+    .buttons-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .cyber-btn {
+      background: rgba(22, 27, 51, 0.5);
+      backdrop-filter: blur(4px);
+      border: 1px solid #00F2FF;
+      color: #A0D8EF;
+      padding: 12px 28px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: 'Orbitron', monospace;
+      border-radius: 0px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cyber-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 242, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .cyber-btn:hover::before {
+      left: 100%;
+    }
+
+    .cyber-btn:hover {
+      background: #00F2FF;
+      color: #0D0E12;
+      box-shadow: 0 0 20px rgba(0, 242, 255, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .video-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      max-width: 1200px;
+      background: #000;
+      overflow: hidden;
+      box-shadow: 0 0 0 2px rgba(0, 242, 255, 0.2), 0 20px 40px rgba(0,0,0,0.5);
+    }
+
+    .video-container iframe {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: none;
+    }
+
+    .blocker-logo, .blocker-title, .blocker-share-buttons, .blocker-end-logo, .blocker-subscribe, .blocker-more-info {
+      position: absolute;
+      background: transparent;
+      z-index: 20;
+      cursor: not-allowed;
+      pointer-events: auto;
+    }
+    .blocker-logo { top: 0%; left: 0%; width: 82.73%; height: 20.04%; }
+    .blocker-title { top: 0%; left: 0%; width: 82.83%; height: 21.10%; }
+    .blocker-share-buttons { top: 14.37%; left: 57.93%; width: 42.07%; height: 70.94%; }
+    .blocker-end-logo { top: 18.18%; left: 0.20%; width: 44.44%; height: 66.12%; }
+    .blocker-subscribe { top: 0%; left: 91.29%; width: 8.71%; height: 100%; }
+    .blocker-more-info { top: 89.08%; left: 0%; width: 100%; height: 10.92%; }
+
+    .secure-badge {
+      text-align: center;
+      margin: 20px 0 40px;
+    }
+    .secure-badge span {
+      font-size: 0.7rem;
+      background: rgba(0, 242, 255, 0.1);
+      border: 1px solid rgba(0, 242, 255, 0.3);
+      display: inline-block;
+      padding: 6px 18px;
+      border-radius: 30px;
+      color: #A0D8EF;
+      font-family: 'Orbitron', monospace;
+    }
+
+    /* Footer con logos mejorado */
+    .footer {
+      margin-top: 50px;
+      padding-top: 30px;
+      border-top: 1px solid rgba(0, 242, 255, 0.2);
+    }
+
+    .footer-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+
+    .footer-col {
+      flex: 1;
+      min-width: 250px;
+      text-align: center;
+    }
+
+    .footer-col h4 {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.9rem;
+      color: #00F2FF;
+      margin-bottom: 15px;
+    }
+
+    .logo-item img {
+      max-height: 50px;
+      width: auto;
+      filter: drop-shadow(0 0 5px rgba(0, 242, 255, 0.5));
+      transition: transform 0.2s ease;
+    }
+
+    .logo-item img:hover {
+      transform: scale(1.05);
+    }
+
+    .social-group {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .social-icon-sm {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 35px;
+      height: 35px;
+      background: rgba(22, 27, 51, 0.6);
+      border: 1px solid #00F2FF;
+      color: #00F2FF;
+      font-size: 1rem;
+      transition: all 0.25s ease;
+      text-decoration: none;
+    }
+
+    .social-icon-sm:hover {
+      background: #00F2FF;
+      color: #0D0E12;
+      transform: translateY(-2px);
+    }
+
+    .contact-info {
+      font-size: 0.8rem;
+      line-height: 1.8;
+    }
+
+    .contact-info a {
+      color: #A0D8EF;
+      text-decoration: none;
+    }
+
+    .contact-info a:hover {
+      color: #00F2FF;
+    }
+
+    .whatsapp-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #25D366;
+      color: white;
+      padding: 8px 20px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.8rem;
+      margin-top: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .whatsapp-btn:hover {
+      background: #128C7E;
+      transform: scale(1.05);
+    }
+
+    .copyright {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 0.7rem;
+      color: #A0D8EF;
+      opacity: 0.6;
+    }
+
+    .blocker-tooltip {
+      position: fixed;
+      background: #dc2626;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      z-index: 9999;
+      pointer-events: none;
+      white-space: nowrap;
+      font-family: 'Orbitron', monospace;
+      animation: fadeOut 1.5s ease-out forwards;
+    }
+
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      70% { opacity: 1; }
+      100% { opacity: 0; visibility: hidden; }
+    }
+
+    .logout-btn {
+      background: rgba(220, 38, 38, 0.3);
+      border: 1px solid #dc2626;
+      color: #dc2626;
+      padding: 5px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.7rem;
+      margin-left: 15px;
+    }
+
+    .logout-btn:hover {
+      background: #dc2626;
+      color: white;
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 20px 16px 30px; }
+      .main-header h1 { font-size: 1.4rem; }
+      .cyber-btn { padding: 8px 16px; font-size: 0.7rem; }
+      .footer-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <h2>🔐 ACCESO SEGURO</h2>
+    <input type="text" id="companyInput" class="login-input" placeholder="EMPRESA" value="" autocomplete="off">
+    <input type="text" id="userInput" class="login-input" placeholder="USUARIO" value="" autocomplete="off">
+    <input type="password" id="passwordInput" class="login-input" placeholder="CONTRASEÑA" value="" autocomplete="off">
+    <button id="loginBtn" class="login-btn">INGRESAR AL SISTEMA</button>
+    <div id="loginError" class="error-msg"></div>
+  </div>
+</div>
+
+<div class="main-content" id="mainContent">
+  <div class="container">
+    <div class="user-info" id="userInfo">
+      <span id="userCompanyDisplay"></span> | <span id="userNameDisplay"></span>
+      <button id="logoutBtn" class="logout-btn">CERRAR SESIÓN</button>
+    </div>
+
+    <div class="main-header">
+      <h1>VIDEOTUTORIALES<br><span style="font-size: 1.2rem;">SST UNIVERSITY</span></h1>
+      <div class="sub">SECURE LEARNING PORTAL</div>
+      <div class="hud-line"></div>
+    </div>
+
+    <div id="lista" class="buttons-container"></div>
+
+    <div class="video-wrapper">
+      <div class="video-container" id="videoContainer">
+        <iframe id="securePlayer" title="Reproductor seguro" allow="accelerometer; autoplay; encrypted-media; gyroscope" allowfullscreen="false" frameborder="0" src="about:blank"></iframe>
+        <div class="blocker-logo" id="blockerLogo"></div>
+        <div class="blocker-title" id="blockerTitle"></div>
+        <div class="blocker-share-buttons" id="blockerShare"></div>
+        <div class="blocker-end-logo" id="blockerEndLogo"></div>
+        <div class="blocker-subscribe" id="blockerSubscribe"></div>
+        <div class="blocker-more-info" id="blockerMoreInfo"></div>
+      </div>
+    </div>
+
+    <div class="secure-badge">
+      <span>🔒 PROTECCIÓN HUD ACTIVA · SIN ACCESO A YOUTUBE</span>
+    </div>
+
+    <div class="footer">
+      <div class="footer-row">
+        <!-- Logo Innovatech con redes sociales -->
+        <div class="footer-col">
+          <div class="logo-item">
+            <img src="Resources/Innovatechvr.png" alt="Innovatech VR" onerror="this.src='https://placehold.co/120x40/1e293b/00F2FF?text=INNOVATECH'">
+          </div>
+          <div class="social-group">
+            <a href="#" class="social-icon-sm" id="innovatechLinkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="social-icon-sm" id="innovatechInstagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-icon-sm" id="innovatechFacebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-icon-sm" id="innovatechWeb"><i class="fas fa-globe"></i></a>
+          </div>
+        </div>
+
+        <!-- Logo Ambiente con redes sociales -->
+        <div class="footer-col">
+          <div class="logo-item">
+            <img src="Resources/Ambiente.png" alt="Ambiente" onerror="this.src='https://placehold.co/100x40/1e293b/00F2FF?text=AMBIENTE'">
+          </div>
+          <div class="social-group">
+            <a href="#" class="social-icon-sm" id="ambienteLinkedin"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="social-icon-sm" id="ambienteInstagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-icon-sm" id="ambienteFacebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-icon-sm" id="ambienteWeb"><i class="fas fa-globe"></i></a>
+          </div>
+        </div>
+
+        <!-- Información de contacto -->
+        <div class="footer-col">
+          <h4>📧 CONTACTO</h4>
+          <div class="contact-info">
+            <p><i class="fas fa-envelope"></i> <a href="mailto:Developer@innovatechvr.com">Developer@innovatechvr.com</a></p>
+            <p><i class="fas fa-briefcase"></i> <a href="mailto:lvera@ambienteconsultores.com">lvera@ambienteconsultores.com</a></p>
+            <a href="https://wa.me/573213071580" class="whatsapp-btn" target="_blank">
+              <i class="fab fa-whatsapp"></i> +57 321 3071580
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="copyright">
+        <span>© 2026 SST UNIVERSITY · INNOVATECH VR · AMBIENTE CONSULTORES · TODOS LOS DERECHOS RESERVADOS</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD3WLsNvfPX5NLF891p6zKBHZhaFA_Wpls",
+    authDomain: "sst-university.firebaseapp.com",
+    databaseURL: "https://sst-university-default-rtdb.firebaseio.com",
+    projectId: "sst-university"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  let currentUser = null;
+  let currentTrainings = [];
+
+  const loginOverlay = document.getElementById('loginOverlay');
+  const mainContent = document.getElementById('mainContent');
+  const listaDiv = document.getElementById("lista");
+  const playerFrame = document.getElementById("securePlayer");
+
+  function extractYouTubeID(urlOrId) {
+    if (!urlOrId) return null;
+    const str = String(urlOrId).trim();
+    if (/^[a-zA-Z0-9_-]{11}$/.test(str)) return str;
+    let match = str.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([^&?#]+)/);
+    if (match) return match[1];
+    match = str.match(/youtube\.com\/embed\/([^?&]+)/);
+    if (match) return match[1];
+    return null;
+  }
+
+// 🔥 NUEVA LÓGICA: Tutorial obligatorio + trainings del usuario
+async function cargarCapacitaciones() {
+  try {
+    const snapshot = await get(ref(db, "VideoTutoriales"));
+    if (!snapshot.exists()) {
+      listaDiv.innerHTML = '<div style="color:#A0D8EF;">⚠️ NO HAY CAPACITACIONES DISPONIBLES</div>';
+      return;
+    }
+
+    let data = snapshot.val();
+    let tutoriales = Array.isArray(data) ? data : Object.values(data);
+    
+    // 1. Buscar el tutorial obligatorio (ID_TRAINING = "Tutorial")
+    const tutorialObligatorio = tutoriales.find(item => item && item.ID_TRAINING === "Tutorial");
+    //const tutorialObligatorio2 = tutoriales.find(item => item && item.ID_TRAINING === "Extra_EspaciosConfinados");
+    
+    // 2. Filtrar los trainings permitidos para este usuario (excluyendo "Tutorial" para no duplicar)
+    const trainingsUsuario = tutoriales.filter(item => {
+      return item && 
+             item.ID_TRAINING && 
+             item.ID_TRAINING !== "Tutorial" && 
+             currentTrainings.includes(item.ID_TRAINING);
+    });
+    
+    // 3. Construir la lista final: tutorial obligatorio (si existe) + trainings del usuario
+    let videosFinales = [];
+    
+    if (tutorialObligatorio && extractYouTubeID(tutorialObligatorio.videoId)) {
+      videosFinales.push(tutorialObligatorio);
+    }
+    /*if (tutorialObligatorio2 && extractYouTubeID(tutorialObligatorio2.videoId)) {
+      videosFinales.push(tutorialObligatorio2);
+    }*/
+    
+    videosFinales = [...videosFinales, ...trainingsUsuario];
+    
+    // 4. Filtrar solo los que tienen videoId válido
+    const conVideo = videosFinales.filter(item => extractYouTubeID(item.videoId));
+    
+    if (!conVideo.length) {
+      listaDiv.innerHTML = '<div style="color:#A0D8EF;">❌ NO HAY VIDEOS DISPONIBLES PARA TU PERFIL</div>';
+      return;
+    }
+
+    listaDiv.innerHTML = '';
+    
+    conVideo.forEach((cap, index) => {
+      const btn = document.createElement("button");
+      btn.className = "cyber-btn";
+      // Agregar indicador visual si es el tutorial obligatorio
+      const esTutorial = cap.ID_TRAINING === "Tutorial";
+      const prefix = esTutorial ? "🎓 TUTORIAL - " : `${index}. `;
+      btn.innerText = esTutorial ? `🎓 ${cap.titulo}` : `${index} - ${cap.titulo}`;
+      
+      if (index === 0) {
+        btn.style.background = "#00F2FF";
+        btn.style.color = "#0D0E12";
+        btn.style.boxShadow = "0 0 20px rgba(0, 242, 255, 0.6)";
+      }
+      
+      btn.onclick = () => {
+        document.querySelectorAll('.cyber-btn').forEach(b => {
+          b.style.background = "";
+          b.style.color = "";
+          b.style.boxShadow = "";
+        });
+        btn.style.background = "#00F2FF";
+        btn.style.color = "#0D0E12";
+        btn.style.boxShadow = "0 0 20px rgba(0, 242, 255, 0.6)";
+        
+        const videoID = extractYouTubeID(cap.videoId);
+        if (!videoID) {
+          alert("ID DE VIDEO INVÁLIDO");
+          return;
+        }
+        const origin = window.location.origin;
+        const url = `https://www.youtube.com/embed/${videoID}?modestbranding=1&rel=0&playsinline=1&controls=1&origin=${encodeURIComponent(origin)}`;
+        playerFrame.src = url;
+      };
+      listaDiv.appendChild(btn);
+    });
+
+    const primerId = extractYouTubeID(conVideo[0]?.videoId);
+    if (primerId) {
+      const origin = window.location.origin;
+      playerFrame.src = `https://www.youtube.com/embed/${primerId}?modestbranding=1&rel=0&playsinline=1&controls=1&origin=${encodeURIComponent(origin)}`;
+    }
+
+  } catch (error) {
+    console.error(error);
+    listaDiv.innerHTML = '<div style="color:#ff4444;">⚠️ ERROR AL CARGAR DATOS</div>';
+  }
+}
+
+  async function login(company, username, password) {
+    try {
+      const snapshot = await get(ref(db, "Companies"));
+      if (!snapshot.exists()) {
+        document.getElementById('loginError').textContent = 'ERROR: Base de datos no disponible';
+        return false;
+      }
+
+      const companies = snapshot.val();
+      const companyData = companies[company];
+      
+      if (!companyData) {
+        document.getElementById('loginError').textContent = 'ERROR: Empresa no encontrada';
+        return false;
+      }
+      
+      const credentials = companyData.credentiales;
+      
+      if (credentials.user === username && credentials.password == parseInt(password)) {
+        currentUser = { company, username };
+        currentTrainings = credentials.TRAININGS || [];
+        
+        document.getElementById('userCompanyDisplay').textContent = company;
+        document.getElementById('userNameDisplay').textContent = username;
+        
+        loginOverlay.style.display = 'none';
+        mainContent.style.display = 'block';
+        
+        await cargarCapacitaciones();
+        return true;
+      } else {
+        document.getElementById('loginError').textContent = 'ERROR: Usuario o contraseña incorrectos';
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+      document.getElementById('loginError').textContent = 'ERROR DE CONEXIÓN';
+      return false;
+    }
+  }
+
+  function logout() {
+    currentUser = null;
+    currentTrainings = [];
+    loginOverlay.style.display = 'flex';
+    mainContent.style.display = 'none';
+    document.getElementById('companyInput').value = 'NOMBRE EMPRESA';
+    document.getElementById('userInput').value = 'USER';
+    document.getElementById('passwordInput').value = 'password';
+    document.getElementById('loginError').textContent = '';
+  }
+
+  document.getElementById('loginBtn').addEventListener('click', () => {
+    const company = document.getElementById('companyInput').value.trim();
+    const username = document.getElementById('userInput').value.trim();
+    const password = document.getElementById('passwordInput').value.trim();
+    login(company, username, password);
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', logout);
+
+  document.getElementById('companyInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') document.getElementById('loginBtn').click();
+  });
+  document.getElementById('userInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') document.getElementById('loginBtn').click();
+  });
+  document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') document.getElementById('loginBtn').click();
+  });
+
+  // Configurar redes sociales
+  setTimeout(() => {
+    const socialUrls = {
+      innovatech: {
+        linkedin: "https://www.linkedin.com/company/innovatech-vr/",
+        instagram: "https://www.instagram.com/innovatechvr",
+        facebook: "https://www.instagram.com/innovatechvr",
+        web: "https://innovatechvr.com"
+      },
+      ambiente: {
+        linkedin: "https://www.linkedin.com/company/ambienteconsultores",
+        instagram: "https://www.instagram.com/ambiente_consultores/",
+        facebook: "https://www.facebook.com/profile.php?id=100075844992312",
+        web: "https://ambienteconsultores.com.co/"
+      }
+    };
+    
+    document.getElementById("innovatechLinkedin")?.setAttribute("href", socialUrls.innovatech.linkedin);
+    document.getElementById("innovatechInstagram")?.setAttribute("href", socialUrls.innovatech.instagram);
+    document.getElementById("innovatechFacebook")?.setAttribute("href", socialUrls.innovatech.facebook);
+    document.getElementById("innovatechWeb")?.setAttribute("href", socialUrls.innovatech.web);
+    
+    document.getElementById("ambienteLinkedin")?.setAttribute("href", socialUrls.ambiente.linkedin);
+    document.getElementById("ambienteInstagram")?.setAttribute("href", socialUrls.ambiente.instagram);
+    document.getElementById("ambienteFacebook")?.setAttribute("href", socialUrls.ambiente.facebook);
+    document.getElementById("ambienteWeb")?.setAttribute("href", socialUrls.ambiente.web);
+  }, 100);
+
+  const companyInput = document.getElementById('companyInput');
+  const userInput = document.getElementById('userInput');
+  
+  if (companyInput) {
+    companyInput.addEventListener('input', function(e) {
+      this.value = this.value.toUpperCase();
+    });
+  }
+  
+  if (userInput) {
+    userInput.addEventListener('input', function(e) {
+      this.value = this.value.toUpperCase();
+    });
+  }
+  
+  // La contraseña NO se convierte a mayúsculas para mantener la seguridad
+  // pero puedes agregarlo si lo deseas:
+   const passwordInput = document.getElementById('passwordInput');
+  if (passwordInput) {
+    passwordInput.addEventListener('input', function(e) {
+      this.value = this.value.toUpperCase();
+   });
+   }
+</script>
+
+<script>
+  (function() {
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      return false;
+    });
+
+    document.addEventListener('keydown', (e) => {
+      const key = e.key;
+      const ctrl = e.ctrlKey || e.metaKey;
+      const shift = e.shiftKey;
+
+      if (key === 'F12' ||
+          (ctrl && shift && (key === 'I' || key === 'J' || key === 'C')) ||
+          (ctrl && key === 'u') ||
+          (ctrl && key === 's') ||
+          (ctrl && key === 'p') ||
+          (ctrl && key === 'c') ||
+          (ctrl && key === 'x') ||
+          (ctrl && key === 'v')) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+
+      if (key === 'PrintScreen') {
+        e.preventDefault();
+        alert('CAPTURA DE PANTALLA DESHABILITADA');
+        return false;
+      }
+    });
+
+    window.addEventListener('dragstart', (e) => {
+      e.preventDefault();
+      return false;
+    });
+
+    document.addEventListener('copy', (e) => {
+      e.preventDefault();
+      return false;
+    });
+
+    function showBlockerMessage(event) {
+      const tooltip = document.createElement('div');
+      tooltip.className = 'blocker-tooltip';
+      tooltip.textContent = '⛔ ZONA BLOQUEADA · NO SE PUEDE ABRIR YOUTUBE';
+      tooltip.style.left = (event.clientX + 15) + 'px';
+      tooltip.style.top = (event.clientY - 35) + 'px';
+      document.body.appendChild(tooltip);
+      setTimeout(() => tooltip.remove(), 1500);
+    }
+
+    const blockers = ['blockerLogo', 'blockerTitle', 'blockerShare', 'blockerEndLogo', 'blockerSubscribe', 'blockerMoreInfo'];
+    blockers.forEach(id => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.addEventListener('click', (e) => {
+          e.preventDefault();
+          showBlockerMessage(e);
+        });
+      }
+    });
+  })();
+</script>
+</body>
+</html>

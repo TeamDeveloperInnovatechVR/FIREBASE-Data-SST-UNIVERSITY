@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>SST University · Videotutoriales</title>
+  <!-- Google Fonts Cyber/Sci-Fi -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 (Iconos) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * {
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0D0E12;
+      min-height: 100vh;
+      color: #FFFFFF;
+    }
+
+    /* Fondo con degradado radial - Efecto HUD Cyber */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 30%, rgba(22, 27, 51, 0.6) 0%, #0D0E12 90%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Patrón de fondo sutil (estructura alámbrica) */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 30px 24px 40px;
+    }
+
+    /* Header con título principal */
+    .main-header {
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .main-header h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #FFFFFF 0%, #00F2FF 50%, #7000FF 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .main-header .sub {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.75rem;
+      color: #A0D8EF;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+
+    /* Línea decorativa HUD */
+    .hud-line {
+      width: 120px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #00F2FF, #7000FF, transparent);
+      margin: 15px auto 0;
+    }
+
+    /* Contenedor de botones estilo Cyber HUD */
+    .buttons-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .cyber-btn {
+      background: rgba(22, 27, 51, 0.5);
+      backdrop-filter: blur(4px);
+      border: 1px solid #00F2FF;
+      color: #A0D8EF;
+      padding: 12px 28px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: 'Orbitron', monospace;
+      border-radius: 0px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 8px rgba(0, 242, 255, 0.3);
+    }
+
+    .cyber-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 242, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .cyber-btn:hover::before {
+      left: 100%;
+    }
+
+    .cyber-btn:hover {
+      background: #00F2FF;
+      color: #0D0E12;
+      box-shadow: 0 0 20px rgba(0, 242, 255, 0.6);
+      border-color: #00F2FF;
+      transform: translateY(-2px);
+    }
+
+    /* Reproductor con marco futurista */
+    .video-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      max-width: 1200px;
+      background: #000;
+      border-radius: 0px;
+      overflow: hidden;
+      box-shadow: 0 0 0 2px rgba(0, 242, 255, 0.2), 0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(112, 0, 255, 0.3);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .video-container::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(135deg, #00F2FF, #7000FF);
+      z-index: -1;
+      border-radius: 0px;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    /* Glow magenta detrás del reproductor */
+    .video-container::after {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 10%;
+      width: 80%;
+      height: 100%;
+      background: radial-gradient(ellipse, rgba(112, 0, 255, 0.25), transparent);
+      filter: blur(40px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .video-container iframe {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: none;
+      background: #000;
+    }
+
+    /* Capas de bloqueo - Mismas coordenadas funcionales */
+    .blocker-logo, .blocker-title, .blocker-share-buttons, .blocker-end-logo, .blocker-subscribe, .blocker-more-info {
+      position: absolute;
+      background: transparent;
+      z-index: 20;
+      cursor: not-allowed;
+      pointer-events: auto;
+    }
+    .blocker-logo { top: 0%; left: 0%; width: 82.73%; height: 20.04%; }
+    .blocker-title { top: 0%; left: 0%; width: 82.83%; height: 21.10%; }
+    .blocker-share-buttons { top: 14.37%; left: 57.93%; width: 42.07%; height: 70.94%; }
+    .blocker-end-logo { top: 18.18%; left: 0.20%; width: 44.44%; height: 66.12%; }
+    .blocker-subscribe { top: 0%; left: 91.29%; width: 8.71%; height: 100%; }
+    .blocker-more-info { top: 89.08%; left: 0%; width: 100%; height: 10.92%; }
+
+    /* Badge de seguridad */
+    .secure-badge {
+      text-align: center;
+      margin: 20px 0 40px;
+    }
+    .secure-badge span {
+      font-size: 0.7rem;
+      background: rgba(0, 242, 255, 0.1);
+      border: 1px solid rgba(0, 242, 255, 0.3);
+      display: inline-block;
+      padding: 6px 18px;
+      border-radius: 30px;
+      color: #A0D8EF;
+      font-family: 'Orbitron', monospace;
+      letter-spacing: 1px;
+      backdrop-filter: blur(4px);
+    }
+
+    /* Footer con logos y redes sociales */
+    .footer {
+      margin-top: 50px;
+      padding-top: 30px;
+      border-top: 1px solid rgba(0, 242, 255, 0.2);
+    }
+
+    .logos-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .logo-item {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .logo-item img {
+      max-height: 50px;
+      width: auto;
+      filter: drop-shadow(0 0 5px rgba(0, 242, 255, 0.5));
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .logo-item img:hover {
+      transform: scale(1.05);
+      filter: drop-shadow(0 0 12px rgba(0, 242, 255, 0.8));
+    }
+
+    /* Redes sociales */
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      flex-wrap: wrap;
+    }
+
+    .social-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      background: rgba(22, 27, 51, 0.6);
+      border: 1px solid #00F2FF;
+      border-radius: 0px;
+      color: #00F2FF;
+      font-size: 1.4rem;
+      transition: all 0.25s ease;
+      text-decoration: none;
+      backdrop-filter: blur(4px);
+    }
+
+    .social-icon:hover {
+      background: #00F2FF;
+      color: #0D0E12;
+      transform: translateY(-3px);
+      box-shadow: 0 0 15px rgba(0, 242, 255, 0.5);
+    }
+
+    .copyright {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 0.7rem;
+      color: #A0D8EF;
+      opacity: 0.6;
+      font-family: 'Orbitron', monospace;
+    }
+
+    /* Tooltip bloqueo */
+    .blocker-tooltip {
+      position: fixed;
+      background: #dc2626;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      z-index: 9999;
+      pointer-events: none;
+      white-space: nowrap;
+      font-weight: 500;
+      font-family: 'Orbitron', monospace;
+      animation: fadeOut 1.5s ease-out forwards;
+    }
+
+    @keyframes fadeOut {
+      0% { opacity: 1; transform: scale(1); }
+      70% { opacity: 1; }
+      100% { opacity: 0; visibility: hidden; transform: scale(0.9); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container { padding: 20px 16px 30px; }
+      .main-header h1 { font-size: 1.4rem; }
+      .cyber-btn { padding: 8px 20px; font-size: 0.75rem; }
+      .logos-container { gap: 25px; }
+      .logo-item img { max-height: 40px; }
+      .social-icon { width: 38px; height: 38px; font-size: 1.2rem; }
+    }
+
+    @media (max-width: 480px) {
+      .main-header h1 { font-size: 1.1rem; }
+      .cyber-btn { padding: 6px 16px; font-size: 0.65rem; letter-spacing: 0.5px; }
+      .logos-container { gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Header Cyber -->
+  <div class="main-header">
+    <h1>VIDEOTUTORIALES<br><span style="font-size: 1.2rem;">SST UNIVERSITY</span></h1>
+    <div class="sub">SECURE LEARNING PORTAL</div>
+    <div class="hud-line"></div>
+  </div>
+
+  <!-- Botones de capacitaciones -->
+  <div id="lista" class="buttons-container"></div>
+
+  <!-- Reproductor con marco futurista -->
+  <div class="video-wrapper">
+    <div class="video-container" id="videoContainer">
+      <iframe 
+        id="securePlayer" 
+        title="Reproductor seguro"
+        allow="accelerometer; autoplay; encrypted-media; gyroscope"
+        allowfullscreen="false"
+        frameborder="0"
+        src="about:blank"
+      ></iframe>
+      <!-- Capas de bloqueo -->
+      <div class="blocker-logo" id="blockerLogo"></div>
+      <div class="blocker-title" id="blockerTitle"></div>
+      <div class="blocker-share-buttons" id="blockerShare"></div>
+      <div class="blocker-end-logo" id="blockerEndLogo"></div>
+      <div class="blocker-subscribe" id="blockerSubscribe"></div>
+      <div class="blocker-more-info" id="blockerMoreInfo"></div>
+    </div>
+  </div>
+
+  <!-- Badge seguridad -->
+  <div class="secure-badge">
+    <span>🔒 PROTECCIÓN HUD ACTIVA · SIN ACCESO A YOUTUBE</span>
+  </div>
+
+  <!-- Footer con logos y redes sociales -->
+  <div class="footer">
+    <div class="logos-container">
+      <div class="logo-item">
+        <img src="Resources/Innovatechvr.png" alt="Innovatech VR" onerror="this.src='https://placehold.co/120x40/1e293b/00F2FF?text=INNOVATECH'">
+      </div>
+      <div class="logo-item">
+        <img src="Resources/Ambiente.png" alt="Ambiente" onerror="this.src='https://placehold.co/100x40/1e293b/00F2FF?text=AMBIENTE'">
+      </div>
+    </div>
+    
+    <div class="social-icons">
+      <a href="#" class="social-icon" target="_blank" id="linkedinLink"><i class="fab fa-linkedin-in"></i></a>
+      <a href="#" class="social-icon" target="_blank" id="instagramLink"><i class="fab fa-instagram"></i></a>
+      <a href="#" class="social-icon" target="_blank" id="facebookLink"><i class="fab fa-facebook-f"></i></a>
+      <a href="#" class="social-icon" target="_blank" id="webLink"><i class="fas fa-globe"></i></a>
+    </div>
+    <div class="copyright">
+      <span>© 2025 SST UNIVERSITY · INNOVATECH VR · TODOS LOS DERECHOS RESERVADOS</span>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD3WLsNvfPX5NLF891p6zKBHZhaFA_Wpls",
+    authDomain: "sst-university.firebaseapp.com",
+    databaseURL: "https://sst-university-default-rtdb.firebaseio.com",
+    projectId: "sst-university"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const listaDiv = document.getElementById("lista");
+  const playerFrame = document.getElementById("securePlayer");
+
+  function extractYouTubeID(urlOrId) {
+    if (!urlOrId) return null;
+    const str = String(urlOrId).trim();
+    if (/^[a-zA-Z0-9_-]{11}$/.test(str)) return str;
+    let match = str.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([^&?#]+)/);
+    if (match) return match[1];
+    match = str.match(/youtube\.com\/embed\/([^?&]+)/);
+    if (match) return match[1];
+    return null;
+  }
+
+  async function cargarCapacitaciones() {
+    try {
+      const snapshot = await get(ref(db, "VideoTutoriales"));
+      if (!snapshot.exists()) {
+        listaDiv.innerHTML = '<div style="color:#A0D8EF; font-family:Orbitron;">⚠️ NO HAY CAPACITACIONES DISPONIBLES</div>';
+        return;
+      }
+
+      let data = snapshot.val();
+      let tutoriales = Array.isArray(data) ? data : Object.values(data);
+      const validos = tutoriales.filter(item => item && item.titulo && item.videoId);
+
+      if (!validos.length) {
+        listaDiv.innerHTML = '<div style="color:#A0D8EF;">❌ NO HAY VIDEOS VÁLIDOS</div>';
+        return;
+      }
+
+      // Orden de lectura: mantener el orden original del JSON
+      validos.forEach((cap, index) => {
+        const btn = document.createElement("button");
+        btn.className = "cyber-btn";
+        btn.innerText = cap.titulo;
+        if (index === 0) {
+          btn.style.background = "#00F2FF";
+          btn.style.color = "#0D0E12";
+          btn.style.boxShadow = "0 0 20px rgba(0, 242, 255, 0.6)";
+        }
+        btn.onclick = () => {
+          document.querySelectorAll('.cyber-btn').forEach(b => {
+            b.style.background = "";
+            b.style.color = "";
+            b.style.boxShadow = "";
+          });
+          btn.style.background = "#00F2FF";
+          btn.style.color = "#0D0E12";
+          btn.style.boxShadow = "0 0 20px rgba(0, 242, 255, 0.6)";
+          
+          const videoID = extractYouTubeID(cap.videoId);
+          if (!videoID) {
+            alert("ID DE VIDEO INVÁLIDO");
+            return;
+          }
+          const origin = window.location.origin;
+          const url = `https://www.youtube.com/embed/${videoID}?modestbranding=1&rel=0&playsinline=1&controls=1&origin=${encodeURIComponent(origin)}`;
+          playerFrame.src = url;
+        };
+        listaDiv.appendChild(btn);
+      });
+
+      const primerId = extractYouTubeID(validos[0].videoId);
+      if (primerId) {
+        const origin = window.location.origin;
+        playerFrame.src = `https://www.youtube.com/embed/${primerId}?modestbranding=1&rel=0&playsinline=1&controls=1&origin=${encodeURIComponent(origin)}`;
+      }
+
+    } catch (error) {
+      console.error(error);
+      listaDiv.innerHTML = '<div style="color:#ff4444;">⚠️ ERROR AL CARGAR DATOS</div>';
+    }
+  }
+
+  cargarCapacitaciones();
+
+  // Configuración de redes sociales
+  setTimeout(() => {
+    const socialLinks = {
+      linkedin: "https://www.linkedin.com/company/innovatechvr",
+      instagram: "https://www.instagram.com/innovatechvr",
+      facebook: "https://www.facebook.com/innovatechvr",
+      web: "https://www.innovatechvr.com"
+    };
+    document.getElementById("linkedinLink")?.setAttribute("href", socialLinks.linkedin);
+    document.getElementById("instagramLink")?.setAttribute("href", socialLinks.instagram);
+    document.getElementById("facebookLink")?.setAttribute("href", socialLinks.facebook);
+    document.getElementById("webLink")?.setAttribute("href", socialLinks.web);
+  }, 100);
+</script>
+
+<script>
+  (function() {
+    // Bloquear clic derecho
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      return false;
+    });
+
+    // Bloquear teclas peligrosas - CORREGIDO (arrow function correcta)
+    document.addEventListener('keydown', (e) => {
+      const key = e.key;
+      const ctrl = e.ctrlKey || e.metaKey;
+      const shift = e.shiftKey;
+
+      if (key === 'F12' ||
+          (ctrl && shift && (key === 'I' || key === 'J' || key === 'C')) ||
+          (ctrl && key === 'u') ||
+          (ctrl && key === 's') ||
+          (ctrl && key === 'p') ||
+          (ctrl && key === 'c') ||
+          (ctrl && key === 'x') ||
+          (ctrl && key === 'v')) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+
+      if (key === 'PrintScreen') {
+        e.preventDefault();
+        alert('CAPTURA DE PANTALLA DESHABILITADA');
+        navigator.clipboard.writeText('').catch(() => {});
+        return false;
+      }
+    });
+
+    window.addEventListener('dragstart', (e) => {
+      e.preventDefault();
+      return false;
+    });
+
+    document.addEventListener('copy', (e) => {
+      e.preventDefault();
+      e.clipboardData.setData('text/plain', '⚠️ CONTENIDO PROTEGIDO');
+      alert('NO SE PERMITE COPIAR INFORMACIÓN');
+      return false;
+    });
+
+    const iframe = document.getElementById('securePlayer');
+    if (iframe) {
+      iframe.addEventListener('fullscreenchange', () => {
+        if (document.fullscreenElement === iframe) {
+          document.exitFullscreen();
+        }
+      });
+      iframe.removeAttribute('allowfullscreen');
+      iframe.setAttribute('allowfullscreen', 'false');
+    }
+
+    function showBlockerMessage(event) {
+      const tooltip = document.createElement('div');
+      tooltip.className = 'blocker-tooltip';
+      tooltip.textContent = '⛔ ZONA BLOQUEADA · NO SE PUEDE ABRIR YOUTUBE';
+      tooltip.style.left = (event.clientX + 15) + 'px';
+      tooltip.style.top = (event.clientY - 35) + 'px';
+      document.body.appendChild(tooltip);
+      setTimeout(() => {
+        if (tooltip && tooltip.remove) tooltip.remove();
+      }, 1500);
+    }
+
+    const blockers = ['blockerLogo', 'blockerTitle', 'blockerShare', 'blockerEndLogo', 'blockerSubscribe', 'blockerMoreInfo'];
+    blockers.forEach(id => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          showBlockerMessage(e);
+          return false;
+        });
+        element.addEventListener('dblclick', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        });
+        element.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        });
+      }
+    });
+  })();
+</script>
+</body>
+</html>
