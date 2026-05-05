@@ -89,15 +89,15 @@
     }
 
     .login-input {
-    text-transform: uppercase;
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    background: rgba(13, 14, 18, 0.8);
-    border: 1px solid #00F2FF;
-    color: #fff;
-    font-family: 'Inter', monospace;
-  }
+      text-transform: uppercase;
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      background: rgba(13, 14, 18, 0.8);
+      border: 1px solid #00F2FF;
+      color: #fff;
+      font-family: 'Inter', monospace;
+    }
 
     .login-input:focus {
       outline: none;
@@ -129,9 +129,36 @@
       font-size: 0.8rem;
     }
 
-    /* Contenido principal (oculto hasta login) */
     .main-content {
       display: none;
+    }
+
+    /* Mensaje para móvil */
+    .mobile-blocker {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+      background: rgba(22, 27, 51, 0.9);
+      border: 2px solid #dc2626;
+      margin: 20px;
+      border-radius: 16px;
+    }
+
+    .mobile-blocker i {
+      font-size: 4rem;
+      color: #dc2626;
+      margin-bottom: 20px;
+    }
+
+    .mobile-blocker h3 {
+      font-family: 'Orbitron', monospace;
+      color: #dc2626;
+      margin-bottom: 15px;
+    }
+
+    .mobile-blocker p {
+      color: #A0D8EF;
+      margin-bottom: 10px;
     }
 
     .main-header {
@@ -242,38 +269,19 @@
       width: 100%;
       aspect-ratio: 16 / 9;
       border: none;
+      pointer-events: auto;
     }
 
-    .blocker-logo, .blocker-title, .blocker-share-buttons, .blocker-end-logo, .blocker-subscribe, .blocker-more-info {
+    /* Capas de bloqueo - Solo visibles en desktop */
+    .blocker-layer {
       position: absolute;
       background: transparent;
       z-index: 20;
       cursor: not-allowed;
       pointer-events: auto;
     }
-    .blocker-logo { top: 0%; left: 0%; width: 82.73%; height: 20.04%; }
-    .blocker-title { top: 0%; left: 0%; width: 82.83%; height: 21.10%; }
-    .blocker-share-buttons { top: 14.37%; left: 57.93%; width: 42.07%; height: 70.94%; }
-    .blocker-end-logo { top: 18.18%; left: 0.20%; width: 44.44%; height: 66.12%; }
-    .blocker-subscribe { top: 0%; left: 91.29%; width: 8.71%; height: 100%; }
-    .blocker-more-info { top: 89.08%; left: 0%; width: 100%; height: 10.92%; }
 
-    .secure-badge {
-      text-align: center;
-      margin: 20px 0 40px;
-    }
-    .secure-badge span {
-      font-size: 0.7rem;
-      background: rgba(0, 242, 255, 0.1);
-      border: 1px solid rgba(0, 242, 255, 0.3);
-      display: inline-block;
-      padding: 6px 18px;
-      border-radius: 30px;
-      color: #A0D8EF;
-      font-family: 'Orbitron', monospace;
-    }
-
-    /* Footer con logos mejorado */
+    /* Footer */
     .footer {
       margin-top: 50px;
       padding-top: 30px;
@@ -426,6 +434,16 @@
   </style>
 </head>
 <body>
+
+<!-- DETECTOR DE MÓVIL - Mensaje de bloqueo -->
+<div id="mobileWarning" style="display: none;" class="mobile-blocker">
+  <i class="fas fa-mobile-alt"></i>
+  <h3>📱 ACCESO SOLO EN PC</h3>
+  <p>Este contenido solo está disponible en <strong>computadoras de escritorio</strong>.</p>
+  <p>Por favor, accede desde una PC para ver los videotutoriales.</p>
+  <p style="margin-top: 20px; font-size: 0.8rem;">🔒 SST UNIVERSITY · INNOVATECH VR</p>
+</div>
+
 <div class="login-overlay" id="loginOverlay">
   <div class="login-card">
     <h2>🔐 ACCESO SEGURO</h2>
@@ -455,12 +473,8 @@
     <div class="video-wrapper">
       <div class="video-container" id="videoContainer">
         <iframe id="securePlayer" title="Reproductor seguro" allow="accelerometer; autoplay; encrypted-media; gyroscope" allowfullscreen="false" frameborder="0" src="about:blank"></iframe>
-        <div class="blocker-logo" id="blockerLogo"></div>
-        <div class="blocker-title" id="blockerTitle"></div>
-        <div class="blocker-share-buttons" id="blockerShare"></div>
-        <div class="blocker-end-logo" id="blockerEndLogo"></div>
-        <div class="blocker-subscribe" id="blockerSubscribe"></div>
-        <div class="blocker-more-info" id="blockerMoreInfo"></div>
+        <!-- Capas de bloqueo - Se generan dinámicamente solo en desktop -->
+        <div id="desktopBlockers"></div>
       </div>
     </div>
 
@@ -470,7 +484,6 @@
 
     <div class="footer">
       <div class="footer-row">
-        <!-- Logo Innovatech con redes sociales -->
         <div class="footer-col">
           <div class="logo-item">
             <img src="Resources/Innovatechvr.png" alt="Innovatech VR" onerror="this.src='https://placehold.co/120x40/1e293b/00F2FF?text=INNOVATECH'">
@@ -483,7 +496,6 @@
           </div>
         </div>
 
-        <!-- Logo Ambiente con redes sociales -->
         <div class="footer-col">
           <div class="logo-item">
             <img src="Resources/Ambiente.png" alt="Ambiente" onerror="this.src='https://placehold.co/100x40/1e293b/00F2FF?text=AMBIENTE'">
@@ -496,7 +508,6 @@
           </div>
         </div>
 
-        <!-- Información de contacto -->
         <div class="footer-col">
           <h4>📧 CONTACTO</h4>
           <div class="contact-info">
@@ -514,6 +525,20 @@
     </div>
   </div>
 </div>
+
+<script>
+  // DETECTAR DISPOSITIVO MÓVIL
+  function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+  }
+
+  // Si es móvil, mostrar mensaje de bloqueo y ocultar el contenido
+  if (isMobileDevice()) {
+    document.getElementById('mobileWarning').style.display = 'block';
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'none';
+  }
+</script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -548,99 +573,143 @@
     return null;
   }
 
-// 🔥 NUEVA LÓGICA: Tutorial obligatorio + trainings del usuario
-async function cargarCapacitaciones() {
-  try {
-    const snapshot = await get(ref(db, "VideoTutoriales"));
-    if (!snapshot.exists()) {
-      listaDiv.innerHTML = '<div style="color:#A0D8EF;">⚠️ NO HAY CAPACITACIONES DISPONIBLES</div>';
-      return;
-    }
-
-    let data = snapshot.val();
-    let tutoriales = Array.isArray(data) ? data : Object.values(data);
+  // Crear capas de bloqueo SOLO para desktop
+  function crearBloquesDesktop() {
+    const container = document.getElementById('videoContainer');
+    const blockersContainer = document.getElementById('desktopBlockers');
+    if (!blockersContainer) return;
     
-    // 1. Buscar el tutorial obligatorio (ID_TRAINING = "Tutorial")
-    const tutorialObligatorio = tutoriales.find(item => item && item.ID_TRAINING === "Tutorial");
-    //const tutorialObligatorio2 = tutoriales.find(item => item && item.ID_TRAINING === "Extra_EspaciosConfinados");
+    blockersContainer.innerHTML = '';
     
-    // 2. Filtrar los trainings permitidos para este usuario (excluyendo "Tutorial" para no duplicar)
-    const trainingsUsuario = tutoriales.filter(item => {
-      return item && 
-             item.ID_TRAINING && 
-             item.ID_TRAINING !== "Tutorial" && 
-             currentTrainings.includes(item.ID_TRAINING);
-    });
+    const bloques = [
+      { id: 'logo', top: 0, left: 0, width: 82.73, height: 20.04 },
+      { id: 'title', top: 0, left: 0, width: 82.83, height: 21.10 },
+      { id: 'share', top: 14.37, left: 57.93, width: 42.07, height: 70.94 },
+      { id: 'endLogo', top: 18.18, left: 0.20, width: 44.44, height: 66.12 },
+      { id: 'subscribe', top: 0, left: 91.29, width: 8.71, height: 100 },
+      { id: 'moreInfo', top: 89.08, left: 0, width: 100, height: 10.92 }
+    ];
     
-    // 3. Construir la lista final: tutorial obligatorio (si existe) + trainings del usuario
-    let videosFinales = [];
-    
-    if (tutorialObligatorio && extractYouTubeID(tutorialObligatorio.videoId)) {
-      videosFinales.push(tutorialObligatorio);
-    }
-    /*if (tutorialObligatorio2 && extractYouTubeID(tutorialObligatorio2.videoId)) {
-      videosFinales.push(tutorialObligatorio2);
-    }*/
-    
-    videosFinales = [...videosFinales, ...trainingsUsuario];
-    
-    // 4. Filtrar solo los que tienen videoId válido
-    const conVideo = videosFinales.filter(item => extractYouTubeID(item.videoId));
-    
-    if (!conVideo.length) {
-      listaDiv.innerHTML = '<div style="color:#A0D8EF;">❌ NO HAY VIDEOS DISPONIBLES PARA TU PERFIL</div>';
-      return;
-    }
-
-    listaDiv.innerHTML = '';
-    
-    conVideo.forEach((cap, index) => {
-      const btn = document.createElement("button");
-      btn.className = "cyber-btn";
-      // Agregar indicador visual si es el tutorial obligatorio
-      const esTutorial = cap.ID_TRAINING === "Tutorial";
-      const prefix = esTutorial ? "🎓 TUTORIAL - " : `${index}. `;
-      btn.innerText = esTutorial ? `🎓 ${cap.titulo}` : `${index} - ${cap.titulo}`;
+    bloques.forEach(bloque => {
+      const capa = document.createElement('div');
+      capa.className = 'blocker-layer';
+      capa.style.position = 'absolute';
+      capa.style.top = bloque.top + '%';
+      capa.style.left = bloque.left + '%';
+      capa.style.width = bloque.width + '%';
+      capa.style.height = bloque.height + '%';
+      capa.style.background = 'transparent';
+      capa.style.zIndex = '20';
+      capa.style.cursor = 'not-allowed';
+      capa.style.pointerEvents = 'auto';
       
-      if (index === 0) {
-        btn.style.background = "#00F2FF";
-        btn.style.color = "#0D0E12";
-        btn.style.boxShadow = "0 0 20px rgba(0, 242, 255, 0.6)";
+      capa.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        showBlockerMessage(e);
+        return false;
+      });
+      
+      blockersContainer.appendChild(capa);
+    });
+  }
+
+  function showBlockerMessage(event) {
+    const tooltip = document.createElement('div');
+    tooltip.className = 'blocker-tooltip';
+    tooltip.textContent = '⛔ ZONA BLOQUEADA · NO SE PUEDE ABRIR YOUTUBE';
+    tooltip.style.left = (event.clientX + 15) + 'px';
+    tooltip.style.top = (event.clientY - 35) + 'px';
+    document.body.appendChild(tooltip);
+    setTimeout(() => tooltip.remove(), 1500);
+  }
+
+  async function cargarCapacitaciones() {
+    try {
+      const snapshot = await get(ref(db, "VideoTutoriales"));
+      if (!snapshot.exists()) {
+        listaDiv.innerHTML = '<div style="color:#A0D8EF;">⚠️ NO HAY CAPACITACIONES DISPONIBLES</div>';
+        return;
+      }
+
+      let data = snapshot.val();
+      let tutoriales = Array.isArray(data) ? data : Object.values(data);
+      
+      const tutorialObligatorio = tutoriales.find(item => item && item.ID_TRAINING === "Tutorial");
+      
+      const trainingsUsuario = tutoriales.filter(item => {
+        return item && 
+               item.ID_TRAINING && 
+               item.ID_TRAINING !== "Tutorial" && 
+               currentTrainings.includes(item.ID_TRAINING);
+      });
+      
+      let videosFinales = [];
+      
+      if (tutorialObligatorio && extractYouTubeID(tutorialObligatorio.videoId)) {
+        videosFinales.push(tutorialObligatorio);
       }
       
-      btn.onclick = () => {
-        document.querySelectorAll('.cyber-btn').forEach(b => {
-          b.style.background = "";
-          b.style.color = "";
-          b.style.boxShadow = "";
-        });
-        btn.style.background = "#00F2FF";
-        btn.style.color = "#0D0E12";
-        btn.style.boxShadow = "0 0 20px rgba(0, 242, 255, 0.6)";
+      videosFinales = [...videosFinales, ...trainingsUsuario];
+      const conVideo = videosFinales.filter(item => extractYouTubeID(item.videoId));
+      
+      if (!conVideo.length) {
+        listaDiv.innerHTML = '<div style="color:#A0D8EF;">❌ NO HAY VIDEOS DISPONIBLES PARA TU PERFIL</div>';
+        return;
+      }
+
+      listaDiv.innerHTML = '';
+      
+      conVideo.forEach((cap, index) => {
+        const btn = document.createElement("button");
+        btn.className = "cyber-btn";
+        const esTutorial = cap.ID_TRAINING === "Tutorial";
+        btn.innerText = esTutorial ? `🎓 ${cap.titulo}` : `${index} - ${cap.titulo}`;
         
-        const videoID = extractYouTubeID(cap.videoId);
-        if (!videoID) {
-          alert("ID DE VIDEO INVÁLIDO");
-          return;
+        if (index === 0) {
+          btn.style.background = "#00F2FF";
+          btn.style.color = "#0D0E12";
+          btn.style.boxShadow = "0 0 20px rgba(0, 242, 255, 0.6)";
         }
+        
+        btn.onclick = () => {
+          document.querySelectorAll('.cyber-btn').forEach(b => {
+            b.style.background = "";
+            b.style.color = "";
+            b.style.boxShadow = "";
+          });
+          btn.style.background = "#00F2FF";
+          btn.style.color = "#0D0E12";
+          btn.style.boxShadow = "0 0 20px rgba(0, 242, 255, 0.6)";
+          
+          const videoID = extractYouTubeID(cap.videoId);
+          if (!videoID) {
+            alert("ID DE VIDEO INVÁLIDO");
+            return;
+          }
+          const origin = window.location.origin;
+          const url = `https://www.youtube.com/embed/${videoID}?modestbranding=1&rel=0&playsinline=1&controls=1&origin=${encodeURIComponent(origin)}`;
+          playerFrame.src = url;
+        };
+        listaDiv.appendChild(btn);
+      });
+
+      const primerId = extractYouTubeID(conVideo[0]?.videoId);
+      if (primerId) {
         const origin = window.location.origin;
-        const url = `https://www.youtube.com/embed/${videoID}?modestbranding=1&rel=0&playsinline=1&controls=1&origin=${encodeURIComponent(origin)}`;
-        playerFrame.src = url;
-      };
-      listaDiv.appendChild(btn);
-    });
+        playerFrame.src = `https://www.youtube.com/embed/${primerId}?modestbranding=1&rel=0&playsinline=1&controls=1&origin=${encodeURIComponent(origin)}`;
+      }
 
-    const primerId = extractYouTubeID(conVideo[0]?.videoId);
-    if (primerId) {
-      const origin = window.location.origin;
-      playerFrame.src = `https://www.youtube.com/embed/${primerId}?modestbranding=1&rel=0&playsinline=1&controls=1&origin=${encodeURIComponent(origin)}`;
+      // Crear bloques de bloqueo SOLO si NO es móvil
+      if (!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        crearBloquesDesktop();
+      }
+
+    } catch (error) {
+      console.error(error);
+      listaDiv.innerHTML = '<div style="color:#ff4444;">⚠️ ERROR AL CARGAR DATOS</div>';
     }
-
-  } catch (error) {
-    console.error(error);
-    listaDiv.innerHTML = '<div style="color:#ff4444;">⚠️ ERROR AL CARGAR DATOS</div>';
   }
-}
 
   async function login(company, username, password) {
     try {
@@ -688,9 +757,9 @@ async function cargarCapacitaciones() {
     currentTrainings = [];
     loginOverlay.style.display = 'flex';
     mainContent.style.display = 'none';
-    document.getElementById('companyInput').value = 'NOMBRE EMPRESA';
-    document.getElementById('userInput').value = 'USER';
-    document.getElementById('passwordInput').value = 'password';
+    document.getElementById('companyInput').value = '';
+    document.getElementById('userInput').value = '';
+    document.getElementById('passwordInput').value = '';
     document.getElementById('loginError').textContent = '';
   }
 
@@ -713,7 +782,23 @@ async function cargarCapacitaciones() {
     if (e.key === 'Enter') document.getElementById('loginBtn').click();
   });
 
-  // Configurar redes sociales
+  // Convertir a mayúsculas
+  const companyInput = document.getElementById('companyInput');
+  const userInput = document.getElementById('userInput');
+  
+  if (companyInput) {
+    companyInput.addEventListener('input', function(e) {
+      this.value = this.value.toUpperCase();
+    });
+  }
+  
+  if (userInput) {
+    userInput.addEventListener('input', function(e) {
+      this.value = this.value.toUpperCase();
+    });
+  }
+
+  // Redes sociales
   setTimeout(() => {
     const socialUrls = {
       innovatech: {
@@ -740,30 +825,6 @@ async function cargarCapacitaciones() {
     document.getElementById("ambienteFacebook")?.setAttribute("href", socialUrls.ambiente.facebook);
     document.getElementById("ambienteWeb")?.setAttribute("href", socialUrls.ambiente.web);
   }, 100);
-
-  const companyInput = document.getElementById('companyInput');
-  const userInput = document.getElementById('userInput');
-  
-  if (companyInput) {
-    companyInput.addEventListener('input', function(e) {
-      this.value = this.value.toUpperCase();
-    });
-  }
-  
-  if (userInput) {
-    userInput.addEventListener('input', function(e) {
-      this.value = this.value.toUpperCase();
-    });
-  }
-  
-  // La contraseña NO se convierte a mayúsculas para mantener la seguridad
-  // pero puedes agregarlo si lo deseas:
-   const passwordInput = document.getElementById('passwordInput');
-  if (passwordInput) {
-    passwordInput.addEventListener('input', function(e) {
-      this.value = this.value.toUpperCase();
-   });
-   }
 </script>
 
 <script>
@@ -803,30 +864,9 @@ async function cargarCapacitaciones() {
       return false;
     });
 
-    document.addEventListener('copy', (e) => {
+    document.addEventListener('copy', (e) {
       e.preventDefault();
       return false;
-    });
-
-    function showBlockerMessage(event) {
-      const tooltip = document.createElement('div');
-      tooltip.className = 'blocker-tooltip';
-      tooltip.textContent = '⛔ ZONA BLOQUEADA · NO SE PUEDE ABRIR YOUTUBE';
-      tooltip.style.left = (event.clientX + 15) + 'px';
-      tooltip.style.top = (event.clientY - 35) + 'px';
-      document.body.appendChild(tooltip);
-      setTimeout(() => tooltip.remove(), 1500);
-    }
-
-    const blockers = ['blockerLogo', 'blockerTitle', 'blockerShare', 'blockerEndLogo', 'blockerSubscribe', 'blockerMoreInfo'];
-    blockers.forEach(id => {
-      const element = document.getElementById(id);
-      if (element) {
-        element.addEventListener('click', (e) => {
-          e.preventDefault();
-          showBlockerMessage(e);
-        });
-      }
     });
   })();
 </script>
