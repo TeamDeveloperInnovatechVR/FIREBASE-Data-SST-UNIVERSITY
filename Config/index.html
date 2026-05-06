@@ -530,22 +530,47 @@
     await saveGlobalTrainings(newList);
   };
 
+  // Función para limpiar strings RCP (remover comillas escapadas y vacíos)
+  function cleanRCPValue(value) {
+    if (value === null || value === undefined) return null;
+    if (typeof value === 'string') {
+      // Remover comillas dobles escapadas y comillas normales
+      let cleaned = value.replace(/^["']|["']$/g, '');
+      cleaned = cleaned.replace(/\\"/g, '"');
+      // Si después de limpiar queda vacío, retornar null
+      if (cleaned === '') return null;
+      return cleaned;
+    }
+    return value;
+  }
+
+  function cleanRCPArray(rcpArray) {
+    if (!rcpArray || !Array.isArray(rcpArray)) return [];
+    // Filtrar valores nulos, undefined o vacíos
+    const cleaned = rcpArray.map(item => cleanRCPValue(item)).filter(item => item !== null && item !== '');
+    return cleaned;
+  }
+
   async function renderAllCompanies() {
     const snapshot = await get(ref(db, COMPANIES_REF));
     const companies = snapshot.val() || {};
     const container = document.getElementById('companiesList');
     if (!container) return;
     
-    container.innerHTML = Object.entries(companies).map(([companyName, companyData]) => `
+    container.innerHTML = Object.entries(companies).map(([companyName, companyData]) => {
+      const cleanRCP = cleanRCPArray(companyData.RCP);
+      // Escapar correctamente el string JSON para evitar errores
+      const rcpString = JSON.stringify(cleanRCP).replace(/'/g, "\\'");
+      return `
       <div style="background: rgba(22, 27, 51, 0.4); margin-bottom: 20px; padding: 15px;">
         <h3 style="color:#00F2FF;">🏢 ${companyName}</h3>
-        <button class="edit-btn" onclick="editCompany('${companyName}')">✏️ EDITAR EMPRESA</button>
-        <button class="edit-btn" onclick="editRCP('${companyName}', ${JSON.stringify(companyData.RCP || [])})">🔢 EDITAR RCP</button>
-        <button class="delete-btn" onclick="deleteCompany('${companyName}')">🗑️ ELIMINAR EMPRESA</button>
-        <button class="add-btn" onclick="addDevice('${companyName}')">+ AGREGAR DISPOSITIVO</button>
+        <button class="edit-btn" onclick='window.editCompany("${companyName}")'>✏️ EDITAR EMPRESA</button>
+        <button class="edit-btn" onclick='window.editRCP("${companyName}", ${rcpString})'>🔢 EDITAR RCP</button>
+        <button class="delete-btn" onclick='window.deleteCompany("${companyName}")'>🗑️ ELIMINAR EMPRESA</button>
+        <button class="add-btn" onclick='window.addDevice("${companyName}")'>+ AGREGAR DISPOSITIVO</button>
         <div id="devices-${companyName}"></div>
       </div>
-    `).join('');
+    `}).join('');
     
     for (const [companyName, companyData] of Object.entries(companies)) {
       const devicesContainer = document.getElementById(`devices-${companyName}`);
@@ -555,8 +580,8 @@
           ${Object.entries(companyData.devices).map(([deviceId, deviceData]) => `
             <div style="border:1px solid rgba(0,242,255,0.2); padding:12px; margin:8px 0;">
               <strong>🔑 ${deviceId}</strong>
-              <button class="edit-btn" onclick="editDevice('${companyName}', '${deviceId}')">✏️ EDITAR</button>
-              <button class="delete-btn" onclick="deleteDevice('${companyName}', '${deviceId}')">🗑️ ELIMINAR</button>
+              <button class="edit-btn" onclick='window.editDevice("${companyName}", "${deviceId}")'>✏️ EDITAR</button>
+              <button class="delete-btn" onclick='window.deleteDevice("${companyName}", "${deviceId}")'>🗑️ ELIMINAR</button>
               <div style="font-size:0.75rem; margin-top:5px;">
                 Licencia: ${deviceData.license?.type || 'N/A'} | Expira: ${deviceData.license?.expirationDate || 'N/A'}
                 ${deviceData.license?.updateLicense ? '🔄 Auto-renovable' : ''}
@@ -571,10 +596,14 @@
     }
   }
 
-  // Editar RCP de la empresa - AHORA ACEPTA TEXTO ALFANUMÉRICO
+  // Editar RCP de la empresa - CORREGIDO
   window.editRCP = (companyName, currentRCP) => {
+    // Limpiar los valores de RCP antes de mostrarlos
+    let cleanRCP = Array.isArray(currentRCP) ? [...currentRCP] : [];
+    cleanRCP = cleanRCP.filter(item => item && item !== '');
+    
     showModal('Editar RCP de ' + companyName, `
-      <label>📡 Códigos/seriales Bluetooth (ej: 12:IW:87:18):</label>
+      <label>📡 Códigos/seriales (ej: 12:IW:87:18):</label>
       <div class="rcp-list" id="rcpListContainer"></div>
       <div style="display: flex; gap: 10px; margin-top: 15px;">
         <input type="text" id="newRCPValue" class="modal-input" placeholder="Ej: 12:IW:87:18" style="flex:1; font-family: monospace;">
@@ -583,19 +612,25 @@
       <p style="font-size:0.7rem; color:#A0D8EF; margin-top:10px;">💡 Puedes ingresar cualquier código alfanumérico (seriales Bluetooth, códigos de dispositivo, etc.)</p>
     `, async () => {
       const newRCPList = window.currentRCPList || [];
-      await update(ref(db, `${COMPANIES_REF}/${companyName}`), { RCP: newRCPList });
+      // Filtrar valores vacíos antes de guardar
+      const finalList = newRCPList.filter(item => item && item.trim() !== '');
+      await update(ref(db, `${COMPANIES_REF}/${companyName}`), { RCP: finalList });
       renderAllCompanies();
     });
     
-    window.currentRCPList = [...(currentRCP || [])];
+    window.currentRCPList = [...cleanRCP];
     
     function renderRCPList() {
       const container = document.getElementById('rcpListContainer');
       if (!container) return;
+      if (window.currentRCPList.length === 0) {
+        container.innerHTML = '<div style="color:#A0D8EF; padding:10px;">No hay códigos RCP registrados</div>';
+        return;
+      }
       container.innerHTML = window.currentRCPList.map((rcp, idx) => `
         <div class="rcp-tag">
           <span class="rcp-code">🔑 ${rcp}</span>
-          <span class="remove-tag" onclick="removeRCPItem(${idx})">✖</span>
+          <span class="remove-tag" onclick="window.removeRCPItem(${idx})">✖</span>
         </div>
       `).join('');
     }
@@ -605,16 +640,26 @@
       renderRCPList();
     };
     
-    document.getElementById('addRCPBtn')?.addEventListener('click', () => {
-      const newValue = document.getElementById('newRCPValue').value.trim();
-      if (newValue && !window.currentRCPList.includes(newValue)) {
-        window.currentRCPList.push(newValue);
-        renderRCPList();
-        document.getElementById('newRCPValue').value = '';
-      } else if (newValue && window.currentRCPList.includes(newValue)) {
-        alert('⚠️ Este código ya existe en la lista');
+    // Esperar a que el DOM del modal esté listo
+    setTimeout(() => {
+      const addBtn = document.getElementById('addRCPBtn');
+      if (addBtn) {
+        // Remover listener anterior para evitar duplicados
+        const newBtn = addBtn.cloneNode(true);
+        addBtn.parentNode.replaceChild(newBtn, addBtn);
+        newBtn.addEventListener('click', () => {
+          const input = document.getElementById('newRCPValue');
+          const newValue = input?.value.trim();
+          if (newValue && !window.currentRCPList.includes(newValue)) {
+            window.currentRCPList.push(newValue);
+            renderRCPList();
+            if (input) input.value = '';
+          } else if (newValue && window.currentRCPList.includes(newValue)) {
+            alert('⚠️ Este código ya existe en la lista');
+          }
+        });
       }
-    });
+    }, 100);
     
     renderRCPList();
   };
@@ -942,17 +987,20 @@
     const container = document.getElementById('usersList');
     if (!container) return;
     
-    container.innerHTML = Object.entries(companies).map(([companyName, companyData]) => `
+    container.innerHTML = Object.entries(companies).map(([companyName, companyData]) => {
+      const cleanRCP = cleanRCPArray(companyData.RCP);
+      const rcpString = JSON.stringify(cleanRCP).replace(/'/g, "\\'");
+      return `
       <div style="border:1px solid rgba(0,242,255,0.2); padding:15px; margin-bottom:15px;">
         <h3 style="color:#00F2FF;">🏢 ${companyName}</h3>
         <p><strong>Usuario:</strong> ${companyData.credentiales?.user || 'N/A'}</p>
         <p><strong>Password:</strong> ${companyData.credentiales?.password || 'N/A'}</p>
-        <p><strong>RCPs:</strong> ${(companyData.RCP || []).map(r => `<code style="background:#000; padding:2px 6px; margin:2px; display:inline-block;">${r}</code>`).join(', ') || 'Ninguno'}</p>
+        <p><strong>RCPs:</strong> ${(cleanRCP).map(r => `<code style="background:#000; padding:2px 6px; margin:2px; display:inline-block;">${r}</code>`).join(', ') || 'Ninguno'}</p>
         <p><strong>Trainings asignados:</strong> ${(companyData.credentiales?.TRAININGS || []).length} trainings</p>
-        <button class="edit-btn" onclick="editCompany('${companyName}')">✏️ EDITAR CREDENCIALES</button>
-        <button class="edit-btn" onclick="editRCP('${companyName}', ${JSON.stringify(companyData.RCP || [])})">🔢 EDITAR RCP</button>
+        <button class="edit-btn" onclick='window.editCompany("${companyName}")'>✏️ EDITAR CREDENCIALES</button>
+        <button class="edit-btn" onclick='window.editRCP("${companyName}", ${rcpString})'>🔢 EDITAR RCP</button>
       </div>
-    `).join('');
+    `}).join('');
   }
 
   document.getElementById('adminLoginBtn').addEventListener('click', () => {
@@ -968,12 +1016,14 @@
     if (e.key === 'Enter') document.getElementById('adminLoginBtn').click();
   });
 
+  // Exponer funciones globales
   window.editCompany = editCompany;
   window.deleteCompany = deleteCompany;
   window.addDevice = addDevice;
   window.editDevice = editDevice;
   window.deleteDevice = deleteDevice;
   window.editRCP = editRCP;
+  window.removeRCPItem = removeRCPItem;
   window.renderAllCompanies = renderAllCompanies;
   window.renderUsersList = renderUsersList;
 </script>
