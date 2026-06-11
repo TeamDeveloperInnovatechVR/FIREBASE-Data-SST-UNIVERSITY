@@ -7,411 +7,58 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      user-select: none;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #0D0E12;
-      min-height: 100vh;
-      color: #FFFFFF;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at 50% 30%, rgba(22, 27, 51, 0.6) 0%, #0D0E12 90%);
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    body::after {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    .admin-container {
-      max-width: 1600px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    .login-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(13, 14, 18, 0.95);
-      backdrop-filter: blur(10px);
-      z-index: 1000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .login-card {
-      background: rgba(22, 27, 51, 0.9);
-      border: 1px solid #00F2FF;
-      padding: 40px;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 0 40px rgba(0, 242, 255, 0.2);
-    }
-
-    .login-card h2 {
-      font-family: 'Orbitron', monospace;
-      text-align: center;
-      margin-bottom: 30px;
-      background: linear-gradient(135deg, #00F2FF, #7000FF);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-    }
-
-    .login-input {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      background: rgba(13, 14, 18, 0.8);
-      border: 1px solid #00F2FF;
-      color: #fff;
-      font-family: 'Inter', monospace;
-    }
-
-    .login-input:focus {
-      outline: none;
-      box-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
-    }
-
-    .login-btn {
-      width: 100%;
-      padding: 12px;
-      background: #00F2FF;
-      border: none;
-      color: #0D0E12;
-      font-family: 'Orbitron', monospace;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .login-btn:hover {
-      background: #7000FF;
-      color: white;
-      box-shadow: 0 0 20px rgba(112, 0, 255, 0.5);
-    }
-
-    .error-msg {
-      color: #ff4444;
-      text-align: center;
-      margin-top: 15px;
-      font-size: 0.8rem;
-    }
-
-    .dashboard-content {
-      display: none;
-    }
-
-    .top-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      background: rgba(22, 27, 51, 0.8);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(0, 242, 255, 0.3);
-      padding: 12px 24px;
-      margin-bottom: 30px;
-    }
-
-    .logo-area h1 {
-      font-family: 'Orbitron', monospace;
-      font-size: 1.1rem;
-      background: linear-gradient(135deg, #00F2FF, #7000FF);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-    }
-
-    .nav-buttons {
-      display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
-
-    .nav-btn {
-      background: rgba(22, 27, 51, 0.6);
-      border: 1px solid #00F2FF;
-      color: #A0D8EF;
-      padding: 8px 20px;
-      font-family: 'Orbitron', monospace;
-      font-size: 0.75rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .nav-btn:hover,
-    .nav-btn.active {
-      background: #00F2FF;
-      color: #0D0E12;
-      box-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
-    }
-
-    .logout-nav {
-      background: rgba(220, 38, 38, 0.3);
-      border-color: #dc2626;
-      color: #dc2626;
-    }
-
-    .logout-nav:hover {
-      background: #dc2626;
-      color: white;
-    }
-
-    .panel {
-      background: rgba(22, 27, 51, 0.6);
-      backdrop-filter: blur(5px);
-      border: 1px solid rgba(0, 242, 255, 0.2);
-      padding: 25px;
-      margin-bottom: 30px;
-    }
-
-    .panel h2 {
-      font-family: 'Orbitron', monospace;
-      font-size: 1.2rem;
-      color: #00F2FF;
-      margin-bottom: 20px;
-      border-bottom: 1px solid rgba(0, 242, 255, 0.3);
-      padding-bottom: 8px;
-    }
-
-    .edit-btn, .delete-btn, .add-btn {
-      background: transparent;
-      border: 1px solid;
-      padding: 4px 12px;
-      margin: 0 3px;
-      cursor: pointer;
-      font-size: 0.7rem;
-      transition: all 0.2s ease;
-    }
-
-    .edit-btn {
-      border-color: #00F2FF;
-      color: #00F2FF;
-    }
-
-    .edit-btn:hover {
-      background: #00F2FF;
-      color: #0D0E12;
-    }
-
-    .delete-btn {
-      border-color: #dc2626;
-      color: #dc2626;
-    }
-
-    .delete-btn:hover {
-      background: #dc2626;
-      color: white;
-    }
-
-    .add-btn {
-      border-color: #10b981;
-      color: #10b981;
-      margin-bottom: 15px;
-    }
-
-    .add-btn:hover {
-      background: #10b981;
-      color: white;
-    }
-
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(13, 14, 18, 0.95);
-      backdrop-filter: blur(8px);
-      z-index: 2000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-content {
-      background: #1a1f2e;
-      border: 1px solid #00F2FF;
-      padding: 30px;
-      width: 90%;
-      max-width: 550px;
-      max-height: 85vh;
-      overflow-y: auto;
-    }
-
-    .modal-content h3 {
-      font-family: 'Orbitron', monospace;
-      margin-bottom: 20px;
-      color: #00F2FF;
-    }
-
-    .modal-input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 12px;
-      background: rgba(13, 14, 18, 0.8);
-      border: 1px solid #00F2FF;
-      color: white;
-    }
-
-    .toggle-switch {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      margin: 15px 0;
-      padding: 10px;
-      background: rgba(13, 14, 18, 0.5);
-    }
-
-    .toggle-label {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-    }
-
-    .toggle-label input {
-      width: 40px;
-      height: 20px;
-      appearance: none;
-      background: #dc2626;
-      border-radius: 20px;
-      position: relative;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .toggle-label input:checked {
-      background: #10b981;
-    }
-
-    .toggle-label input::before {
-      content: '';
-      position: absolute;
-      width: 16px;
-      height: 16px;
-      background: white;
-      border-radius: 50%;
-      top: 2px;
-      left: 3px;
-      transition: all 0.3s ease;
-    }
-
-    .toggle-label input:checked::before {
-      left: 21px;
-    }
-
-    .modal-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .save-btn {
-      background: #10b981;
-      border: none;
-      padding: 10px 20px;
-      color: white;
-      cursor: pointer;
-    }
-
-    .cancel-btn {
-      background: #dc2626;
-      border: none;
-      padding: 10px 20px;
-      color: white;
-      cursor: pointer;
-    }
-
-    .trainings-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 15px 0;
-    }
-
-    .training-tag {
-      background: rgba(0, 242, 255, 0.2);
-      border: 1px solid #00F2FF;
-      padding: 4px 12px;
-      font-size: 0.7rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-    }
-
-    .training-tag.selected {
-      background: #00F2FF;
-      color: #0D0E12;
-    }
-
-    .remove-tag {
-      cursor: pointer;
-      color: #dc2626;
-      font-weight: bold;
-    }
-
-    .rcp-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 15px 0;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-
-    .rcp-tag {
-      background: rgba(112, 0, 255, 0.3);
-      border: 1px solid #7000FF;
-      padding: 6px 12px;
-      font-size: 0.75rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      border-radius: 4px;
-      font-family: monospace;
-    }
-
-    .rcp-code {
-      font-weight: bold;
-      letter-spacing: 0.5px;
-    }
-
-    @media (max-width: 768px) {
-      .admin-container { padding: 15px; }
-      .top-nav { flex-direction: column; gap: 15px; }
-      .modal-content { padding: 20px; }
-    }
+    /* (tus estilos originales, no cambian) */
+    * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+    body { font-family: 'Inter', sans-serif; background: #0D0E12; min-height: 100vh; color: #FFFFFF; }
+    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 30%, rgba(22, 27, 51, 0.6) 0%, #0D0E12 90%); pointer-events: none; z-index: -1; }
+    body::after { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: -1; }
+    .admin-container { max-width: 1600px; margin: 0 auto; padding: 20px; }
+    .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 14, 18, 0.95); backdrop-filter: blur(10px); z-index: 1000; display: flex; justify-content: center; align-items: center; }
+    .login-card { background: rgba(22, 27, 51, 0.9); border: 1px solid #00F2FF; padding: 40px; width: 90%; max-width: 400px; box-shadow: 0 0 40px rgba(0, 242, 255, 0.2); }
+    .login-card h2 { font-family: 'Orbitron', monospace; text-align: center; margin-bottom: 30px; background: linear-gradient(135deg, #00F2FF, #7000FF); background-clip: text; -webkit-background-clip: text; color: transparent; }
+    .login-input { width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(13, 14, 18, 0.8); border: 1px solid #00F2FF; color: #fff; font-family: 'Inter', monospace; }
+    .login-input:focus { outline: none; box-shadow: 0 0 10px rgba(0, 242, 255, 0.5); }
+    .login-btn { width: 100%; padding: 12px; background: #00F2FF; border: none; color: #0D0E12; font-family: 'Orbitron', monospace; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
+    .login-btn:hover { background: #7000FF; color: white; box-shadow: 0 0 20px rgba(112, 0, 255, 0.5); }
+    .error-msg { color: #ff4444; text-align: center; margin-top: 15px; font-size: 0.8rem; }
+    .dashboard-content { display: none; }
+    .top-nav { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; background: rgba(22, 27, 51, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(0, 242, 255, 0.3); padding: 12px 24px; margin-bottom: 30px; }
+    .logo-area h1 { font-family: 'Orbitron', monospace; font-size: 1.1rem; background: linear-gradient(135deg, #00F2FF, #7000FF); background-clip: text; -webkit-background-clip: text; color: transparent; }
+    .nav-buttons { display: flex; gap: 15px; flex-wrap: wrap; }
+    .nav-btn { background: rgba(22, 27, 51, 0.6); border: 1px solid #00F2FF; color: #A0D8EF; padding: 8px 20px; font-family: 'Orbitron', monospace; font-size: 0.75rem; cursor: pointer; transition: all 0.2s ease; }
+    .nav-btn:hover, .nav-btn.active { background: #00F2FF; color: #0D0E12; box-shadow: 0 0 15px rgba(0, 242, 255, 0.4); }
+    .logout-nav { background: rgba(220, 38, 38, 0.3); border-color: #dc2626; color: #dc2626; }
+    .logout-nav:hover { background: #dc2626; color: white; }
+    .panel { background: rgba(22, 27, 51, 0.6); backdrop-filter: blur(5px); border: 1px solid rgba(0, 242, 255, 0.2); padding: 25px; margin-bottom: 30px; }
+    .panel h2 { font-family: 'Orbitron', monospace; font-size: 1.2rem; color: #00F2FF; margin-bottom: 20px; border-bottom: 1px solid rgba(0, 242, 255, 0.3); padding-bottom: 8px; }
+    .edit-btn, .delete-btn, .add-btn { background: transparent; border: 1px solid; padding: 4px 12px; margin: 0 3px; cursor: pointer; font-size: 0.7rem; transition: all 0.2s ease; }
+    .edit-btn { border-color: #00F2FF; color: #00F2FF; }
+    .edit-btn:hover { background: #00F2FF; color: #0D0E12; }
+    .delete-btn { border-color: #dc2626; color: #dc2626; }
+    .delete-btn:hover { background: #dc2626; color: white; }
+    .add-btn { border-color: #10b981; color: #10b981; margin-bottom: 15px; }
+    .add-btn:hover { background: #10b981; color: white; }
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 14, 18, 0.95); backdrop-filter: blur(8px); z-index: 2000; display: flex; justify-content: center; align-items: center; }
+    .modal-content { background: #1a1f2e; border: 1px solid #00F2FF; padding: 30px; width: 90%; max-width: 550px; max-height: 85vh; overflow-y: auto; }
+    .modal-content h3 { font-family: 'Orbitron', monospace; margin-bottom: 20px; color: #00F2FF; }
+    .modal-input { width: 100%; padding: 10px; margin-bottom: 12px; background: rgba(13, 14, 18, 0.8); border: 1px solid #00F2FF; color: white; }
+    .toggle-switch { display: flex; align-items: center; gap: 15px; margin: 15px 0; padding: 10px; background: rgba(13, 14, 18, 0.5); }
+    .toggle-label { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .toggle-label input { width: 40px; height: 20px; appearance: none; background: #dc2626; border-radius: 20px; position: relative; cursor: pointer; transition: all 0.3s ease; }
+    .toggle-label input:checked { background: #10b981; }
+    .toggle-label input::before { content: ''; position: absolute; width: 16px; height: 16px; background: white; border-radius: 50%; top: 2px; left: 3px; transition: all 0.3s ease; }
+    .toggle-label input:checked::before { left: 21px; }
+    .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
+    .save-btn { background: #10b981; border: none; padding: 10px 20px; color: white; cursor: pointer; }
+    .cancel-btn { background: #dc2626; border: none; padding: 10px 20px; color: white; cursor: pointer; }
+    .trainings-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
+    .training-tag { background: rgba(0, 242, 255, 0.2); border: 1px solid #00F2FF; padding: 4px 12px; font-size: 0.7rem; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+    .training-tag.selected { background: #00F2FF; color: #0D0E12; }
+    .remove-tag { cursor: pointer; color: #dc2626; font-weight: bold; }
+    .rcp-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; max-height: 200px; overflow-y: auto; }
+    .rcp-tag { background: rgba(112, 0, 255, 0.3); border: 1px solid #7000FF; padding: 6px 12px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 10px; border-radius: 4px; font-family: monospace; }
+    .rcp-code { font-weight: bold; letter-spacing: 0.5px; }
+    @media (max-width: 768px) { .admin-container { padding: 15px; } .top-nav { flex-direction: column; gap: 15px; } .modal-content { padding: 20px; } }
   </style>
 </head>
 <body>
@@ -483,33 +130,70 @@
   };
 
   const COMPANIES_REF = 'Companies';
+  const GLOBAL_TRAININGS_REF = 'GlobalTrainings';
   let globalTrainings = [];
 
+  // ---------- FUNCIONES AUXILIARES ----------
+  function cleanRCPValue(value) {
+    if (value === null || value === undefined) return null;
+    if (typeof value === 'string') {
+      let cleaned = value.replace(/^["']|["']$/g, '');
+      cleaned = cleaned.replace(/\\"/g, '"');
+      return cleaned === '' ? null : cleaned;
+    }
+    return value;
+  }
+
+  function cleanRCPArray(rcpArray) {
+    if (!rcpArray || !Array.isArray(rcpArray)) return [];
+    return rcpArray.map(item => cleanRCPValue(item)).filter(item => item !== null && item !== '');
+  }
+
+  // Cargar trainings globales desde la misma base (nodo GlobalTrainings)
   async function loadGlobalTrainings() {
     try {
-      const response = await fetch('https://licencessstuniversity-default-rtdb.firebaseio.com/TRAININGS.json');
-      const data = await response.json();
-      globalTrainings = Array.isArray(data) ? data : Object.values(data || {});
+      const globalTrainingsRef = ref(db, GLOBAL_TRAININGS_REF);
+      const snapshot = await get(globalTrainingsRef);
+      if (snapshot.exists() && Array.isArray(snapshot.val())) {
+        globalTrainings = snapshot.val();
+      } else {
+        // Si no existe, lo construimos recorriendo todas las empresas
+        const companiesSnap = await get(ref(db, COMPANIES_REF));
+        const companies = companiesSnap.val() || {};
+        const allTrainings = new Set();
+        Object.values(companies).forEach(company => {
+          if (company.credentiales?.TRAININGS && Array.isArray(company.credentiales.TRAININGS)) {
+            company.credentiales.TRAININGS.forEach(t => allTrainings.add(t));
+          }
+          if (company.devices) {
+            Object.values(company.devices).forEach(device => {
+              if (device.trainingsActive && Array.isArray(device.trainingsActive)) {
+                device.trainingsActive.forEach(t => allTrainings.add(t));
+              }
+            });
+          }
+        });
+        globalTrainings = Array.from(allTrainings).sort();
+        // Guardamos por primera vez
+        await set(globalTrainingsRef, globalTrainings);
+      }
       renderGlobalTrainings();
     } catch (error) {
-      console.error('Error cargando trainings globales:', error);
+      console.error("Error cargando trainings globales:", error);
+      globalTrainings = [];
+      renderGlobalTrainings();
     }
   }
 
   async function saveGlobalTrainings(trainings) {
     try {
-      const response = await fetch('https://licencessstuniversity-default-rtdb.firebaseio.com/TRAININGS.json', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(trainings)
-      });
-      if (response.ok) {
-        globalTrainings = trainings;
-        renderGlobalTrainings();
-        renderAllCompanies();
-      }
+      const globalTrainingsRef = ref(db, GLOBAL_TRAININGS_REF);
+      await set(globalTrainingsRef, trainings);
+      globalTrainings = trainings;
+      renderGlobalTrainings();
+      renderAllCompanies(); // refrescar empresas que muestran trainings
     } catch (error) {
-      alert('Error guardando trainings');
+      alert("Error guardando trainings: " + error.message);
     }
   }
 
@@ -519,38 +203,21 @@
     container.innerHTML = globalTrainings.map((training, idx) => `
       <div class="training-tag">
         ${training}
-        <span class="remove-tag" onclick="window.removeGlobalTraining(${idx})">✖</span>
+        <span class="remove-tag" data-idx="${idx}">✖</span>
       </div>
     `).join('');
+    // Asignar eventos manualmente para evitar problemas con onclick global
+    document.querySelectorAll('#globalTrainingsList .remove-tag').forEach(el => {
+      el.addEventListener('click', async (e) => {
+        const idx = parseInt(e.currentTarget.getAttribute('data-idx'));
+        const newList = [...globalTrainings];
+        newList.splice(idx, 1);
+        await saveGlobalTrainings(newList);
+      });
+    });
   }
 
-  window.removeGlobalTraining = async (idx) => {
-    const newList = [...globalTrainings];
-    newList.splice(idx, 1);
-    await saveGlobalTrainings(newList);
-  };
-
-  // Función para limpiar strings RCP (remover comillas escapadas y vacíos)
-  function cleanRCPValue(value) {
-    if (value === null || value === undefined) return null;
-    if (typeof value === 'string') {
-      // Remover comillas dobles escapadas y comillas normales
-      let cleaned = value.replace(/^["']|["']$/g, '');
-      cleaned = cleaned.replace(/\\"/g, '"');
-      // Si después de limpiar queda vacío, retornar null
-      if (cleaned === '') return null;
-      return cleaned;
-    }
-    return value;
-  }
-
-  function cleanRCPArray(rcpArray) {
-    if (!rcpArray || !Array.isArray(rcpArray)) return [];
-    // Filtrar valores nulos, undefined o vacíos
-    const cleaned = rcpArray.map(item => cleanRCPValue(item)).filter(item => item !== null && item !== '');
-    return cleaned;
-  }
-
+  // Renderizado principal de empresas
   async function renderAllCompanies() {
     const snapshot = await get(ref(db, COMPANIES_REF));
     const companies = snapshot.val() || {};
@@ -559,48 +226,102 @@
     
     container.innerHTML = Object.entries(companies).map(([companyName, companyData]) => {
       const cleanRCP = cleanRCPArray(companyData.RCP);
-      // Escapar correctamente el string JSON para evitar errores
       const rcpString = JSON.stringify(cleanRCP).replace(/'/g, "\\'");
       return `
       <div style="background: rgba(22, 27, 51, 0.4); margin-bottom: 20px; padding: 15px;">
         <h3 style="color:#00F2FF;">🏢 ${companyName}</h3>
-        <button class="edit-btn" onclick='window.editCompany("${companyName}")'>✏️ EDITAR EMPRESA</button>
-        <button class="edit-btn" onclick='window.editRCP("${companyName}", ${rcpString})'>🔢 EDITAR RCP</button>
-        <button class="delete-btn" onclick='window.deleteCompany("${companyName}")'>🗑️ ELIMINAR EMPRESA</button>
-        <button class="add-btn" onclick='window.addDevice("${companyName}")'>+ AGREGAR DISPOSITIVO</button>
+        <button class="edit-btn" data-action="editCompany" data-company="${companyName}">✏️ EDITAR EMPRESA</button>
+        <button class="edit-btn" data-action="editRCP" data-company="${companyName}" data-rcp='${rcpString}'>🔢 EDITAR RCP</button>
+        <button class="delete-btn" data-action="deleteCompany" data-company="${companyName}">🗑️ ELIMINAR EMPRESA</button>
+        <button class="add-btn" data-action="addDevice" data-company="${companyName}">+ AGREGAR DISPOSITIVO</button>
         <div id="devices-${companyName}"></div>
       </div>
     `}).join('');
     
+    // Asignar eventos para botones de empresa
+    document.querySelectorAll('[data-action="editCompany"]').forEach(btn => {
+      btn.addEventListener('click', () => editCompany(btn.getAttribute('data-company')));
+    });
+    document.querySelectorAll('[data-action="editRCP"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const company = btn.getAttribute('data-company');
+        const rcpRaw = btn.getAttribute('data-rcp');
+        let rcpArray = [];
+        try { rcpArray = JSON.parse(rcpRaw); } catch(e) { rcpArray = []; }
+        editRCP(company, rcpArray);
+      });
+    });
+    document.querySelectorAll('[data-action="deleteCompany"]').forEach(btn => {
+      btn.addEventListener('click', () => deleteCompany(btn.getAttribute('data-company')));
+    });
+    document.querySelectorAll('[data-action="addDevice"]').forEach(btn => {
+      btn.addEventListener('click', () => addDevice(btn.getAttribute('data-company')));
+    });
+    
+    // Cargar dispositivos
     for (const [companyName, companyData] of Object.entries(companies)) {
       const devicesContainer = document.getElementById(`devices-${companyName}`);
-      if (devicesContainer && companyData.devices) {
-        devicesContainer.innerHTML = `
-          <h4 style="margin-top: 15px; color:#A0D8EF;">📱 DISPOSITIVOS</h4>
-          ${Object.entries(companyData.devices).map(([deviceId, deviceData]) => `
-            <div style="border:1px solid rgba(0,242,255,0.2); padding:12px; margin:8px 0;">
-              <strong>🔑 ${deviceId}</strong>
-              <button class="edit-btn" onclick='window.editDevice("${companyName}", "${deviceId}")'>✏️ EDITAR</button>
-              <button class="delete-btn" onclick='window.deleteDevice("${companyName}", "${deviceId}")'>🗑️ ELIMINAR</button>
-              <div style="font-size:0.75rem; margin-top:5px;">
-                Licencia: ${deviceData.license?.type || 'N/A'} | Expira: ${deviceData.license?.expirationDate || 'N/A'}
-                ${deviceData.license?.updateLicense ? '🔄 Auto-renovable' : ''}
-                ${deviceData.license?.yearRenovation ? '📅 Renovación anual' : ''}
+      if (devicesContainer) {
+        if (companyData.devices && Object.keys(companyData.devices).length > 0) {
+          devicesContainer.innerHTML = `
+            <h4 style="margin-top: 15px; color:#A0D8EF;">📱 DISPOSITIVOS</h4>
+            ${Object.entries(companyData.devices).map(([deviceId, deviceData]) => `
+              <div style="border:1px solid rgba(0,242,255,0.2); padding:12px; margin:8px 0;">
+                <strong>🔑 ${deviceId}</strong>
+                <button class="edit-device-btn" data-company="${companyName}" data-device="${deviceId}">✏️ EDITAR</button>
+                <button class="delete-device-btn" data-company="${companyName}" data-device="${deviceId}">🗑️ ELIMINAR</button>
+                <div style="font-size:0.75rem; margin-top:5px;">
+                  Licencia: ${deviceData.license?.type || 'N/A'} | Expira: ${deviceData.license?.expirationDate || 'N/A'}
+                  ${deviceData.license?.updateLicense ? '🔄 Auto-renovable' : ''}
+                  ${deviceData.license?.yearRenovation ? '📅 Renovación anual' : ''}
+                </div>
               </div>
-            </div>
-          `).join('')}
-        `;
-      } else if (devicesContainer) {
-        devicesContainer.innerHTML = '<div style="margin-top:15px;">📱 No hay dispositivos registrados</div>';
+            `).join('')}
+          `;
+          // Eventos para botones de dispositivos
+          devicesContainer.querySelectorAll('.edit-device-btn').forEach(btn => {
+            btn.addEventListener('click', () => editDevice(btn.getAttribute('data-company'), btn.getAttribute('data-device')));
+          });
+          devicesContainer.querySelectorAll('.delete-device-btn').forEach(btn => {
+            btn.addEventListener('click', () => deleteDevice(btn.getAttribute('data-company'), btn.getAttribute('data-device')));
+          });
+        } else {
+          devicesContainer.innerHTML = '<div style="margin-top:15px;">📱 No hay dispositivos registrados</div>';
+        }
       }
     }
   }
 
-  // Editar RCP de la empresa - CORREGIDO
-  window.editRCP = (companyName, currentRCP) => {
-    // Limpiar los valores de RCP antes de mostrarlos
+  // ---------- FUNCIONES GLOBALES PARA RCP ----------
+  window.currentRCPList = [];
+  // Función global removeRCPItem (se llama desde los botones del modal)
+  window.removeRCPItem = (idx) => {
+    if (window.currentRCPList && Array.isArray(window.currentRCPList)) {
+      window.currentRCPList.splice(idx, 1);
+      const container = document.getElementById('rcpListContainer');
+      if (container) renderRCPList(container);
+    }
+  };
+
+  function renderRCPList(container) {
+    if (!container) return;
+    if (window.currentRCPList.length === 0) {
+      container.innerHTML = '<div style="color:#A0D8EF; padding:10px;">No hay códigos RCP registrados</div>';
+      return;
+    }
+    container.innerHTML = window.currentRCPList.map((rcp, idx) => `
+      <div class="rcp-tag">
+        <span class="rcp-code">🔑 ${rcp}</span>
+        <span class="remove-tag" onclick="window.removeRCPItem(${idx})">✖</span>
+      </div>
+    `).join('');
+  }
+
+  // Editar RCP de empresa
+  async function editRCP(companyName, currentRCP) {
     let cleanRCP = Array.isArray(currentRCP) ? [...currentRCP] : [];
     cleanRCP = cleanRCP.filter(item => item && item !== '');
+    window.currentRCPList = [...cleanRCP];
     
     showModal('Editar RCP de ' + companyName, `
       <label>📡 Códigos/seriales (ej: 12:IW:87:18):</label>
@@ -609,62 +330,38 @@
         <input type="text" id="newRCPValue" class="modal-input" placeholder="Ej: 12:IW:87:18" style="flex:1; font-family: monospace;">
         <button class="add-btn" id="addRCPBtn" style="margin:0;">+ AGREGAR</button>
       </div>
-      <p style="font-size:0.7rem; color:#A0D8EF; margin-top:10px;">💡 Puedes ingresar cualquier código alfanumérico (seriales Bluetooth, códigos de dispositivo, etc.)</p>
+      <p style="font-size:0.7rem; color:#A0D8EF; margin-top:10px;">💡 Puedes ingresar cualquier código alfanumérico</p>
     `, async () => {
-      const newRCPList = window.currentRCPList || [];
-      // Filtrar valores vacíos antes de guardar
-      const finalList = newRCPList.filter(item => item && item.trim() !== '');
+      const finalList = window.currentRCPList.filter(item => item && item.trim() !== '');
       await update(ref(db, `${COMPANIES_REF}/${companyName}`), { RCP: finalList });
       renderAllCompanies();
     });
     
-    window.currentRCPList = [...cleanRCP];
+    const container = document.getElementById('rcpListContainer');
+    if (container) renderRCPList(container);
     
-    function renderRCPList() {
-      const container = document.getElementById('rcpListContainer');
-      if (!container) return;
-      if (window.currentRCPList.length === 0) {
-        container.innerHTML = '<div style="color:#A0D8EF; padding:10px;">No hay códigos RCP registrados</div>';
-        return;
-      }
-      container.innerHTML = window.currentRCPList.map((rcp, idx) => `
-        <div class="rcp-tag">
-          <span class="rcp-code">🔑 ${rcp}</span>
-          <span class="remove-tag" onclick="window.removeRCPItem(${idx})">✖</span>
-        </div>
-      `).join('');
-    }
-    
-    window.removeRCPItem = (idx) => {
-      window.currentRCPList.splice(idx, 1);
-      renderRCPList();
-    };
-    
-    // Esperar a que el DOM del modal esté listo
+    // Configurar botón agregar
     setTimeout(() => {
       const addBtn = document.getElementById('addRCPBtn');
       if (addBtn) {
-        // Remover listener anterior para evitar duplicados
-        const newBtn = addBtn.cloneNode(true);
-        addBtn.parentNode.replaceChild(newBtn, addBtn);
-        newBtn.addEventListener('click', () => {
+        addBtn.onclick = () => {
           const input = document.getElementById('newRCPValue');
           const newValue = input?.value.trim();
           if (newValue && !window.currentRCPList.includes(newValue)) {
             window.currentRCPList.push(newValue);
-            renderRCPList();
+            const rcpContainer = document.getElementById('rcpListContainer');
+            if (rcpContainer) renderRCPList(rcpContainer);
             if (input) input.value = '';
           } else if (newValue && window.currentRCPList.includes(newValue)) {
             alert('⚠️ Este código ya existe en la lista');
           }
-        });
+        };
       }
     }, 100);
-    
-    renderRCPList();
-  };
+  }
 
-  window.editCompany = async (companyName) => {
+  // Editar empresa (credenciales y trainings)
+  async function editCompany(companyName) {
     const snapshot = await get(ref(db, `${COMPANIES_REF}/${companyName}`));
     const companyData = snapshot.val();
     if (!companyData) return;
@@ -678,7 +375,6 @@
       const newUser = document.getElementById('editCompanyUser').value;
       const newPass = document.getElementById('editCompanyPass').value;
       const selectedTrainings = window.selectedTrainingsTemp || [];
-      
       await update(ref(db, `${COMPANIES_REF}/${companyName}/credentiales`), {
         user: newUser,
         password: parseInt(newPass) || newPass,
@@ -694,31 +390,31 @@
       const container = document.getElementById('editTrainingsList');
       if (!container) return;
       container.innerHTML = globalTrainings.map(training => `
-        <div class="training-tag ${window.selectedTrainingsTemp.includes(training) ? 'selected' : ''}" 
-             onclick="toggleTrainingTemp('${training}')">
+        <div class="training-tag ${window.selectedTrainingsTemp.includes(training) ? 'selected' : ''}" data-training="${training}">
           ${training}
         </div>
       `).join('');
+      container.querySelectorAll('.training-tag').forEach(tag => {
+        tag.addEventListener('click', () => {
+          const training = tag.getAttribute('data-training');
+          const idx = window.selectedTrainingsTemp.indexOf(training);
+          if (idx === -1) window.selectedTrainingsTemp.push(training);
+          else window.selectedTrainingsTemp.splice(idx, 1);
+          renderEditTrainings();
+        });
+      });
     }
-    
-    window.toggleTrainingTemp = (training) => {
-      const idx = window.selectedTrainingsTemp.indexOf(training);
-      if (idx === -1) window.selectedTrainingsTemp.push(training);
-      else window.selectedTrainingsTemp.splice(idx, 1);
-      renderEditTrainings();
-    };
-    
     renderEditTrainings();
-  };
+  }
 
-  window.deleteCompany = async (companyName) => {
+  async function deleteCompany(companyName) {
     if (confirm(`¿Eliminar empresa ${companyName}?`)) {
       await remove(ref(db, `${COMPANIES_REF}/${companyName}`));
       renderAllCompanies();
     }
-  };
+  }
 
-  window.addDevice = (companyName) => {
+  async function addDevice(companyName) {
     const newDeviceId = prompt('Ingrese ID del dispositivo (ej: 789WE):', 'DEV' + Math.floor(Math.random() * 10000));
     if (!newDeviceId) return;
     
@@ -762,8 +458,7 @@
         },
         trainingsActive: selectedActiveTrainings
       };
-      
-      await update(ref(db, `${COMPANIES_REF}/${companyName}/devices/${newDeviceId}`), newDevice);
+      await set(ref(db, `${COMPANIES_REF}/${companyName}/devices/${newDeviceId}`), newDevice);
       renderAllCompanies();
     });
     
@@ -772,22 +467,24 @@
       const container = document.getElementById('deviceTrainingsList');
       if (!container) return;
       container.innerHTML = globalTrainings.map(training => `
-        <div class="training-tag ${window.selectedDeviceTrainings.includes(training) ? 'selected' : ''}" 
-             onclick="toggleDeviceTraining('${training}')">
+        <div class="training-tag ${window.selectedDeviceTrainings.includes(training) ? 'selected' : ''}" data-training="${training}">
           ${training}
         </div>
       `).join('');
+      container.querySelectorAll('.training-tag').forEach(tag => {
+        tag.addEventListener('click', () => {
+          const training = tag.getAttribute('data-training');
+          const idx = window.selectedDeviceTrainings.indexOf(training);
+          if (idx === -1) window.selectedDeviceTrainings.push(training);
+          else window.selectedDeviceTrainings.splice(idx, 1);
+          renderDeviceTrainings();
+        });
+      });
     }
-    window.toggleDeviceTraining = (training) => {
-      const idx = window.selectedDeviceTrainings.indexOf(training);
-      if (idx === -1) window.selectedDeviceTrainings.push(training);
-      else window.selectedDeviceTrainings.splice(idx, 1);
-      renderDeviceTrainings();
-    };
     setTimeout(renderDeviceTrainings, 100);
-  };
+  }
 
-  window.editDevice = async (companyName, deviceId) => {
+  async function editDevice(companyName, deviceId) {
     const snapshot = await get(ref(db, `${COMPANIES_REF}/${companyName}/devices/${deviceId}`));
     const deviceData = snapshot.val();
     if (!deviceData) return;
@@ -840,28 +537,31 @@
       const container = document.getElementById('deviceTrainingsList');
       if (!container) return;
       container.innerHTML = globalTrainings.map(training => `
-        <div class="training-tag ${window.selectedDeviceTrainings.includes(training) ? 'selected' : ''}" 
-             onclick="toggleDeviceEditTraining('${training}')">
+        <div class="training-tag ${window.selectedDeviceTrainings.includes(training) ? 'selected' : ''}" data-training="${training}">
           ${training}
         </div>
       `).join('');
+      container.querySelectorAll('.training-tag').forEach(tag => {
+        tag.addEventListener('click', () => {
+          const training = tag.getAttribute('data-training');
+          const idx = window.selectedDeviceTrainings.indexOf(training);
+          if (idx === -1) window.selectedDeviceTrainings.push(training);
+          else window.selectedDeviceTrainings.splice(idx, 1);
+          renderDeviceEditTrainings();
+        });
+      });
     }
-    window.toggleDeviceEditTraining = (training) => {
-      const idx = window.selectedDeviceTrainings.indexOf(training);
-      if (idx === -1) window.selectedDeviceTrainings.push(training);
-      else window.selectedDeviceTrainings.splice(idx, 1);
-      renderDeviceEditTrainings();
-    };
     setTimeout(renderDeviceEditTrainings, 100);
-  };
+  }
 
-  window.deleteDevice = async (companyName, deviceId) => {
+  async function deleteDevice(companyName, deviceId) {
     if (confirm(`¿Eliminar dispositivo ${deviceId}?`)) {
       await remove(ref(db, `${COMPANIES_REF}/${companyName}/devices/${deviceId}`));
       renderAllCompanies();
     }
-  };
+  }
 
+  // Nueva empresa
   document.getElementById('addCompanyBtn')?.addEventListener('click', () => {
     const newCompany = prompt('Nombre de la nueva empresa:', 'NEW_COMPANY');
     if (!newCompany) return;
@@ -887,7 +587,6 @@
         },
         devices: {}
       };
-      
       await set(ref(db, `${COMPANIES_REF}/${newCompany}`), newCompanyData);
       renderAllCompanies();
     });
@@ -897,21 +596,24 @@
       const container = document.getElementById('newCompanyTrainings');
       if (!container) return;
       container.innerHTML = globalTrainings.map(training => `
-        <div class="training-tag ${window.selectedNewCompanyTrainings.includes(training) ? 'selected' : ''}" 
-             onclick="toggleNewCompanyTraining('${training}')">
+        <div class="training-tag ${window.selectedNewCompanyTrainings.includes(training) ? 'selected' : ''}" data-training="${training}">
           ${training}
         </div>
       `).join('');
+      container.querySelectorAll('.training-tag').forEach(tag => {
+        tag.addEventListener('click', () => {
+          const training = tag.getAttribute('data-training');
+          const idx = window.selectedNewCompanyTrainings.indexOf(training);
+          if (idx === -1) window.selectedNewCompanyTrainings.push(training);
+          else window.selectedNewCompanyTrainings.splice(idx, 1);
+          renderNewCompanyTrainings();
+        });
+      });
     }
-    window.toggleNewCompanyTraining = (training) => {
-      const idx = window.selectedNewCompanyTrainings.indexOf(training);
-      if (idx === -1) window.selectedNewCompanyTrainings.push(training);
-      else window.selectedNewCompanyTrainings.splice(idx, 1);
-      renderNewCompanyTrainings();
-    };
     setTimeout(renderNewCompanyTrainings, 100);
   });
 
+  // Agregar training global
   document.getElementById('addTrainingBtn')?.addEventListener('click', () => {
     const newTraining = prompt('Nuevo training (ej: ConfinedSpaces):');
     if (newTraining && !globalTrainings.includes(newTraining)) {
@@ -919,6 +621,7 @@
     }
   });
 
+  // Modal genérico
   function showModal(title, contentHtml, onSave) {
     const modal = document.createElement('div');
     modal.className = 'modal';
@@ -933,22 +636,20 @@
       </div>
     `;
     document.body.appendChild(modal);
-    
-    document.getElementById('modalSave').onclick = () => {
-      onSave();
-      modal.remove();
-    };
+    document.getElementById('modalSave').onclick = () => { onSave(); modal.remove(); };
     document.getElementById('modalCancel').onclick = () => modal.remove();
   }
 
+  // Navegación entre secciones
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      const section = e.target.dataset.section;
+      const section = e.currentTarget.dataset.section;
       if (section) {
         Object.keys(sections).forEach(s => sections[s].style.display = 'none');
         sections[section].style.display = 'block';
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        e.target.classList.add('active');
+        e.currentTarget.classList.add('active');
+        if (section === 'users') renderUsersList();
       }
     });
   });
@@ -959,6 +660,7 @@
     loginOverlay.style.display = 'flex';
   });
 
+  // Login con el nodo ADMIN (sin autenticación de Firebase)
   async function loginAdmin(username, password) {
     try {
       const snapshot = await get(ref(db, 'ADMIN'));
@@ -976,6 +678,7 @@
         return false;
       }
     } catch (error) {
+      console.error(error);
       document.getElementById('loginError').textContent = 'ERROR DE CONEXIÓN';
       return false;
     }
@@ -986,7 +689,6 @@
     const companies = snapshot.val() || {};
     const container = document.getElementById('usersList');
     if (!container) return;
-    
     container.innerHTML = Object.entries(companies).map(([companyName, companyData]) => {
       const cleanRCP = cleanRCPArray(companyData.RCP);
       const rcpString = JSON.stringify(cleanRCP).replace(/'/g, "\\'");
@@ -995,37 +697,40 @@
         <h3 style="color:#00F2FF;">🏢 ${companyName}</h3>
         <p><strong>Usuario:</strong> ${companyData.credentiales?.user || 'N/A'}</p>
         <p><strong>Password:</strong> ${companyData.credentiales?.password || 'N/A'}</p>
-        <p><strong>RCPs:</strong> ${(cleanRCP).map(r => `<code style="background:#000; padding:2px 6px; margin:2px; display:inline-block;">${r}</code>`).join(', ') || 'Ninguno'}</p>
+        <p><strong>RCPs:</strong> ${cleanRCP.map(r => `<code style="background:#000; padding:2px 6px; margin:2px; display:inline-block;">${r}</code>`).join(', ') || 'Ninguno'}</p>
         <p><strong>Trainings asignados:</strong> ${(companyData.credentiales?.TRAININGS || []).length} trainings</p>
-        <button class="edit-btn" onclick='window.editCompany("${companyName}")'>✏️ EDITAR CREDENCIALES</button>
-        <button class="edit-btn" onclick='window.editRCP("${companyName}", ${rcpString})'>🔢 EDITAR RCP</button>
+        <button class="edit-company-creds" data-company="${companyName}">✏️ EDITAR CREDENCIALES</button>
+        <button class="edit-rcp" data-company="${companyName}" data-rcp='${rcpString}'>🔢 EDITAR RCP</button>
       </div>
     `}).join('');
+    
+    // Eventos para botones dentro de usuarios
+    document.querySelectorAll('.edit-company-creds').forEach(btn => {
+      btn.addEventListener('click', () => editCompany(btn.getAttribute('data-company')));
+    });
+    document.querySelectorAll('.edit-rcp').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const company = btn.getAttribute('data-company');
+        const rcpRaw = btn.getAttribute('data-rcp');
+        let rcpArray = [];
+        try { rcpArray = JSON.parse(rcpRaw); } catch(e) { rcpArray = []; }
+        editRCP(company, rcpArray);
+      });
+    });
   }
 
+  // Eventos login
   document.getElementById('adminLoginBtn').addEventListener('click', () => {
     const user = document.getElementById('adminUser').value.trim();
     const pass = document.getElementById('adminPass').value.trim();
     loginAdmin(user, pass);
   });
-
   document.getElementById('adminUser').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') document.getElementById('adminLoginBtn').click();
   });
   document.getElementById('adminPass').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') document.getElementById('adminLoginBtn').click();
   });
-
-  // Exponer funciones globales
-  window.editCompany = editCompany;
-  window.deleteCompany = deleteCompany;
-  window.addDevice = addDevice;
-  window.editDevice = editDevice;
-  window.deleteDevice = deleteDevice;
-  window.editRCP = editRCP;
-  window.removeRCPItem = removeRCPItem;
-  window.renderAllCompanies = renderAllCompanies;
-  window.renderUsersList = renderUsersList;
 </script>
 </body>
 </html>
