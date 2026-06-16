@@ -2,105 +2,391 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Lectura de Capacitación</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>SST UNIVERSITY · Analítica</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
+    /* ===== ESTILO COMPLETO DEL DASHBOARD (neón oscuro) ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
     body {
-      background-color: #f5f6fa;
+      font-family: 'Inter', sans-serif;
+      background: #0D0E12;
+      min-height: 100vh;
+      color: #FFFFFF;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 30%, rgba(22, 27, 51, 0.6) 0%, #0D0E12 90%);
+      pointer-events: none;
+      z-index: -1;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: -1;
+    }
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    /* HEADER */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(22, 27, 51, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 242, 255, 0.3);
+      padding: 12px 24px;
+      margin-bottom: 30px;
+      border-radius: 12px;
+    }
+    .header img {
+      height: 50px;
+      margin-right: 16px;
+    }
+    .header h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, #00F2FF, #7000FF);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    /* PANELES */
+    .panel {
+      background: rgba(22, 27, 51, 0.6);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(0, 242, 255, 0.2);
+      padding: 25px;
+      margin-bottom: 30px;
+      border-radius: 12px;
+    }
+    .panel h2 {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.2rem;
+      color: #00F2FF;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(0, 242, 255, 0.3);
+      padding-bottom: 8px;
+    }
+    .panel h3 {
+      color: #A0D8EF;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+    /* INPUTS Y BOTONES */
+    .input-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .input-group input {
+      flex: 1;
+      padding: 12px 16px;
+      background: rgba(13, 14, 18, 0.8);
+      border: 1px solid #00F2FF;
+      color: #fff;
+      font-family: 'Inter', monospace;
+      font-size: 1rem;
+      border-radius: 8px;
+      min-width: 200px;
+    }
+    .input-group input:focus {
+      outline: none;
+      box-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+    }
+    .btn-primary {
+      background: #00F2FF;
+      border: none;
+      color: #0D0E12;
+      padding: 12px 28px;
+      font-family: 'Orbitron', monospace;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      background: #7000FF;
+      color: white;
+      box-shadow: 0 0 20px rgba(112, 0, 255, 0.5);
+    }
+    .btn-device {
+      background: rgba(22, 27, 51, 0.6);
+      border: 1px solid #00F2FF;
+      color: #A0D8EF;
+      padding: 8px 20px;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-radius: 6px;
+      margin: 4px;
+      width: 100%;
+      text-align: left;
+    }
+    .btn-device:hover {
+      background: #00F2FF;
+      color: #0D0E12;
+      box-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
+    }
+    .btn-device.active {
+      background: #00F2FF;
+      color: #0D0E12;
+    }
+    /* SELECTOR DE AÑO */
+    .year-selector {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin: 12px 0;
+    }
+    .year-selector select {
+      padding: 8px 16px;
+      background: rgba(13, 14, 18, 0.8);
+      border: 1px solid #00F2FF;
+      color: white;
+      border-radius: 6px;
+      font-family: 'Inter', monospace;
+      cursor: pointer;
+    }
+    /* GRILLA DE GRÁFICOS */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-top: 20px;
+    }
+    .chart-box {
+      background: rgba(13, 14, 18, 0.5);
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid rgba(0, 242, 255, 0.15);
+    }
+    .chart-box h4 {
+      color: #A0D8EF;
+      margin-bottom: 12px;
+      font-weight: 500;
     }
     .chart-container {
-      height: 300px; 
-      width: 300px;
-      margin: auto;
-    }
-    .bar-container {
-      height: 300px;
+      height: 250px;
       width: 100%;
+    }
+    /* LISTA DE DISPOSITIVOS */
+    .device-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 400px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+    .device-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .device-list::-webkit-scrollbar-track {
+      background: rgba(13, 14, 18, 0.3);
+      border-radius: 10px;
+    }
+    .device-list::-webkit-scrollbar-thumb {
+      background: #00F2FF;
+      border-radius: 10px;
+    }
+    /* DETALLE DE DISPOSITIVO */
+    .device-detail {
+      margin-top: 20px;
+      border-top: 1px solid rgba(0, 242, 255, 0.2);
+      padding-top: 20px;
+    }
+    .training-item {
+      background: rgba(13, 14, 18, 0.4);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-left: 3px solid #00F2FF;
+    }
+    .training-item .training-name {
+      font-weight: 600;
+      color: #00F2FF;
+    }
+    .training-item .year-toggle {
+      cursor: pointer;
+      color: #A0D8EF;
+      margin-left: 12px;
+      font-size: 0.8rem;
+    }
+    .training-item .year-toggle:hover {
+      color: #00F2FF;
+    }
+    .month-details {
+      margin-top: 8px;
+      padding-left: 20px;
+      font-size: 0.85rem;
+      display: none;
+    }
+    .month-details.open {
+      display: block;
+    }
+    .month-details p {
+      margin: 2px 0;
+    }
+    .legend-custom {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(13, 14, 18, 0.6);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+    }
+    .legend-color {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+    }
+    /* FOOTER */
+    .footer {
+      text-align: center;
+      padding: 30px 0 10px;
+      border-top: 1px solid rgba(0, 242, 255, 0.15);
+      margin-top: 40px;
+      color: #A0D8EF;
+      font-size: 0.9rem;
+    }
+    .footer img {
+      height: 40px;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    .footer span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    /* OCULTAR */
+    .hidden {
+      display: none !important;
+    }
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .container { padding: 12px; }
+      .header h1 { font-size: 1.1rem; }
+      .charts-grid { grid-template-columns: 1fr; }
+      .input-group { flex-direction: column; align-items: stretch; }
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col p-6 text-white" style="background-color:#f5f6fa;">
+<body>
+  <div class="container">
+    <!-- HEADER -->
+    <header class="header">
+      <img src="Resources/AMB.svg" alt="Logo SST">
+      <h1>SST UNIVERSITY ANALITICA</h1>
+    </header>
 
-  <!-- Header -->
-  <header class="w-full flex items-center justify-center mb-6 bg-[#1e2146] p-4 rounded-xl shadow-md">
-    <img src="Resources/AMB.svg" alt="Logo" class="h-12 mr-4">
-    <h1 class="text-2xl font-bold text-[#f28a1a]">DATA - SST UNIVERSITY</h1>
-  </header>
-
-  <!-- Layout principal -->
-  <div class="w-full flex flex-col lg:flex-row gap-6">
-    <!-- Panel izquierdo -->
-    <div class="lg:w-1/2">
-      <!-- Inputs -->
-      <div class="bg-white p-6 rounded-2xl shadow-lg w-full text-black">
-        <label class="block mb-2 font-semibold text-[#1e2146]">Empresa</label>
-        <input id="empresaInput" type="text" placeholder="Ej: REVIVE" 
-              class="w-full p-2 border rounded-md mb-4 uppercase">
-        
-        <button onclick="leerData()" 
-                class="w-full bg-[#f28a1a] text-white px-4 py-2 rounded-xl shadow-md hover:bg-[#d97706] transition">
-          Leer Data
-        </button>
+    <!-- PANEL DE BÚSQUEDA -->
+    <div class="panel">
+      <h2><i class="fas fa-search"></i> CONSULTAR EMPRESA</h2>
+      <div class="input-group">
+        <input type="text" id="empresaInput" placeholder="Ej: PRUEBADATA" 
+               oninput="this.value = this.value.toUpperCase()" style="text-transform:uppercase;">
+        <button class="btn-primary" onclick="leerData()"><i class="fas fa-cloud-download-alt"></i> LEER DATA</button>
       </div>
-
-      <!-- Resultado -->
-      <div id="resultado" class="mt-6 w-full hidden">
-        <div id="dispositivosList" class="mb-4"></div>
-        <div id="detalleDispositivo" class="bg-white text-black p-4 rounded-xl shadow"></div>
-        <div id="graficoMensualContainer" class="mt-6 bg-white p-4 rounded-xl shadow text-black"></div>
+      <div id="resultado" class="hidden" style="margin-top:20px;">
+        <h3 style="color:#00F2FF;" id="nombreEmpresa"></h3>
       </div>
     </div>
 
-    <!-- Panel derecho (Reporte BI) -->
-    <div class="lg:w-1/2 bg-white p-6 rounded-2xl shadow-lg text-black">
-      <h2 class="text-lg font-bold text-[#1e2146] mb-4">📊 Reporte BI</h2>
-      
-      <!-- Gráficos en paralelo -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-        <!-- Torta -->
-        <div>
-          <h3 class="font-semibold text-[#f28a1a] mb-2 text-center">Distribución de tiempo</h3>
-          <div class="chart-container">
-            <canvas id="useTimeChart"></canvas>
-          </div>
-          <div id="customLegend" class="mt-4 max-h-40 overflow-y-auto border rounded p-2 bg-gray-50 text-black text-sm"></div>
-        </div>
-
-        <!-- Barras -->
-        <div>
-          <h3 class="font-semibold text-[#f28a1a] mb-2 text-center">Comparativa de uso</h3>
-          <div class="bar-container">
-            <canvas id="barChart"></canvas>
+    <!-- PANEL DE RESULTADOS (se muestra tras consulta) -->
+    <div id="resultadosCompletos" class="hidden">
+      <!-- Gráficos generales -->
+      <div class="panel">
+        <h2><i class="fas fa-chart-bar"></i> RANKING GENERAL POR CAPACITACIÓN</h2>
+        <div class="chart-box">
+          <div class="chart-container" style="height:300px;">
+            <canvas id="barChartGeneral"></canvas>
           </div>
         </div>
       </div>
+
+      <div class="panel">
+        <h2><i class="fas fa-chart-pie"></i> RESUMEN GLOBAL</h2>
+        <div class="charts-grid">
+          <div class="chart-box">
+            <h4>⏱️ Uso por dispositivo</h4>
+            <div class="chart-container"><canvas id="pieDispositivos"></canvas></div>
+            <div id="legendDispositivos" class="legend-custom"></div>
+          </div>
+          <div class="chart-box">
+            <h4>📚 Uso por capacitación</h4>
+            <div class="chart-container"><canvas id="pieCapacitaciones"></canvas></div>
+            <div id="legendCapacitaciones" class="legend-custom"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LISTA DE DISPOSITIVOS -->
+      <div class="panel">
+        <h2><i class="fas fa-microchip"></i> DISPOSITIVOS REGISTRADOS</h2>
+        <div id="dispositivosList" class="device-list"></div>
+        <div id="detalleDispositivo" class="device-detail hidden"></div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <span>
+        <img src="Resources/AMB.svg" alt="Ambiente Innovatech" style="height:30px;">
+        <span>Ambiente Innovatech · Datos SST</span>
+      </span>
     </div>
   </div>
 
   <script>
-    const firebaseURL = "https://sst-university-default-rtdb.firebaseio.com/Companies/";
-    let useTimeChartInstance = null;
-    let barChartInstance = null;
-    let graficoMensualInstance = null;
+    const FIREBASE_URL = "https://sst-university-default-rtdb.firebaseio.com/Companies/";
+    let charts = {};
 
-    // 🔥 Diccionarios de traducción
-    const traduccionesMeses = {
-      "January": "Enero",
-      "February": "Febrero",
-      "March": "Marzo",
-      "April": "Abril",
-      "May": "Mayo",
-      "June": "Junio",
-      "July": "Julio",
-      "August": "Agosto",
-      "September": "Septiembre",
-      "October": "Octubre",
-      "November": "Noviembre",
-      "December": "Diciembre"
-    };
+    // ===== UTILIDADES =====
+    function formatTiempo(segundos) {
+      const h = Math.floor(segundos / 3600);
+      const m = Math.floor((segundos % 3600) / 60);
+      const s = segundos % 60;
+      let str = '';
+      if (h) str += `${h}h `;
+      if (m) str += `${m}m `;
+      str += `${s}s`;
+      return str;
+    }
 
-    const traduccionesEntrenamientos = {
+    // Traducciones (puedes ampliarlas)
+    const traducciones = {
       "RoadSecurity": "Seguridad Vial",
       "ConfinedSpaces": "Espacios Confinados",
       "Mines": "Minería",
@@ -132,248 +418,127 @@
       "AirSafety": "Seguridad Aérea",
       "AirportVisualSafety": "Seguridad Vial Aeropuerto",
       "Machinery": "Maquinaria",
-      "RoadSafety": "Seguridad Vial",
       "LoadHoisting": "Izado de Cargas",
       "TEST": "PRUEBA",
       "Tutorial": "Tutorial",
       "Nixus": "Nixus",
-      "Nixus_RoadActors": "Actores Viales Nixus"
+      "Nixus_RoadActors": "Actores Viales Nixus",
+      "HydrocarbonsDerrickman": "Hidrocarburos Derrickman"
     };
+    function traducir(nombre) { return traducciones[nombre] || nombre; }
 
-    // 🔥 Formatear a horas, minutos, segundos
-    function formatTiempo(segundos) {
-      const horas = Math.floor(segundos / 3600);
-      const minutos = Math.floor((segundos % 3600) / 60);
-      const segundosRestantes = segundos % 60;
+    const mesesIngles = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const mesesEsp = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 
-      let resultado = "";
-      if (horas > 0) resultado += `${horas} h `;
-      if (minutos > 0) resultado += `${minutos} min `;
-      resultado += `${segundosRestantes} seg`;
-
-      return resultado.trim();
+    function traducirMes(mes) {
+      const idx = mesesIngles.indexOf(mes);
+      return idx !== -1 ? mesesEsp[idx] : mes;
     }
 
-    // 🔥 Traducir nombre del entrenamiento
-    function traducirEntrenamiento(nombreIngles) {
-      return traduccionesEntrenamientos[nombreIngles] || nombreIngles;
-    }
-
-    // 🔥 Traducir nombre del mes
-    function traducirMes(mesIngles) {
-      return traduccionesMeses[mesIngles] || mesIngles;
-    }
-
+    // ===== OBTENER DATA =====
     async function leerData() {
-      const empresaInput = document.getElementById("empresaInput").value.trim();
-      const empresa = empresaInput.toUpperCase(); 
-      const resultadoDiv = document.getElementById("resultado");
-      const dispositivosDiv = document.getElementById("dispositivosList");
-      const detalleDiv = document.getElementById("detalleDispositivo");
+      const empresa = document.getElementById('empresaInput').value.trim().toUpperCase();
+      if (!empresa) { alert('Ingresa el nombre de la empresa'); return; }
 
-      if (!empresa) {
-        alert("Por favor ingresa la empresa");
-        return;
-      }
-
+      const url = `${FIREBASE_URL}${empresa}/devices.json`;
       try {
-        const response = await fetch(`${firebaseURL}${empresa}/devices.json`);
-        const data = await response.json();
-
-        if (!data) {
-          alert("❌ Empresa no encontrada");
+        const resp = await fetch(url);
+        const data = await resp.json();
+        if (!data || typeof data !== 'object') {
+          alert('❌ No se encontraron dispositivos para esta empresa');
           return;
         }
 
-        // Adaptación para la estructura de datos JSON proporcionada
-        const dispositivos = data.Devices ? Object.values(data.Devices) : [];
-        resultadoDiv.classList.remove("hidden");
+        // Convertir objeto a array de dispositivos (cada uno con su ID)
+        const dispositivos = Object.entries(data).map(([key, value]) => {
+          // value contiene: accessCode, data, license, trainingsActive
+          // El objeto data tiene: ID, Trainings, UsageTime
+          const deviceData = value.data || {};
+          return {
+            id: key,
+            accessCode: value.accessCode,
+            license: value.license,
+            trainingsActive: value.trainingsActive || [],
+            // Datos de uso
+            ID: deviceData.ID || key,
+            Trainings: deviceData.Trainings || [],
+            UsageTime: deviceData.UsageTime || 0
+          };
+        });
 
-        dispositivosDiv.innerHTML = "";
-        detalleDiv.innerHTML = "";
-        document.getElementById("graficoMensualContainer").innerHTML = "";
-
-        if (dispositivos.length === 1) {
-          mostrarDispositivo(dispositivos[0], detalleDiv);
-        } else {
-          dispositivos.forEach(d => {
-            const btn = document.createElement("button");
-            btn.textContent = `📌 Dispositivo ID: ${d.ID}`;
-            btn.classList.add(
-              "bg-[#1e2146]", "text-white", "px-4", "py-2", "rounded-xl", 
-              "shadow-md", "mb-2", "w-full", "text-left", "hover:bg-[#f28a1a]", "transition"
-            );
-            btn.onclick = () => mostrarDispositivo(d, detalleDiv);
-            dispositivosDiv.appendChild(btn);
-          });
+        if (dispositivos.length === 0) {
+          alert('No hay dispositivos registrados');
+          return;
         }
 
+        // Mostrar resultados
+        document.getElementById('resultado').classList.remove('hidden');
+        document.getElementById('resultadosCompletos').classList.remove('hidden');
+        document.getElementById('nombreEmpresa').textContent = `🏢 EMPRESA: ${empresa}`;
+
+        // Procesar y mostrar gráficos
+        renderGenerales(dispositivos);
+        renderListaDispositivos(dispositivos);
+
       } catch (error) {
-        console.error("Error al leer Firebase:", error);
-        alert("⚠️ Ocurrió un error al leer los datos");
+        console.error(error);
+        alert('Error al obtener datos: ' + error.message);
       }
     }
 
-    function mostrarDispositivo(dispositivo, container) {
-      container.innerHTML = `
-        <h2 class="text-lg font-bold text-[#1e2146]">📌 Dispositivo ID: ${dispositivo.ID}</h2>
-        <p class="text-sm text-gray-700">⏱️ Tiempo de uso: ${formatTiempo(dispositivo.UsageTime)}</p>
-        <p class="text-sm text-gray-500">Licencia: ${dispositivo.LicenseLimit || "Sin definir"}</p>
-        <h3 class="mt-2 font-semibold text-[#f28a1a]">Capacitaciones:</h3>
-        <div id="capacitacionesList" class="max-h-60 overflow-y-auto border p-2 rounded bg-gray-50"></div>
-      `;
-
-      const capacitacionesList = container.querySelector("#capacitacionesList");
-      const graficoMensualContainer = document.getElementById("graficoMensualContainer");
-      graficoMensualContainer.innerHTML = "";
-
-      if (dispositivo.Trainings && dispositivo.Trainings.length > 0) {
-        dispositivo.Trainings.forEach(cap => {
-          const item = document.createElement("div");
-          item.classList.add("mb-3", "border-b", "pb-2");
-
-          const nombreTraducido = traducirEntrenamiento(cap.TrainingName);
-          const texto = `${nombreTraducido} - ${formatTiempo(cap.TotalTime || 0)}`;
-          item.innerHTML = `<p class="text-sm font-semibold text-[#1e2146]">${texto}</p>`;
-
-          // ✅ Años y meses
-          if (cap.YearList && cap.YearList.length > 0) {
-            const añosDiv = document.createElement("div");
-            añosDiv.classList.add("ml-4", "text-sm");
-
-            cap.YearList.forEach(yearData => {
-              const año = yearData.Year;
-              const meses = yearData.Months;
-              
-              const añoBtn = document.createElement("button");
-              añoBtn.textContent = `📅 ${año}`;
-              añoBtn.classList.add(
-                "mt-2", "bg-[#1e2146]", "text-white", "px-3", "py-1", "rounded-md",
-                "hover:bg-[#f28a1a]", "transition", "block", "w-full", "text-left"
-              );
-
-              const mesesDiv = document.createElement("div");
-              mesesDiv.classList.add("ml-6", "hidden", "mt-1", "text-gray-700", "bg-gray-100", "rounded", "p-2");
-
-              Object.entries(meses).forEach(([mes, valor]) => {
-                const p = document.createElement("p");
-                const mesTraducido = traducirMes(mes);
-                p.textContent = `• ${mesTraducido}: ${formatTiempo(valor)}`;
-                mesesDiv.appendChild(p);
-              });
-
-              // Botón gráfico mensual (por año)
-              const btnGrafico = document.createElement("button");
-              btnGrafico.textContent = "📊 Ver gráfico mensual";
-              btnGrafico.classList.add("mt-2", "bg-[#f28a1a]", "text-white", "px-3", "py-1", "rounded-md", "hover:bg-[#d97706]", "transition");
-              btnGrafico.onclick = () => {
-                graficoMensualContainer.innerHTML = "";
-                generarGraficoMensualPorAño(cap, año);
-              };
-              mesesDiv.appendChild(btnGrafico);
-
-              añoBtn.onclick = () => {
-                mesesDiv.classList.toggle("hidden");
-              };
-
-              añosDiv.appendChild(añoBtn);
-              añosDiv.appendChild(mesesDiv);
-            });
-
-            item.appendChild(añosDiv);
-          }
-
-          capacitacionesList.appendChild(item);
+    // ===== GRÁFICOS GENERALES =====
+    function renderGenerales(dispositivos) {
+      // 1. Sumar tiempos por capacitación (todos los dispositivos)
+      const trainingTotals = {};
+      dispositivos.forEach(dev => {
+        (dev.Trainings || []).forEach(t => {
+          const name = t.TrainingName;
+          trainingTotals[name] = (trainingTotals[name] || 0) + (t.TotalTime || 0);
         });
-      } else {
-        capacitacionesList.innerHTML = "<p class='text-gray-500'>No hay capacitaciones</p>";
-      }
+      });
 
-      generarGraficos(dispositivo);
-    }
+      const trainingNames = Object.keys(trainingTotals);
+      const trainingValues = Object.values(trainingTotals);
+      const colores = generarColores(trainingNames.length);
 
-    // ✅ FUNCIÓN: gráfico mensual por año
-    function generarGraficoMensualPorAño(capacitacion, año) {
-      const yearData = capacitacion.YearList.find(y => y.Year === año);
-      if (!yearData) return;
-      
-      const container = document.getElementById("graficoMensualContainer");
-      const meses = yearData.Months;
-
-      // Traducir labels de meses
-      const labels = Object.keys(meses).map(mes => traducirMes(mes));
-      const valores = Object.values(meses);
-
-      const canvas = document.createElement("canvas");
-      canvas.classList.add("w-full", "h-64");
-      container.appendChild(canvas);
-
-      if (graficoMensualInstance) graficoMensualInstance.destroy();
-
-      const nombreTraducido = traducirEntrenamiento(capacitacion.TrainingName);
-      
-      graficoMensualInstance = new Chart(canvas, {
-        type: "bar",
+      // Gráfico de barras general
+      const ctxBar = document.getElementById('barChartGeneral').getContext('2d');
+      if (charts.barGeneral) charts.barGeneral.destroy();
+      charts.barGeneral = new Chart(ctxBar, {
+        type: 'bar',
         data: {
-          labels,
+          labels: trainingNames.map(traducir),
           datasets: [{
-            label: `Tiempo por mes (${año}) - ${nombreTraducido}`,
-            data: valores,
-            backgroundColor: "#f28a1a"
+            label: 'Tiempo total (seg)',
+            data: trainingValues,
+            backgroundColor: colores
           }]
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           plugins: {
             legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: context => formatTiempo(context.raw)
-              }
-            }
+            tooltip: { callbacks: { label: ctx => formatTiempo(ctx.raw) } }
           },
           scales: {
-            y: {
-              beginAtZero: true,
-              ticks: { callback: value => formatTiempo(value) }
-            }
+            y: { beginAtZero: true, ticks: { callback: v => formatTiempo(v) } }
           }
         }
       });
-    }
 
-    function generarGraficos(dispositivo) {
-      if (!dispositivo.Trainings || dispositivo.Trainings.length === 0) {
-        // Limpiar gráficos si no hay datos
-        if (useTimeChartInstance) useTimeChartInstance.destroy();
-        if (barChartInstance) barChartInstance.destroy();
-        
-        document.getElementById("customLegend").innerHTML = "<p class='text-gray-500'>No hay datos para mostrar</p>";
-        return;
-      }
+      // 2. Gráfico de torta: dispositivos vs tiempo
+      const devLabels = dispositivos.map(d => d.ID);
+      const devValues = dispositivos.map(d => d.UsageTime || 0);
+      const coloresDev = generarColores(devLabels.length);
 
-      // Traducir nombres de entrenamientos
-      const labels = dispositivo.Trainings.map(cap => traducirEntrenamiento(cap.TrainingName));
-      const tiempos = dispositivo.Trainings.map(cap => cap.TotalTime || 0);
-      const tiemposFormateados = tiempos.map(t => formatTiempo(t));
-
-      const colors = [
-        '#f28a1a', '#1e2146', '#4caf50', '#2196f3', '#9c27b0',
-        '#ff5722', '#00bcd4', '#8bc34a', '#ffc107', '#e91e63',
-        '#795548', '#3f51b5', '#009688', '#cddc39'
-      ];
-
-      // --- Torta ---
-      const ctx = document.getElementById("useTimeChart").getContext("2d");
-      if (useTimeChartInstance) useTimeChartInstance.destroy();
-      useTimeChartInstance = new Chart(ctx, {
+      const ctxPieDev = document.getElementById('pieDispositivos').getContext('2d');
+      if (charts.pieDispositivos) charts.pieDispositivos.destroy();
+      charts.pieDispositivos = new Chart(ctxPieDev, {
         type: 'doughnut',
         data: {
-          labels: labels,
-          datasets: [{
-            data: tiempos,
-            backgroundColor: colors.slice(0, labels.length)
-          }]
+          labels: devLabels,
+          datasets: [{ data: devValues, backgroundColor: coloresDev }]
         },
         options: {
           responsive: true,
@@ -381,55 +546,208 @@
           plugins: { legend: { display: false } }
         }
       });
+      // Leyenda personalizada
+      const legendDev = document.getElementById('legendDispositivos');
+      legendDev.innerHTML = devLabels.map((label, i) => `
+        <div class="legend-item">
+          <span class="legend-color" style="background:${coloresDev[i]}"></span>
+          ${label} - ${formatTiempo(devValues[i])}
+        </div>
+      `).join('');
 
-      // --- Leyenda personalizada ---
-      const legendContainer = document.getElementById("customLegend");
-      legendContainer.innerHTML = "";
-      labels.forEach((label, i) => {
-        const item = document.createElement("div");
-        item.classList.add("flex", "items-center", "mb-1");
-        const colorBox = document.createElement("span");
-        colorBox.style.backgroundColor = colors[i % colors.length];
-        colorBox.classList.add("w-4", "h-4", "inline-block", "mr-2", "rounded");
-        const text = document.createElement("span");
-        text.textContent = `${label} - ${tiemposFormateados[i]}`;
-        item.appendChild(colorBox);
-        item.appendChild(text);
-        legendContainer.appendChild(item);
-      });
+      // 3. Gráfico de torta: capacitaciones general
+      const capLabels = trainingNames;
+      const capValues = trainingValues;
+      const coloresCap = generarColores(capLabels.length);
 
-      // --- Barras ---
-      const barCtx = document.getElementById("barChart").getContext("2d");
-      if (barChartInstance) barChartInstance.destroy();
-      barChartInstance = new Chart(barCtx, {
-        type: 'bar',
+      const ctxPieCap = document.getElementById('pieCapacitaciones').getContext('2d');
+      if (charts.pieCapacitaciones) charts.pieCapacitaciones.destroy();
+      charts.pieCapacitaciones = new Chart(ctxPieCap, {
+        type: 'doughnut',
         data: {
-          labels,
-          datasets: [{
-            label: 'Tiempo de uso',
-            data: tiempos,
-            backgroundColor: colors.slice(0, labels.length)
-          }]
+          labels: capLabels.map(traducir),
+          datasets: [{ data: capValues, backgroundColor: coloresCap }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: {
-            tooltip: {
-              callbacks: { label: context => formatTiempo(context.raw) }
-            },
-            legend: { display: false }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: { callback: value => formatTiempo(value) }
-            }
-          }
+          plugins: { legend: { display: false } }
         }
       });
+      const legendCap = document.getElementById('legendCapacitaciones');
+      legendCap.innerHTML = capLabels.map((label, i) => `
+        <div class="legend-item">
+          <span class="legend-color" style="background:${coloresCap[i]}"></span>
+          ${traducir(label)} - ${formatTiempo(capValues[i])}
+        </div>
+      `).join('');
     }
+
+    // ===== LISTA DE DISPOSITIVOS =====
+    function renderListaDispositivos(dispositivos) {
+      const container = document.getElementById('dispositivosList');
+      container.innerHTML = '';
+      dispositivos.forEach(dev => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-device';
+        btn.textContent = `📌 ${dev.ID}  (${formatTiempo(dev.UsageTime)})`;
+        btn.onclick = () => mostrarDetalleDispositivo(dev, dispositivos);
+        container.appendChild(btn);
+      });
+      // Limpiar detalle
+      document.getElementById('detalleDispositivo').classList.add('hidden');
+      document.getElementById('detalleDispositivo').innerHTML = '';
+    }
+
+    // ===== DETALLE DE DISPOSITIVO =====
+    function mostrarDetalleDispositivo(dispositivo, todosLosDispositivos) {
+      const detailDiv = document.getElementById('detalleDispositivo');
+      detailDiv.classList.remove('hidden');
+      detailDiv.innerHTML = '';
+
+      // Obtener años disponibles en este dispositivo
+      const añosSet = new Set();
+      (dispositivo.Trainings || []).forEach(t => {
+        (t.YearList || []).forEach(y => añosSet.add(y.Year));
+      });
+      const años = Array.from(añosSet).sort();
+
+      // Selector de año
+      const yearSelector = document.createElement('div');
+      yearSelector.className = 'year-selector';
+      yearSelector.innerHTML = `
+        <label style="color:#A0D8EF;">📅 Año:</label>
+        <select id="yearSelect"></select>
+      `;
+      const select = yearSelector.querySelector('select');
+      años.forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a;
+        opt.textContent = a;
+        select.appendChild(opt);
+      });
+      if (años.length) select.value = años[0];
+
+      // Contenedor para gráfico mensual
+      const chartContainer = document.createElement('div');
+      chartContainer.style.margin = '16px 0';
+      chartContainer.innerHTML = `<div class="chart-container" style="height:250px;"><canvas id="chartMensualDetalle"></canvas></div>`;
+
+      // Contenedor para lista de trainings
+      const trainingsContainer = document.createElement('div');
+      trainingsContainer.id = 'trainingsDetalle';
+
+      detailDiv.appendChild(yearSelector);
+      detailDiv.appendChild(chartContainer);
+      detailDiv.appendChild(trainingsContainer);
+
+      // Función para actualizar gráfico y lista según año seleccionado
+      function actualizarDetalle(año) {
+        // 1. Gráfico mensual: sumar tiempos de todos los trainings para ese año
+        const mesesMap = {};
+        mesesIngles.forEach(m => mesesMap[m] = 0);
+        (dispositivo.Trainings || []).forEach(t => {
+          const yearData = (t.YearList || []).find(y => y.Year === año);
+          if (yearData && yearData.Months) {
+            Object.entries(yearData.Months).forEach(([mes, valor]) => {
+              if (mesesMap[mes] !== undefined) mesesMap[mes] += valor;
+            });
+          }
+        });
+        const mesesLabels = mesesIngles.map(traducirMes);
+        const mesesValues = mesesIngles.map(m => mesesMap[m] || 0);
+
+        // Dibujar gráfico
+        const ctx = document.getElementById('chartMensualDetalle').getContext('2d');
+        if (charts.mensualDetalle) charts.mensualDetalle.destroy();
+        charts.mensualDetalle = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: mesesLabels,
+            datasets: [{
+              label: `Tiempo total - ${año}`,
+              data: mesesValues,
+              backgroundColor: '#00F2FF'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, ticks: { callback: v => formatTiempo(v) } }
+            }
+          }
+        });
+
+        // 2. Lista de trainings con desglose
+        trainingsContainer.innerHTML = '';
+        (dispositivo.Trainings || []).forEach(t => {
+          const div = document.createElement('div');
+          div.className = 'training-item';
+          const name = traducir(t.TrainingName);
+          const total = formatTiempo(t.TotalTime || 0);
+          div.innerHTML = `
+            <div class="training-name">${name} <span style="font-weight:normal;color:#A0D8EF;">(${total})</span></div>
+          `;
+          // Mostrar años y meses de este training
+          const yearList = t.YearList || [];
+          yearList.forEach(yd => {
+            const yearBtn = document.createElement('span');
+            yearBtn.className = 'year-toggle';
+            yearBtn.textContent = `📅 ${yd.Year}`;
+            const monthDiv = document.createElement('div');
+            monthDiv.className = 'month-details';
+            // Mostrar meses con tiempo
+            if (yd.Months) {
+              let html = '';
+              Object.entries(yd.Months).forEach(([mes, valor]) => {
+                if (valor > 0) {
+                  html += `<p>• ${traducirMes(mes)}: ${formatTiempo(valor)}</p>`;
+                }
+              });
+              monthDiv.innerHTML = html || '<p style="color:#666;">Sin datos</p>';
+            } else {
+              monthDiv.innerHTML = '<p style="color:#666;">Sin datos</p>';
+            }
+            yearBtn.onclick = () => {
+              monthDiv.classList.toggle('open');
+            };
+            div.appendChild(yearBtn);
+            div.appendChild(monthDiv);
+          });
+          trainingsContainer.appendChild(div);
+        });
+      }
+
+      // Evento change del selector
+      select.addEventListener('change', () => {
+        actualizarDetalle(select.value);
+      });
+
+      // Inicializar con el primer año
+      if (años.length) actualizarDetalle(años[0]);
+    }
+
+    // ===== GENERAR COLORES =====
+    function generarColores(n) {
+      const paleta = [
+        '#00F2FF', '#7000FF', '#FF6B6B', '#FFD93D', '#6BCB77', 
+        '#4D96FF', '#9B59B6', '#F39C12', '#1ABC9C', '#E74C3C',
+        '#3498DB', '#2ECC71', '#E67E22', '#9B59B6', '#1ABC9C'
+      ];
+      const colores = [];
+      for (let i = 0; i < n; i++) {
+        colores.push(paleta[i % paleta.length]);
+      }
+      return colores;
+    }
+
+    // ===== INICIO =====
+    // (Opcional: cargar datos de ejemplo al abrir)
+    window.onload = function() {
+      // Puedes pre-cargar PRUEBADATA si quieres
+    };
   </script>
 </body>
-
 </html>
