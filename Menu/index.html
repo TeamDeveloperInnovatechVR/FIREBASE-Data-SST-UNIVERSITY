@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>SST UNIVERSITY · Menú Principal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    /* ===== ESTILO NEÓN OSCURO ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0D0E12;
+      min-height: 100vh;
+      color: #FFFFFF;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 30%, rgba(22, 27, 51, 0.6) 0%, #0D0E12 90%);
+      pointer-events: none;
+      z-index: -1;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: -1;
+    }
+    .menu-container {
+      max-width: 800px;
+      width: 90%;
+      padding: 40px 30px;
+      background: rgba(22, 27, 51, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 242, 255, 0.3);
+      border-radius: 20px;
+      box-shadow: 0 0 60px rgba(0, 242, 255, 0.15);
+      text-align: center;
+    }
+    .logo-area {
+      margin-bottom: 40px;
+    }
+    .logo-area img {
+      height: 70px;
+      margin-bottom: 10px;
+    }
+    .logo-area h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.8rem;
+      background: linear-gradient(135deg, #00F2FF, #7000FF);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: 2px;
+    }
+    .logo-area p {
+      color: #A0D8EF;
+      font-size: 0.9rem;
+      margin-top: 6px;
+      opacity: 0.8;
+    }
+    .menu-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin: 30px 0;
+    }
+    .menu-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      background: rgba(13, 14, 18, 0.7);
+      border: 1px solid rgba(0, 242, 255, 0.4);
+      border-radius: 14px;
+      padding: 18px 24px;
+      color: #fff;
+      text-decoration: none;
+      font-family: 'Orbitron', monospace;
+      font-size: 1.1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .menu-btn i {
+      font-size: 1.8rem;
+      color: #00F2FF;
+      transition: all 0.3s ease;
+    }
+    .menu-btn:hover {
+      background: #00F2FF;
+      color: #0D0E12;
+      box-shadow: 0 0 30px rgba(0, 242, 255, 0.4);
+      transform: scale(1.02);
+      border-color: #00F2FF;
+    }
+    .menu-btn:hover i {
+      color: #0D0E12;
+    }
+    .menu-btn .label {
+      flex: 1;
+      text-align: left;
+    }
+    .menu-btn .sub {
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      font-size: 0.7rem;
+      opacity: 0.6;
+      display: block;
+      margin-top: 2px;
+    }
+    .footer {
+      margin-top: 30px;
+      color: #A0D8EF;
+      font-size: 0.8rem;
+      border-top: 1px solid rgba(0, 242, 255, 0.15);
+      padding-top: 20px;
+    }
+    .footer img {
+      height: 24px;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    .footer span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    @media (max-width: 600px) {
+      .menu-container { padding: 25px 15px; }
+      .logo-area h1 { font-size: 1.4rem; }
+      .menu-btn { font-size: 0.9rem; padding: 14px 18px; }
+      .menu-btn i { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="menu-container">
+    <!-- LOGO -->
+    <div class="logo-area">
+      <img src="../Resources/AMB.svg" alt="SST University">
+      <h1>SST UNIVERSITY</h1>
+      <p>Plataforma de Analítica y Configuración</p>
+    </div>
+
+    <!-- BOTONES DEL MENÚ con rutas relativas hacia las otras carpetas -->
+    <div class="menu-grid">
+      <a href="../Config/index.html" class="menu-btn">
+        <i class="fas fa-cogs"></i>
+        <span class="label">
+          CONFIGURACIÓN
+          <span class="sub">Gestionar empresas, dispositivos y licencias</span>
+        </span>
+        <i class="fas fa-chevron-right" style="font-size:1rem; opacity:0.5;"></i>
+      </a>
+
+      <a href="../Dashboard/index.html" class="menu-btn">
+        <i class="fas fa-chart-pie"></i>
+        <span class="label">
+          DASHBOARD
+          <span class="sub">Visualizar métricas y reportes de uso</span>
+        </span>
+        <i class="fas fa-chevron-right" style="font-size:1rem; opacity:0.5;"></i>
+      </a>
+
+      <a href="../VideoTutoriales/index.html" class="menu-btn">
+        <i class="fas fa-video"></i>
+        <span class="label">
+          VIDEO TUTORIALES
+          <span class="sub">Guías y capacitaciones en video</span>
+        </span>
+        <i class="fas fa-chevron-right" style="font-size:1rem; opacity:0.5;"></i>
+      </a>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <span>
+        <img src="../Resources/AMB.svg" alt="Ambiente Innovatech">
+        Ambiente Innovatech · 2026
+      </span>
+    </div>
+  </div>
+</body>
+</html>
