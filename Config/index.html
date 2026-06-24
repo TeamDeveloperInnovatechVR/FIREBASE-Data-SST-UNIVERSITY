@@ -1,736 +1,1079 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>ADMIN DASHBOARD · SST UNIVERSITY</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <style>
-    /* (tus estilos originales, no cambian) */
-    * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
-    body { font-family: 'Inter', sans-serif; background: #0D0E12; min-height: 100vh; color: #FFFFFF; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 30%, rgba(22, 27, 51, 0.6) 0%, #0D0E12 90%); pointer-events: none; z-index: -1; }
-    body::after { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: -1; }
-    .admin-container { max-width: 1600px; margin: 0 auto; padding: 20px; }
-    .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 14, 18, 0.95); backdrop-filter: blur(10px); z-index: 1000; display: flex; justify-content: center; align-items: center; }
-    .login-card { background: rgba(22, 27, 51, 0.9); border: 1px solid #00F2FF; padding: 40px; width: 90%; max-width: 400px; box-shadow: 0 0 40px rgba(0, 242, 255, 0.2); }
-    .login-card h2 { font-family: 'Orbitron', monospace; text-align: center; margin-bottom: 30px; background: linear-gradient(135deg, #00F2FF, #7000FF); background-clip: text; -webkit-background-clip: text; color: transparent; }
-    .login-input { width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(13, 14, 18, 0.8); border: 1px solid #00F2FF; color: #fff; font-family: 'Inter', monospace; }
-    .login-input:focus { outline: none; box-shadow: 0 0 10px rgba(0, 242, 255, 0.5); }
-    .login-btn { width: 100%; padding: 12px; background: #00F2FF; border: none; color: #0D0E12; font-family: 'Orbitron', monospace; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
-    .login-btn:hover { background: #7000FF; color: white; box-shadow: 0 0 20px rgba(112, 0, 255, 0.5); }
-    .error-msg { color: #ff4444; text-align: center; margin-top: 15px; font-size: 0.8rem; }
-    .dashboard-content { display: none; }
-    .top-nav { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; background: rgba(22, 27, 51, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(0, 242, 255, 0.3); padding: 12px 24px; margin-bottom: 30px; }
-    .logo-area h1 { font-family: 'Orbitron', monospace; font-size: 1.1rem; background: linear-gradient(135deg, #00F2FF, #7000FF); background-clip: text; -webkit-background-clip: text; color: transparent; }
-    .nav-buttons { display: flex; gap: 15px; flex-wrap: wrap; }
-    .nav-btn { background: rgba(22, 27, 51, 0.6); border: 1px solid #00F2FF; color: #A0D8EF; padding: 8px 20px; font-family: 'Orbitron', monospace; font-size: 0.75rem; cursor: pointer; transition: all 0.2s ease; }
-    .nav-btn:hover, .nav-btn.active { background: #00F2FF; color: #0D0E12; box-shadow: 0 0 15px rgba(0, 242, 255, 0.4); }
-    .logout-nav { background: rgba(220, 38, 38, 0.3); border-color: #dc2626; color: #dc2626; }
-    .logout-nav:hover { background: #dc2626; color: white; }
-    .panel { background: rgba(22, 27, 51, 0.6); backdrop-filter: blur(5px); border: 1px solid rgba(0, 242, 255, 0.2); padding: 25px; margin-bottom: 30px; }
-    .panel h2 { font-family: 'Orbitron', monospace; font-size: 1.2rem; color: #00F2FF; margin-bottom: 20px; border-bottom: 1px solid rgba(0, 242, 255, 0.3); padding-bottom: 8px; }
-    .edit-btn, .delete-btn, .add-btn { background: transparent; border: 1px solid; padding: 4px 12px; margin: 0 3px; cursor: pointer; font-size: 0.7rem; transition: all 0.2s ease; }
-    .edit-btn { border-color: #00F2FF; color: #00F2FF; }
-    .edit-btn:hover { background: #00F2FF; color: #0D0E12; }
-    .delete-btn { border-color: #dc2626; color: #dc2626; }
-    .delete-btn:hover { background: #dc2626; color: white; }
-    .add-btn { border-color: #10b981; color: #10b981; margin-bottom: 15px; }
-    .add-btn:hover { background: #10b981; color: white; }
-    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 14, 18, 0.95); backdrop-filter: blur(8px); z-index: 2000; display: flex; justify-content: center; align-items: center; }
-    .modal-content { background: #1a1f2e; border: 1px solid #00F2FF; padding: 30px; width: 90%; max-width: 550px; max-height: 85vh; overflow-y: auto; }
-    .modal-content h3 { font-family: 'Orbitron', monospace; margin-bottom: 20px; color: #00F2FF; }
-    .modal-input { width: 100%; padding: 10px; margin-bottom: 12px; background: rgba(13, 14, 18, 0.8); border: 1px solid #00F2FF; color: white; }
-    .toggle-switch { display: flex; align-items: center; gap: 15px; margin: 15px 0; padding: 10px; background: rgba(13, 14, 18, 0.5); }
-    .toggle-label { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-    .toggle-label input { width: 40px; height: 20px; appearance: none; background: #dc2626; border-radius: 20px; position: relative; cursor: pointer; transition: all 0.3s ease; }
-    .toggle-label input:checked { background: #10b981; }
-    .toggle-label input::before { content: ''; position: absolute; width: 16px; height: 16px; background: white; border-radius: 50%; top: 2px; left: 3px; transition: all 0.3s ease; }
-    .toggle-label input:checked::before { left: 21px; }
-    .modal-buttons { display: flex; gap: 10px; margin-top: 20px; }
-    .save-btn { background: #10b981; border: none; padding: 10px 20px; color: white; cursor: pointer; }
-    .cancel-btn { background: #dc2626; border: none; padding: 10px 20px; color: white; cursor: pointer; }
-    .trainings-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
-    .training-tag { background: rgba(0, 242, 255, 0.2); border: 1px solid #00F2FF; padding: 4px 12px; font-size: 0.7rem; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
-    .training-tag.selected { background: #00F2FF; color: #0D0E12; }
-    .remove-tag { cursor: pointer; color: #dc2626; font-weight: bold; }
-    .rcp-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; max-height: 200px; overflow-y: auto; }
-    .rcp-tag { background: rgba(112, 0, 255, 0.3); border: 1px solid #7000FF; padding: 6px 12px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 10px; border-radius: 4px; font-family: monospace; }
-    .rcp-code { font-weight: bold; letter-spacing: 0.5px; }
-    @media (max-width: 768px) { .admin-container { padding: 15px; } .top-nav { flex-direction: column; gap: 15px; } .modal-content { padding: 20px; } }
+    /* ===== ESTILOS (sin cambios) ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0D0E12;
+      min-height: 100vh;
+      color: #FFFFFF;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 30%, rgba(22, 27, 51, 0.6) 0%, #0D0E12 90%);
+      pointer-events: none;
+      z-index: -1;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image:
+        linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: -1;
+    }
+    .admin-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .login-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(13, 14, 18, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .login-card {
+      background: rgba(22, 27, 51, 0.9);
+      border: 1px solid #00F2FF;
+      padding: 40px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 0 40px rgba(0, 242, 255, 0.2);
+    }
+    .login-card h2 {
+      font-family: 'Orbitron', monospace;
+      text-align: center;
+      margin-bottom: 30px;
+      background: linear-gradient(135deg, #00F2FF, #7000FF);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    .login-input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      background: rgba(13, 14, 18, 0.8);
+      border: 1px solid #00F2FF;
+      color: #fff;
+      font-family: 'Inter', monospace;
+    }
+    .login-input:focus {
+      outline: none;
+      box-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+    }
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: #00F2FF;
+      border: none;
+      color: #0D0E12;
+      font-family: 'Orbitron', monospace;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .login-btn:hover {
+      background: #7000FF;
+      color: white;
+      box-shadow: 0 0 20px rgba(112, 0, 255, 0.5);
+    }
+    .error-msg {
+      color: #ff4444;
+      text-align: center;
+      margin-top: 15px;
+      font-size: 0.8rem;
+    }
+    .dashboard-content {
+      display: none;
+    }
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      background: rgba(22, 27, 51, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 242, 255, 0.3);
+      padding: 12px 24px;
+      margin-bottom: 30px;
+    }
+    .logo-area h1 {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.1rem;
+      background: linear-gradient(135deg, #00F2FF, #7000FF);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    .nav-buttons {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .nav-btn {
+      background: rgba(22, 27, 51, 0.6);
+      border: 1px solid #00F2FF;
+      color: #A0D8EF;
+      padding: 8px 20px;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .nav-btn:hover,
+    .nav-btn.active {
+      background: #00F2FF;
+      color: #0D0E12;
+      box-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
+    }
+    .logout-nav {
+      background: rgba(220, 38, 38, 0.3);
+      border-color: #dc2626;
+      color: #dc2626;
+    }
+    .logout-nav:hover {
+      background: #dc2626;
+      color: white;
+    }
+    .panel {
+      background: rgba(22, 27, 51, 0.6);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(0, 242, 255, 0.2);
+      padding: 25px;
+      margin-bottom: 30px;
+    }
+    .panel h2 {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.2rem;
+      color: #00F2FF;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(0, 242, 255, 0.3);
+      padding-bottom: 8px;
+    }
+    .edit-btn,
+    .delete-btn,
+    .add-btn {
+      background: transparent;
+      border: 1px solid;
+      padding: 4px 12px;
+      margin: 0 3px;
+      cursor: pointer;
+      font-size: 0.7rem;
+      transition: all 0.2s ease;
+    }
+    .edit-btn {
+      border-color: #00F2FF;
+      color: #00F2FF;
+    }
+    .edit-btn:hover {
+      background: #00F2FF;
+      color: #0D0E12;
+    }
+    .delete-btn {
+      border-color: #dc2626;
+      color: #dc2626;
+    }
+    .delete-btn:hover {
+      background: #dc2626;
+      color: white;
+    }
+    .add-btn {
+      border-color: #10b981;
+      color: #10b981;
+      margin-bottom: 15px;
+    }
+    .add-btn:hover {
+      background: #10b981;
+      color: white;
+    }
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(13, 14, 18, 0.95);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: #1a1f2e;
+      border: 1px solid #00F2FF;
+      padding: 30px;
+      width: 90%;
+      max-width: 550px;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+    .modal-content h3 {
+      font-family: 'Orbitron', monospace;
+      margin-bottom: 20px;
+      color: #00F2FF;
+    }
+    .modal-input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      background: rgba(13, 14, 18, 0.8);
+      border: 1px solid #00F2FF;
+      color: white;
+      font-family: 'Inter', sans-serif;
+    }
+    /* para inputs tipo date */
+    .modal-input[type="date"] {
+      color-scheme: dark;
+    }
+    .toggle-switch {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin: 15px 0;
+      padding: 10px;
+      background: rgba(13, 14, 18, 0.5);
+    }
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+    .toggle-label input {
+      width: 40px;
+      height: 20px;
+      appearance: none;
+      background: #dc2626;
+      border-radius: 20px;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .toggle-label input:checked {
+      background: #10b981;
+    }
+    .toggle-label input::before {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: white;
+      border-radius: 50%;
+      top: 2px;
+      left: 3px;
+      transition: all 0.3s ease;
+    }
+    .toggle-label input:checked::before {
+      left: 21px;
+    }
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .save-btn {
+      background: #10b981;
+      border: none;
+      padding: 10px 20px;
+      color: white;
+      cursor: pointer;
+    }
+    .cancel-btn {
+      background: #dc2626;
+      border: none;
+      padding: 10px 20px;
+      color: white;
+      cursor: pointer;
+    }
+    .trainings-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 15px 0;
+    }
+    .training-tag {
+      background: rgba(0, 242, 255, 0.2);
+      border: 1px solid #00F2FF;
+      padding: 4px 12px;
+      font-size: 0.7rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    .training-tag.selected {
+      background: #00F2FF;
+      color: #0D0E12;
+    }
+    .remove-tag {
+      cursor: pointer;
+      color: #dc2626;
+      font-weight: bold;
+    }
+    .rcp-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 15px 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .rcp-tag {
+      background: rgba(112, 0, 255, 0.3);
+      border: 1px solid #7000FF;
+      padding: 6px 12px;
+      font-size: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+    .rcp-code {
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+    @media (max-width: 768px) {
+      .admin-container {
+        padding: 15px;
+      }
+      .top-nav {
+        flex-direction: column;
+        gap: 15px;
+      }
+      .modal-content {
+        padding: 20px;
+      }
+    }
   </style>
 </head>
 <body>
 
-<div class="login-overlay" id="loginOverlay">
-  <div class="login-card">
-    <h2>🔐 ADMIN ACCESS</h2>
-    <input type="text" id="adminUser" class="login-input" placeholder="USUARIO" value="">
-    <input type="password" id="adminPass" class="login-input" placeholder="CONTRASEÑA" value="">
-    <button id="adminLoginBtn" class="login-btn">INGRESAR AL DASHBOARD</button>
-    <div id="loginError" class="error-msg"></div>
-  </div>
-</div>
-
-<div class="dashboard-content" id="dashboardContent">
-  <div class="admin-container">
-    <div class="top-nav">
-      <div class="logo-area">
-        <h1>SST UNIVERSITY · ADMIN DASHBOARD</h1>
-      </div>
-      <div class="nav-buttons">
-        <button class="nav-btn active" data-section="companies">🏢 EMPRESAS</button>
-        <button class="nav-btn" data-section="trainings">📚 TRAININGS GLOBALES</button>
-        <button class="nav-btn" data-section="users">👥 USUARIOS</button>
-        <button class="nav-btn" id="logoutDashboard">🚪 CERRAR SESIÓN</button>
-      </div>
-    </div>
-
-    <div id="companiesSection" class="panel">
-      <h2>🏢 GESTIÓN DE EMPRESAS</h2>
-      <button class="add-btn" id="addCompanyBtn">+ NUEVA EMPRESA</button>
-      <div id="companiesList"></div>
-    </div>
-
-    <div id="trainingsSection" class="panel" style="display:none;">
-      <h2>📚 TRAININGS GLOBALES</h2>
-      <div class="trainings-list" id="globalTrainingsList"></div>
-      <button class="add-btn" id="addTrainingBtn">+ AGREGAR TRAINING</button>
-    </div>
-
-    <div id="usersSection" class="panel" style="display:none;">
-      <h2>👥 CREDENCIALES DE USUARIOS</h2>
-      <div id="usersList"></div>
+  <!-- LOGIN -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-card">
+      <h2>🔐 ADMIN ACCESS</h2>
+      <input type="text" id="adminUser" class="login-input" placeholder="USUARIO" value="" />
+      <input type="password" id="adminPass" class="login-input" placeholder="CONTRASEÑA" value="" />
+      <button id="adminLoginBtn" class="login-btn">INGRESAR AL DASHBOARD</button>
+      <div id="loginError" class="error-msg"></div>
     </div>
   </div>
-</div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getDatabase, ref, get, set, update, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  <!-- DASHBOARD -->
+  <div class="dashboard-content" id="dashboardContent">
+    <div class="admin-container">
+      <div class="top-nav">
+        <div class="logo-area">
+          <h1>SST UNIVERSITY · ADMIN DASHBOARD</h1>
+        </div>
+        <div class="nav-buttons">
+          <button class="nav-btn active" data-section="companies">🏢 EMPRESAS</button>
+          <button class="nav-btn" data-section="trainings">📚 TRAININGS GLOBALES</button>
+          <button class="nav-btn" data-section="users">👥 USUARIOS</button>
+          <button class="nav-btn" id="logoutDashboard">🚪 CERRAR SESIÓN</button>
+        </div>
+      </div>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyD3WLsNvfPX5NLF891p6zKBHZhaFA_Wpls",
-    authDomain: "sst-university.firebaseapp.com",
-    databaseURL: "https://sst-university-default-rtdb.firebaseio.com",
-    projectId: "sst-university"
-  };
+      <div id="companiesSection" class="panel">
+        <h2>🏢 GESTIÓN DE EMPRESAS</h2>
+        <button class="add-btn" id="addCompanyBtn">+ NUEVA EMPRESA</button>
+        <div id="companiesList"></div>
+      </div>
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+      <div id="trainingsSection" class="panel" style="display:none;">
+        <h2>📚 TRAININGS GLOBALES</h2>
+        <div class="trainings-list" id="globalTrainingsList"></div>
+        <button class="add-btn" id="addTrainingBtn">+ AGREGAR TRAINING</button>
+      </div>
 
-  let currentAdmin = null;
-  const loginOverlay = document.getElementById('loginOverlay');
-  const dashboardContent = document.getElementById('dashboardContent');
-  const sections = {
-    companies: document.getElementById('companiesSection'),
-    trainings: document.getElementById('trainingsSection'),
-    users: document.getElementById('usersSection')
-  };
+      <div id="usersSection" class="panel" style="display:none;">
+        <h2>👥 CREDENCIALES DE USUARIOS</h2>
+        <div id="usersList"></div>
+      </div>
+    </div>
+  </div>
 
-  const COMPANIES_REF = 'Companies';
-  const GLOBAL_TRAININGS_REF = 'GlobalTrainings';
-  let globalTrainings = [];
+  <!-- ====== SCRIPT PRINCIPAL (ACTUALIZADO CON VALIDACIÓN DE FECHAS) ====== -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, get, set, update, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-  // ---------- FUNCIONES AUXILIARES ----------
-  function cleanRCPValue(value) {
-    if (value === null || value === undefined) return null;
-    if (typeof value === 'string') {
-      let cleaned = value.replace(/^["']|["']$/g, '');
-      cleaned = cleaned.replace(/\\"/g, '"');
-      return cleaned === '' ? null : cleaned;
-    }
-    return value;
-  }
+    const firebaseConfig = {
+      apiKey: "AIzaSyD3WLsNvfPX5NLF891p6zKBHZhaFA_Wpls",
+      authDomain: "sst-university.firebaseapp.com",
+      databaseURL: "https://sst-university-default-rtdb.firebaseio.com",
+      projectId: "sst-university"
+    };
 
-  function cleanRCPArray(rcpArray) {
-    if (!rcpArray || !Array.isArray(rcpArray)) return [];
-    return rcpArray.map(item => cleanRCPValue(item)).filter(item => item !== null && item !== '');
-  }
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-  // Cargar trainings globales desde la misma base (nodo GlobalTrainings)
-  async function loadGlobalTrainings() {
-    try {
-      const globalTrainingsRef = ref(db, GLOBAL_TRAININGS_REF);
-      const snapshot = await get(globalTrainingsRef);
-      if (snapshot.exists() && Array.isArray(snapshot.val())) {
-        globalTrainings = snapshot.val();
-      } else {
-        // Si no existe, lo construimos recorriendo todas las empresas
-        const companiesSnap = await get(ref(db, COMPANIES_REF));
-        const companies = companiesSnap.val() || {};
-        const allTrainings = new Set();
-        Object.values(companies).forEach(company => {
-          if (company.credentiales?.TRAININGS && Array.isArray(company.credentiales.TRAININGS)) {
-            company.credentiales.TRAININGS.forEach(t => allTrainings.add(t));
-          }
-          if (company.devices) {
-            Object.values(company.devices).forEach(device => {
-              if (device.trainingsActive && Array.isArray(device.trainingsActive)) {
-                device.trainingsActive.forEach(t => allTrainings.add(t));
-              }
-            });
-          }
-        });
-        globalTrainings = Array.from(allTrainings).sort();
-        // Guardamos por primera vez
-        await set(globalTrainingsRef, globalTrainings);
+    let currentAdmin = null;
+    const loginOverlay = document.getElementById('loginOverlay');
+    const dashboardContent = document.getElementById('dashboardContent');
+    const sections = {
+      companies: document.getElementById('companiesSection'),
+      trainings: document.getElementById('trainingsSection'),
+      users: document.getElementById('usersSection')
+    };
+
+    const COMPANIES_REF = 'Companies';
+    const GLOBAL_TRAININGS_REF = 'GlobalTrainings';
+    let globalTrainings = [];
+
+    // ---------- FUNCIONES AUXILIARES ----------
+    function cleanRCPValue(value) {
+      if (value === null || value === undefined) return null;
+      if (typeof value === 'string') {
+        let cleaned = value.replace(/^["']|["']$/g, '');
+        cleaned = cleaned.replace(/\\"/g, '"');
+        return cleaned === '' ? null : cleaned;
       }
-      renderGlobalTrainings();
-    } catch (error) {
-      console.error("Error cargando trainings globales:", error);
-      globalTrainings = [];
-      renderGlobalTrainings();
+      return value;
     }
-  }
 
-  async function saveGlobalTrainings(trainings) {
-    try {
-      const globalTrainingsRef = ref(db, GLOBAL_TRAININGS_REF);
-      await set(globalTrainingsRef, trainings);
-      globalTrainings = trainings;
-      renderGlobalTrainings();
-      renderAllCompanies(); // refrescar empresas que muestran trainings
-    } catch (error) {
-      alert("Error guardando trainings: " + error.message);
+    function cleanRCPArray(rcpArray) {
+      if (!rcpArray || !Array.isArray(rcpArray)) return [];
+      return rcpArray.map(item => cleanRCPValue(item)).filter(item => item !== null && item !== '');
     }
-  }
 
-  function renderGlobalTrainings() {
-    const container = document.getElementById('globalTrainingsList');
-    if (!container) return;
-    container.innerHTML = globalTrainings.map((training, idx) => `
-      <div class="training-tag">
-        ${training}
-        <span class="remove-tag" data-idx="${idx}">✖</span>
-      </div>
-    `).join('');
-    // Asignar eventos manualmente para evitar problemas con onclick global
-    document.querySelectorAll('#globalTrainingsList .remove-tag').forEach(el => {
-      el.addEventListener('click', async (e) => {
-        const idx = parseInt(e.currentTarget.getAttribute('data-idx'));
-        const newList = [...globalTrainings];
-        newList.splice(idx, 1);
-        await saveGlobalTrainings(newList);
-      });
-    });
-  }
-
-  // Renderizado principal de empresas
-  async function renderAllCompanies() {
-    const snapshot = await get(ref(db, COMPANIES_REF));
-    const companies = snapshot.val() || {};
-    const container = document.getElementById('companiesList');
-    if (!container) return;
-    
-    container.innerHTML = Object.entries(companies).map(([companyName, companyData]) => {
-      const cleanRCP = cleanRCPArray(companyData.RCP);
-      const rcpString = JSON.stringify(cleanRCP).replace(/'/g, "\\'");
-      return `
-      <div style="background: rgba(22, 27, 51, 0.4); margin-bottom: 20px; padding: 15px;">
-        <h3 style="color:#00F2FF;">🏢 ${companyName}</h3>
-        <button class="edit-btn" data-action="editCompany" data-company="${companyName}">✏️ EDITAR EMPRESA</button>
-        <button class="edit-btn" data-action="editRCP" data-company="${companyName}" data-rcp='${rcpString}'>🔢 EDITAR RCP</button>
-        <button class="delete-btn" data-action="deleteCompany" data-company="${companyName}">🗑️ ELIMINAR EMPRESA</button>
-        <button class="add-btn" data-action="addDevice" data-company="${companyName}">+ AGREGAR DISPOSITIVO</button>
-        <div id="devices-${companyName}"></div>
-      </div>
-    `}).join('');
-    
-    // Asignar eventos para botones de empresa
-    document.querySelectorAll('[data-action="editCompany"]').forEach(btn => {
-      btn.addEventListener('click', () => editCompany(btn.getAttribute('data-company')));
-    });
-    document.querySelectorAll('[data-action="editRCP"]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const company = btn.getAttribute('data-company');
-        const rcpRaw = btn.getAttribute('data-rcp');
-        let rcpArray = [];
-        try { rcpArray = JSON.parse(rcpRaw); } catch(e) { rcpArray = []; }
-        editRCP(company, rcpArray);
-      });
-    });
-    document.querySelectorAll('[data-action="deleteCompany"]').forEach(btn => {
-      btn.addEventListener('click', () => deleteCompany(btn.getAttribute('data-company')));
-    });
-    document.querySelectorAll('[data-action="addDevice"]').forEach(btn => {
-      btn.addEventListener('click', () => addDevice(btn.getAttribute('data-company')));
-    });
-    
-    // Cargar dispositivos
-    for (const [companyName, companyData] of Object.entries(companies)) {
-      const devicesContainer = document.getElementById(`devices-${companyName}`);
-      if (devicesContainer) {
-        if (companyData.devices && Object.keys(companyData.devices).length > 0) {
-          devicesContainer.innerHTML = `
-            <h4 style="margin-top: 15px; color:#A0D8EF;">📱 DISPOSITIVOS</h4>
-            ${Object.entries(companyData.devices).map(([deviceId, deviceData]) => `
-              <div style="border:1px solid rgba(0,242,255,0.2); padding:12px; margin:8px 0;">
-                <strong>🔑 ${deviceId}</strong>
-                <button class="edit-device-btn" data-company="${companyName}" data-device="${deviceId}">✏️ EDITAR</button>
-                <button class="delete-device-btn" data-company="${companyName}" data-device="${deviceId}">🗑️ ELIMINAR</button>
-                <div style="font-size:0.75rem; margin-top:5px;">
-                  Licencia: ${deviceData.license?.type || 'N/A'} | Expira: ${deviceData.license?.expirationDate || 'N/A'}
-                  ${deviceData.license?.updateLicense ? '🔄 Auto-renovable' : ''}
-                  ${deviceData.license?.yearRenovation ? '📅 Renovación anual' : ''}
-                </div>
-              </div>
-            `).join('')}
-          `;
-          // Eventos para botones de dispositivos
-          devicesContainer.querySelectorAll('.edit-device-btn').forEach(btn => {
-            btn.addEventListener('click', () => editDevice(btn.getAttribute('data-company'), btn.getAttribute('data-device')));
-          });
-          devicesContainer.querySelectorAll('.delete-device-btn').forEach(btn => {
-            btn.addEventListener('click', () => deleteDevice(btn.getAttribute('data-company'), btn.getAttribute('data-device')));
-          });
+    // ---------- TRAININGS GLOBALES ----------
+    async function loadGlobalTrainings() {
+      try {
+        const globalTrainingsRef = ref(db, GLOBAL_TRAININGS_REF);
+        const snapshot = await get(globalTrainingsRef);
+        if (snapshot.exists() && Array.isArray(snapshot.val())) {
+          globalTrainings = snapshot.val();
         } else {
-          devicesContainer.innerHTML = '<div style="margin-top:15px;">📱 No hay dispositivos registrados</div>';
+          const companiesSnap = await get(ref(db, COMPANIES_REF));
+          const companies = companiesSnap.val() || {};
+          const allTrainings = new Set();
+          Object.values(companies).forEach(company => {
+            if (company.credentiales?.TRAININGS && Array.isArray(company.credentiales.TRAININGS)) {
+              company.credentiales.TRAININGS.forEach(t => allTrainings.add(t));
+            }
+            if (company.devices) {
+              Object.values(company.devices).forEach(device => {
+                if (device.trainingsActive && Array.isArray(device.trainingsActive)) {
+                  device.trainingsActive.forEach(t => allTrainings.add(t));
+                }
+              });
+            }
+          });
+          globalTrainings = Array.from(allTrainings).sort();
+          await set(globalTrainingsRef, globalTrainings);
+        }
+        renderGlobalTrainings();
+      } catch (error) {
+        console.error("Error cargando trainings globales:", error);
+        globalTrainings = [];
+        renderGlobalTrainings();
+      }
+    }
+
+    async function saveGlobalTrainings(trainings) {
+      try {
+        const globalTrainingsRef = ref(db, GLOBAL_TRAININGS_REF);
+        await set(globalTrainingsRef, trainings);
+        globalTrainings = trainings;
+        renderGlobalTrainings();
+        renderAllCompanies();
+      } catch (error) {
+        alert("Error guardando trainings: " + error.message);
+      }
+    }
+
+    function renderGlobalTrainings() {
+      const container = document.getElementById('globalTrainingsList');
+      if (!container) return;
+      container.innerHTML = globalTrainings.map((training, idx) => `
+        <div class="training-tag">
+          ${training}
+          <span class="remove-tag" data-idx="${idx}">✖</span>
+        </div>
+      `).join('');
+      document.querySelectorAll('#globalTrainingsList .remove-tag').forEach(el => {
+        el.addEventListener('click', async (e) => {
+          const idx = parseInt(e.currentTarget.getAttribute('data-idx'));
+          const newList = [...globalTrainings];
+          newList.splice(idx, 1);
+          await saveGlobalTrainings(newList);
+        });
+      });
+    }
+
+    // ---------- RENDER EMPRESAS ----------
+    async function renderAllCompanies() {
+      const snapshot = await get(ref(db, COMPANIES_REF));
+      const companies = snapshot.val() || {};
+      const container = document.getElementById('companiesList');
+      if (!container) return;
+
+      container.innerHTML = Object.entries(companies).map(([companyName, companyData]) => {
+        const cleanRCP = cleanRCPArray(companyData.RCP);
+        const rcpString = JSON.stringify(cleanRCP).replace(/'/g, "\\'");
+        return `
+        <div style="background: rgba(22, 27, 51, 0.4); margin-bottom: 20px; padding: 15px;">
+          <h3 style="color:#00F2FF;">🏢 ${companyName}</h3>
+          <button class="edit-btn" data-action="editCompany" data-company="${companyName}">✏️ EDITAR EMPRESA</button>
+          <button class="edit-btn" data-action="editRCP" data-company="${companyName}" data-rcp='${rcpString}'>🔢 EDITAR RCP</button>
+          <button class="delete-btn" data-action="deleteCompany" data-company="${companyName}">🗑️ ELIMINAR EMPRESA</button>
+          <button class="add-btn" data-action="addDevice" data-company="${companyName}">+ AGREGAR DISPOSITIVO</button>
+          <div id="devices-${companyName}"></div>
+        </div>
+      `}).join('');
+
+      document.querySelectorAll('[data-action="editCompany"]').forEach(btn => {
+        btn.addEventListener('click', () => editCompany(btn.getAttribute('data-company')));
+      });
+      document.querySelectorAll('[data-action="editRCP"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const company = btn.getAttribute('data-company');
+          const rcpRaw = btn.getAttribute('data-rcp');
+          let rcpArray = [];
+          try { rcpArray = JSON.parse(rcpRaw); } catch (e) { rcpArray = []; }
+          editRCP(company, rcpArray);
+        });
+      });
+      document.querySelectorAll('[data-action="deleteCompany"]').forEach(btn => {
+        btn.addEventListener('click', () => deleteCompany(btn.getAttribute('data-company')));
+      });
+      document.querySelectorAll('[data-action="addDevice"]').forEach(btn => {
+        btn.addEventListener('click', () => addDevice(btn.getAttribute('data-company')));
+      });
+
+      for (const [companyName, companyData] of Object.entries(companies)) {
+        const devicesContainer = document.getElementById(`devices-${companyName}`);
+        if (devicesContainer) {
+          if (companyData.devices && Object.keys(companyData.devices).length > 0) {
+            devicesContainer.innerHTML = `
+              <h4 style="margin-top: 15px; color:#A0D8EF;">📱 DISPOSITIVOS</h4>
+              ${Object.entries(companyData.devices).map(([deviceId, deviceData]) => `
+                <div style="border:1px solid rgba(0,242,255,0.2); padding:12px; margin:8px 0;">
+                  <strong>🔑 ${deviceId}</strong>
+                  <button class="edit-device-btn" data-company="${companyName}" data-device="${deviceId}">✏️ EDITAR</button>
+                  <button class="delete-device-btn" data-company="${companyName}" data-device="${deviceId}">🗑️ ELIMINAR</button>
+                  <div style="font-size:0.75rem; margin-top:5px;">
+                    Licencia: ${deviceData.license?.type || 'N/A'} | Expira: ${deviceData.license?.expirationDate || 'N/A'}
+                    ${deviceData.license?.updateLicense ? '🔄 Auto-renovable' : ''}
+                    ${deviceData.license?.yearRenovation ? '📅 Renovación anual' : ''}
+                  </div>
+                </div>
+              `).join('')}
+            `;
+            devicesContainer.querySelectorAll('.edit-device-btn').forEach(btn => {
+              btn.addEventListener('click', () => editDevice(btn.getAttribute('data-company'), btn.getAttribute('data-device')));
+            });
+            devicesContainer.querySelectorAll('.delete-device-btn').forEach(btn => {
+              btn.addEventListener('click', () => deleteDevice(btn.getAttribute('data-company'), btn.getAttribute('data-device')));
+            });
+          } else {
+            devicesContainer.innerHTML = '<div style="margin-top:15px;">📱 No hay dispositivos registrados</div>';
+          }
         }
       }
     }
-  }
 
-  // ---------- FUNCIONES GLOBALES PARA RCP ----------
-  window.currentRCPList = [];
-  // Función global removeRCPItem (se llama desde los botones del modal)
-  window.removeRCPItem = (idx) => {
-    if (window.currentRCPList && Array.isArray(window.currentRCPList)) {
-      window.currentRCPList.splice(idx, 1);
+    // ---------- RCP ----------
+    window.currentRCPList = [];
+    window.removeRCPItem = (idx) => {
+      if (window.currentRCPList && Array.isArray(window.currentRCPList)) {
+        window.currentRCPList.splice(idx, 1);
+        const container = document.getElementById('rcpListContainer');
+        if (container) renderRCPList(container);
+      }
+    };
+
+    function renderRCPList(container) {
+      if (!container) return;
+      if (window.currentRCPList.length === 0) {
+        container.innerHTML = '<div style="color:#A0D8EF; padding:10px;">No hay códigos RCP registrados</div>';
+        return;
+      }
+      container.innerHTML = window.currentRCPList.map((rcp, idx) => `
+        <div class="rcp-tag">
+          <span class="rcp-code">🔑 ${rcp}</span>
+          <span class="remove-tag" onclick="window.removeRCPItem(${idx})">✖</span>
+        </div>
+      `).join('');
+    }
+
+    async function editRCP(companyName, currentRCP) {
+      let cleanRCP = Array.isArray(currentRCP) ? [...currentRCP] : [];
+      cleanRCP = cleanRCP.filter(item => item && item !== '');
+      window.currentRCPList = [...cleanRCP];
+
+      showModal('Editar RCP de ' + companyName, `
+        <label>📡 Códigos/seriales (ej: 12:IW:87:18):</label>
+        <div class="rcp-list" id="rcpListContainer"></div>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+          <input type="text" id="newRCPValue" class="modal-input" placeholder="Ej: 12:IW:87:18" style="flex:1; font-family: monospace;">
+          <button class="add-btn" id="addRCPBtn" style="margin:0;">+ AGREGAR</button>
+        </div>
+        <p style="font-size:0.7rem; color:#A0D8EF; margin-top:10px;">💡 Puedes ingresar cualquier código alfanumérico</p>
+      `, async () => {
+        const finalList = window.currentRCPList.filter(item => item && item.trim() !== '');
+        await update(ref(db, `${COMPANIES_REF}/${companyName}`), { RCP: finalList });
+        renderAllCompanies();
+      });
+
       const container = document.getElementById('rcpListContainer');
       if (container) renderRCPList(container);
-    }
-  };
 
-  function renderRCPList(container) {
-    if (!container) return;
-    if (window.currentRCPList.length === 0) {
-      container.innerHTML = '<div style="color:#A0D8EF; padding:10px;">No hay códigos RCP registrados</div>';
-      return;
+      setTimeout(() => {
+        const addBtn = document.getElementById('addRCPBtn');
+        if (addBtn) {
+          addBtn.onclick = () => {
+            const input = document.getElementById('newRCPValue');
+            const newValue = input?.value.trim();
+            if (newValue && !window.currentRCPList.includes(newValue)) {
+              window.currentRCPList.push(newValue);
+              const rcpContainer = document.getElementById('rcpListContainer');
+              if (rcpContainer) renderRCPList(rcpContainer);
+              if (input) input.value = '';
+            } else if (newValue && window.currentRCPList.includes(newValue)) {
+              alert('⚠️ Este código ya existe en la lista');
+            }
+          };
+        }
+      }, 100);
     }
-    container.innerHTML = window.currentRCPList.map((rcp, idx) => `
-      <div class="rcp-tag">
-        <span class="rcp-code">🔑 ${rcp}</span>
-        <span class="remove-tag" onclick="window.removeRCPItem(${idx})">✖</span>
-      </div>
-    `).join('');
-  }
 
-  // Editar RCP de empresa
-  async function editRCP(companyName, currentRCP) {
-    let cleanRCP = Array.isArray(currentRCP) ? [...currentRCP] : [];
-    cleanRCP = cleanRCP.filter(item => item && item !== '');
-    window.currentRCPList = [...cleanRCP];
-    
-    showModal('Editar RCP de ' + companyName, `
-      <label>📡 Códigos/seriales (ej: 12:IW:87:18):</label>
-      <div class="rcp-list" id="rcpListContainer"></div>
-      <div style="display: flex; gap: 10px; margin-top: 15px;">
-        <input type="text" id="newRCPValue" class="modal-input" placeholder="Ej: 12:IW:87:18" style="flex:1; font-family: monospace;">
-        <button class="add-btn" id="addRCPBtn" style="margin:0;">+ AGREGAR</button>
-      </div>
-      <p style="font-size:0.7rem; color:#A0D8EF; margin-top:10px;">💡 Puedes ingresar cualquier código alfanumérico</p>
-    `, async () => {
-      const finalList = window.currentRCPList.filter(item => item && item.trim() !== '');
-      await update(ref(db, `${COMPANIES_REF}/${companyName}`), { RCP: finalList });
-      renderAllCompanies();
-    });
-    
-    const container = document.getElementById('rcpListContainer');
-    if (container) renderRCPList(container);
-    
-    // Configurar botón agregar
-    setTimeout(() => {
-      const addBtn = document.getElementById('addRCPBtn');
-      if (addBtn) {
-        addBtn.onclick = () => {
-          const input = document.getElementById('newRCPValue');
-          const newValue = input?.value.trim();
-          if (newValue && !window.currentRCPList.includes(newValue)) {
-            window.currentRCPList.push(newValue);
-            const rcpContainer = document.getElementById('rcpListContainer');
-            if (rcpContainer) renderRCPList(rcpContainer);
-            if (input) input.value = '';
-          } else if (newValue && window.currentRCPList.includes(newValue)) {
-            alert('⚠️ Este código ya existe en la lista');
-          }
+    // ---------- EDITAR EMPRESA ----------
+    async function editCompany(companyName) {
+      const snapshot = await get(ref(db, `${COMPANIES_REF}/${companyName}`));
+      const companyData = snapshot.val();
+      if (!companyData) return;
+
+      showModal('Editar Empresa', `
+        <input id="editCompanyUser" class="modal-input" placeholder="Usuario" value="${companyData.credentiales?.user || ''}">
+        <input id="editCompanyPass" class="modal-input" placeholder="Password" value="${companyData.credentiales?.password || ''}">
+        <label>Trainings asignados (desde lista global):</label>
+        <div class="trainings-list" id="editTrainingsList"></div>
+      `, async () => {
+        const newUser = document.getElementById('editCompanyUser').value;
+        const newPass = document.getElementById('editCompanyPass').value;
+        const selectedTrainings = window.selectedTrainingsTemp || [];
+        await update(ref(db, `${COMPANIES_REF}/${companyName}/credentiales`), {
+          user: newUser,
+          password: parseInt(newPass) || newPass,
+          TRAININGS: selectedTrainings
+        });
+        renderAllCompanies();
+      });
+
+      const currentTrainings = companyData.credentiales?.TRAININGS || [];
+      window.selectedTrainingsTemp = [...currentTrainings];
+
+      function renderEditTrainings() {
+        const container = document.getElementById('editTrainingsList');
+        if (!container) return;
+        container.innerHTML = globalTrainings.map(training => `
+          <div class="training-tag ${window.selectedTrainingsTemp.includes(training) ? 'selected' : ''}" data-training="${training}">
+            ${training}
+          </div>
+        `).join('');
+        container.querySelectorAll('.training-tag').forEach(tag => {
+          tag.addEventListener('click', () => {
+            const training = tag.getAttribute('data-training');
+            const idx = window.selectedTrainingsTemp.indexOf(training);
+            if (idx === -1) window.selectedTrainingsTemp.push(training);
+            else window.selectedTrainingsTemp.splice(idx, 1);
+            renderEditTrainings();
+          });
+        });
+      }
+      renderEditTrainings();
+    }
+
+    async function deleteCompany(companyName) {
+      if (confirm(`¿Eliminar empresa ${companyName}?`)) {
+        await remove(ref(db, `${COMPANIES_REF}/${companyName}`));
+        renderAllCompanies();
+      }
+    }
+
+    // ---------- DISPOSITIVOS (CON VALIDACIÓN DE FECHAS) ----------
+    async function addDevice(companyName) {
+      const newDeviceId = prompt('Ingrese ID del dispositivo (ej: 789WE):', 'DEV' + Math.floor(Math.random() * 10000));
+      if (!newDeviceId) return;
+
+      const today = new Date().toISOString().split('T')[0];
+      const oneYearLater = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0];
+
+      showModal('Agregar Dispositivo', `
+        <input id="deviceAccessCode" class="modal-input" placeholder="Código de acceso" value="${Math.floor(Math.random() * 999999)}">
+        <input id="deviceType" class="modal-input" placeholder="Tipo licencia (PRO/PREMIUM/STANDARD)" value="STANDARD">
+        <input id="deviceActivation" class="modal-input" type="date" value="${today}">
+        <input id="deviceExpiration" class="modal-input" type="date" value="${oneYearLater}">
+        <div class="toggle-switch">
+          <label class="toggle-label">
+            <span>🔄 Actualización automática de licencia:</span>
+            <input type="checkbox" id="deviceUpdateLicense">
+          </label>
+        </div>
+        <div class="toggle-switch">
+          <label class="toggle-label">
+            <span>📅 Renovación anual:</span>
+            <input type="checkbox" id="deviceYearRenovation">
+          </label>
+        </div>
+        <label>Trainings activos:</label>
+        <div class="trainings-list" id="deviceTrainingsList"></div>
+      `, async () => {
+        const accessCode = document.getElementById('deviceAccessCode').value;
+        const licenseType = document.getElementById('deviceType').value;
+        const activationDate = document.getElementById('deviceActivation').value;
+        const expirationDate = document.getElementById('deviceExpiration').value;
+        const updateLicense = document.getElementById('deviceUpdateLicense').checked;
+        const yearRenovation = document.getElementById('deviceYearRenovation').checked;
+        const selectedActiveTrainings = window.selectedDeviceTrainings || [];
+
+        // VALIDACIÓN DE FECHAS
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!dateRegex.test(activationDate) || !dateRegex.test(expirationDate)) {
+          alert('⚠️ Formato de fecha incorrecto. Debe ser AAAA-MM-DD (ej: 2025-12-31)');
+          return;
+        }
+        const d1 = new Date(activationDate);
+        const d2 = new Date(expirationDate);
+        if (isNaN(d1.getTime()) || isNaN(d2.getTime())) {
+          alert('⚠️ Fecha inválida. Por favor ingrese una fecha real.');
+          return;
+        }
+
+        const newDevice = {
+          accessCode: accessCode,
+          data: { monthlyUsage: {}, totalTrainingsCompleted: 0, totalUsageHours: 0 },
+          license: {
+            activationDate: activationDate,
+            expirationDate: expirationDate,
+            type: licenseType,
+            updateLicense: updateLicense,
+            yearRenovation: yearRenovation
+          },
+          trainingsActive: selectedActiveTrainings
         };
+        await set(ref(db, `${COMPANIES_REF}/${companyName}/devices/${newDeviceId}`), newDevice);
+        renderAllCompanies();
+      });
+
+      window.selectedDeviceTrainings = [];
+      function renderDeviceTrainings() {
+        const container = document.getElementById('deviceTrainingsList');
+        if (!container) return;
+        container.innerHTML = globalTrainings.map(training => `
+          <div class="training-tag ${window.selectedDeviceTrainings.includes(training) ? 'selected' : ''}" data-training="${training}">
+            ${training}
+          </div>
+        `).join('');
+        container.querySelectorAll('.training-tag').forEach(tag => {
+          tag.addEventListener('click', () => {
+            const training = tag.getAttribute('data-training');
+            const idx = window.selectedDeviceTrainings.indexOf(training);
+            if (idx === -1) window.selectedDeviceTrainings.push(training);
+            else window.selectedDeviceTrainings.splice(idx, 1);
+            renderDeviceTrainings();
+          });
+        });
       }
-    }, 100);
-  }
+      setTimeout(renderDeviceTrainings, 100);
+    }
 
-  // Editar empresa (credenciales y trainings)
-  async function editCompany(companyName) {
-    const snapshot = await get(ref(db, `${COMPANIES_REF}/${companyName}`));
-    const companyData = snapshot.val();
-    if (!companyData) return;
-    
-    showModal('Editar Empresa', `
-      <input id="editCompanyUser" class="modal-input" placeholder="Usuario" value="${companyData.credentiales?.user || ''}">
-      <input id="editCompanyPass" class="modal-input" placeholder="Password" value="${companyData.credentiales?.password || ''}">
-      <label>Trainings asignados (desde lista global):</label>
-      <div class="trainings-list" id="editTrainingsList"></div>
-    `, async () => {
-      const newUser = document.getElementById('editCompanyUser').value;
-      const newPass = document.getElementById('editCompanyPass').value;
-      const selectedTrainings = window.selectedTrainingsTemp || [];
-      await update(ref(db, `${COMPANIES_REF}/${companyName}/credentiales`), {
-        user: newUser,
-        password: parseInt(newPass) || newPass,
-        TRAININGS: selectedTrainings
-      });
-      renderAllCompanies();
-    });
-    
-    const currentTrainings = companyData.credentiales?.TRAININGS || [];
-    window.selectedTrainingsTemp = [...currentTrainings];
-    
-    function renderEditTrainings() {
-      const container = document.getElementById('editTrainingsList');
-      if (!container) return;
-      container.innerHTML = globalTrainings.map(training => `
-        <div class="training-tag ${window.selectedTrainingsTemp.includes(training) ? 'selected' : ''}" data-training="${training}">
-          ${training}
+    async function editDevice(companyName, deviceId) {
+      const snapshot = await get(ref(db, `${COMPANIES_REF}/${companyName}/devices/${deviceId}`));
+      const deviceData = snapshot.val();
+      if (!deviceData) return;
+
+      showModal('Editar Dispositivo', `
+        <input id="deviceAccessCode" class="modal-input" value="${deviceData.accessCode || ''}">
+        <input id="deviceType" class="modal-input" value="${deviceData.license?.type || ''}">
+        <input id="deviceActivation" class="modal-input" type="date" value="${deviceData.license?.activationDate || ''}">
+        <input id="deviceExpiration" class="modal-input" type="date" value="${deviceData.license?.expirationDate || ''}">
+        <div class="toggle-switch">
+          <label class="toggle-label">
+            <span>🔄 Actualización automática de licencia:</span>
+            <input type="checkbox" id="deviceUpdateLicense" ${deviceData.license?.updateLicense ? 'checked' : ''}>
+          </label>
         </div>
-      `).join('');
-      container.querySelectorAll('.training-tag').forEach(tag => {
-        tag.addEventListener('click', () => {
-          const training = tag.getAttribute('data-training');
-          const idx = window.selectedTrainingsTemp.indexOf(training);
-          if (idx === -1) window.selectedTrainingsTemp.push(training);
-          else window.selectedTrainingsTemp.splice(idx, 1);
-          renderEditTrainings();
+        <div class="toggle-switch">
+          <label class="toggle-label">
+            <span>📅 Renovación anual:</span>
+            <input type="checkbox" id="deviceYearRenovation" ${deviceData.license?.yearRenovation ? 'checked' : ''}>
+          </label>
+        </div>
+        <label>Trainings activos:</label>
+        <div class="trainings-list" id="deviceTrainingsList"></div>
+      `, async () => {
+        const accessCode = document.getElementById('deviceAccessCode').value;
+        const licenseType = document.getElementById('deviceType').value;
+        const activationDate = document.getElementById('deviceActivation').value;
+        const expirationDate = document.getElementById('deviceExpiration').value;
+        const updateLicense = document.getElementById('deviceUpdateLicense').checked;
+        const yearRenovation = document.getElementById('deviceYearRenovation').checked;
+        const selectedTrainings = window.selectedDeviceTrainings || [];
+
+        // VALIDACIÓN DE FECHAS
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!dateRegex.test(activationDate) || !dateRegex.test(expirationDate)) {
+          alert('⚠️ Formato de fecha incorrecto. Debe ser AAAA-MM-DD (ej: 2025-12-31)');
+          return;
+        }
+        const d1 = new Date(activationDate);
+        const d2 = new Date(expirationDate);
+        if (isNaN(d1.getTime()) || isNaN(d2.getTime())) {
+          alert('⚠️ Fecha inválida. Por favor ingrese una fecha real.');
+          return;
+        }
+
+        await update(ref(db, `${COMPANIES_REF}/${companyName}/devices/${deviceId}`), {
+          accessCode: accessCode,
+          license: {
+            activationDate: activationDate,
+            expirationDate: expirationDate,
+            type: licenseType,
+            updateLicense: updateLicense,
+            yearRenovation: yearRenovation
+          },
+          trainingsActive: selectedTrainings,
+          data: deviceData.data || { monthlyUsage: {}, totalTrainingsCompleted: 0, totalUsageHours: 0 }
         });
+        renderAllCompanies();
       });
-    }
-    renderEditTrainings();
-  }
 
-  async function deleteCompany(companyName) {
-    if (confirm(`¿Eliminar empresa ${companyName}?`)) {
-      await remove(ref(db, `${COMPANIES_REF}/${companyName}`));
-      renderAllCompanies();
-    }
-  }
-
-  async function addDevice(companyName) {
-    const newDeviceId = prompt('Ingrese ID del dispositivo (ej: 789WE):', 'DEV' + Math.floor(Math.random() * 10000));
-    if (!newDeviceId) return;
-    
-    showModal('Agregar Dispositivo', `
-      <input id="deviceAccessCode" class="modal-input" placeholder="Código de acceso" value="${Math.floor(Math.random() * 999999)}">
-      <input id="deviceType" class="modal-input" placeholder="Tipo licencia (PRO/PREMIUM/STANDARD)" value="STANDARD">
-      <input id="deviceActivation" class="modal-input" placeholder="Fecha activación (YYYY-MM-DD)" value="${new Date().toISOString().split('T')[0]}">
-      <input id="deviceExpiration" class="modal-input" placeholder="Fecha expiración (YYYY-MM-DD)" value="${new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0]}">
-      <div class="toggle-switch">
-        <label class="toggle-label">
-          <span>🔄 Actualización automática de licencia:</span>
-          <input type="checkbox" id="deviceUpdateLicense">
-        </label>
-      </div>
-      <div class="toggle-switch">
-        <label class="toggle-label">
-          <span>📅 Renovación anual:</span>
-          <input type="checkbox" id="deviceYearRenovation">
-        </label>
-      </div>
-      <label>Trainings activos:</label>
-      <div class="trainings-list" id="deviceTrainingsList"></div>
-    `, async () => {
-      const accessCode = document.getElementById('deviceAccessCode').value;
-      const licenseType = document.getElementById('deviceType').value;
-      const activationDate = document.getElementById('deviceActivation').value;
-      const expirationDate = document.getElementById('deviceExpiration').value;
-      const updateLicense = document.getElementById('deviceUpdateLicense').checked;
-      const yearRenovation = document.getElementById('deviceYearRenovation').checked;
-      const selectedActiveTrainings = window.selectedDeviceTrainings || [];
-      
-      const newDevice = {
-        accessCode: accessCode,
-        data: { monthlyUsage: {}, totalTrainingsCompleted: 0, totalUsageHours: 0 },
-        license: {
-          activationDate: activationDate,
-          expirationDate: expirationDate,
-          type: licenseType,
-          updateLicense: updateLicense,
-          yearRenovation: yearRenovation
-        },
-        trainingsActive: selectedActiveTrainings
-      };
-      await set(ref(db, `${COMPANIES_REF}/${companyName}/devices/${newDeviceId}`), newDevice);
-      renderAllCompanies();
-    });
-    
-    window.selectedDeviceTrainings = [];
-    function renderDeviceTrainings() {
-      const container = document.getElementById('deviceTrainingsList');
-      if (!container) return;
-      container.innerHTML = globalTrainings.map(training => `
-        <div class="training-tag ${window.selectedDeviceTrainings.includes(training) ? 'selected' : ''}" data-training="${training}">
-          ${training}
-        </div>
-      `).join('');
-      container.querySelectorAll('.training-tag').forEach(tag => {
-        tag.addEventListener('click', () => {
-          const training = tag.getAttribute('data-training');
-          const idx = window.selectedDeviceTrainings.indexOf(training);
-          if (idx === -1) window.selectedDeviceTrainings.push(training);
-          else window.selectedDeviceTrainings.splice(idx, 1);
-          renderDeviceTrainings();
+      window.selectedDeviceTrainings = deviceData.trainingsActive || [];
+      function renderDeviceEditTrainings() {
+        const container = document.getElementById('deviceTrainingsList');
+        if (!container) return;
+        container.innerHTML = globalTrainings.map(training => `
+          <div class="training-tag ${window.selectedDeviceTrainings.includes(training) ? 'selected' : ''}" data-training="${training}">
+            ${training}
+          </div>
+        `).join('');
+        container.querySelectorAll('.training-tag').forEach(tag => {
+          tag.addEventListener('click', () => {
+            const training = tag.getAttribute('data-training');
+            const idx = window.selectedDeviceTrainings.indexOf(training);
+            if (idx === -1) window.selectedDeviceTrainings.push(training);
+            else window.selectedDeviceTrainings.splice(idx, 1);
+            renderDeviceEditTrainings();
+          });
         });
-      });
+      }
+      setTimeout(renderDeviceEditTrainings, 100);
     }
-    setTimeout(renderDeviceTrainings, 100);
-  }
 
-  async function editDevice(companyName, deviceId) {
-    const snapshot = await get(ref(db, `${COMPANIES_REF}/${companyName}/devices/${deviceId}`));
-    const deviceData = snapshot.val();
-    if (!deviceData) return;
-    
-    showModal('Editar Dispositivo', `
-      <input id="deviceAccessCode" class="modal-input" value="${deviceData.accessCode || ''}">
-      <input id="deviceType" class="modal-input" value="${deviceData.license?.type || ''}">
-      <input id="deviceActivation" class="modal-input" value="${deviceData.license?.activationDate || ''}">
-      <input id="deviceExpiration" class="modal-input" value="${deviceData.license?.expirationDate || ''}">
-      <div class="toggle-switch">
-        <label class="toggle-label">
-          <span>🔄 Actualización automática de licencia:</span>
-          <input type="checkbox" id="deviceUpdateLicense" ${deviceData.license?.updateLicense ? 'checked' : ''}>
-        </label>
-      </div>
-      <div class="toggle-switch">
-        <label class="toggle-label">
-          <span>📅 Renovación anual:</span>
-          <input type="checkbox" id="deviceYearRenovation" ${deviceData.license?.yearRenovation ? 'checked' : ''}>
-        </label>
-      </div>
-      <label>Trainings activos:</label>
-      <div class="trainings-list" id="deviceTrainingsList"></div>
-    `, async () => {
-      const accessCode = document.getElementById('deviceAccessCode').value;
-      const licenseType = document.getElementById('deviceType').value;
-      const activationDate = document.getElementById('deviceActivation').value;
-      const expirationDate = document.getElementById('deviceExpiration').value;
-      const updateLicense = document.getElementById('deviceUpdateLicense').checked;
-      const yearRenovation = document.getElementById('deviceYearRenovation').checked;
-      const selectedTrainings = window.selectedDeviceTrainings || [];
-      
-      await update(ref(db, `${COMPANIES_REF}/${companyName}/devices/${deviceId}`), {
-        accessCode: accessCode,
-        license: {
-          activationDate: activationDate,
-          expirationDate: expirationDate,
-          type: licenseType,
-          updateLicense: updateLicense,
-          yearRenovation: yearRenovation
-        },
-        trainingsActive: selectedTrainings,
-        data: deviceData.data || { monthlyUsage: {}, totalTrainingsCompleted: 0, totalUsageHours: 0 }
+    async function deleteDevice(companyName, deviceId) {
+      if (confirm(`¿Eliminar dispositivo ${deviceId}?`)) {
+        await remove(ref(db, `${COMPANIES_REF}/${companyName}/devices/${deviceId}`));
+        renderAllCompanies();
+      }
+    }
+
+    // ---------- NUEVA EMPRESA ----------
+    document.getElementById('addCompanyBtn')?.addEventListener('click', () => {
+      const newCompany = prompt('Nombre de la nueva empresa:', 'NEW_COMPANY');
+      if (!newCompany) return;
+
+      showModal('Crear Empresa', `
+        <input id="newCompanyUser" class="modal-input" placeholder="Usuario" value="ADMIN">
+        <input id="newCompanyPass" class="modal-input" placeholder="Password" value="123456">
+        <input id="newCompanyRCP" class="modal-input" placeholder="Código RCP inicial (ej: 12:IW:87:18)" value="12:IW:87:18">
+        <label>Trainings asignados:</label>
+        <div class="trainings-list" id="newCompanyTrainings"></div>
+      `, async () => {
+        const user = document.getElementById('newCompanyUser').value;
+        const pass = document.getElementById('newCompanyPass').value;
+        const rcpValue = document.getElementById('newCompanyRCP').value.trim() || "12:IW:87:18";
+        const selectedTrainings = window.selectedNewCompanyTrainings || [];
+
+        const newCompanyData = {
+          RCP: [rcpValue],
+          credentiales: {
+            TRAININGS: selectedTrainings,
+            password: parseInt(pass) || pass,
+            user: user
+          },
+          devices: {}
+        };
+        await set(ref(db, `${COMPANIES_REF}/${newCompany}`), newCompanyData);
+        renderAllCompanies();
       });
-      renderAllCompanies();
-    });
-    
-    window.selectedDeviceTrainings = deviceData.trainingsActive || [];
-    function renderDeviceEditTrainings() {
-      const container = document.getElementById('deviceTrainingsList');
-      if (!container) return;
-      container.innerHTML = globalTrainings.map(training => `
-        <div class="training-tag ${window.selectedDeviceTrainings.includes(training) ? 'selected' : ''}" data-training="${training}">
-          ${training}
-        </div>
-      `).join('');
-      container.querySelectorAll('.training-tag').forEach(tag => {
-        tag.addEventListener('click', () => {
-          const training = tag.getAttribute('data-training');
-          const idx = window.selectedDeviceTrainings.indexOf(training);
-          if (idx === -1) window.selectedDeviceTrainings.push(training);
-          else window.selectedDeviceTrainings.splice(idx, 1);
-          renderDeviceEditTrainings();
+
+      window.selectedNewCompanyTrainings = [];
+      function renderNewCompanyTrainings() {
+        const container = document.getElementById('newCompanyTrainings');
+        if (!container) return;
+        container.innerHTML = globalTrainings.map(training => `
+          <div class="training-tag ${window.selectedNewCompanyTrainings.includes(training) ? 'selected' : ''}" data-training="${training}">
+            ${training}
+          </div>
+        `).join('');
+        container.querySelectorAll('.training-tag').forEach(tag => {
+          tag.addEventListener('click', () => {
+            const training = tag.getAttribute('data-training');
+            const idx = window.selectedNewCompanyTrainings.indexOf(training);
+            if (idx === -1) window.selectedNewCompanyTrainings.push(training);
+            else window.selectedNewCompanyTrainings.splice(idx, 1);
+            renderNewCompanyTrainings();
+          });
         });
-      });
-    }
-    setTimeout(renderDeviceEditTrainings, 100);
-  }
-
-  async function deleteDevice(companyName, deviceId) {
-    if (confirm(`¿Eliminar dispositivo ${deviceId}?`)) {
-      await remove(ref(db, `${COMPANIES_REF}/${companyName}/devices/${deviceId}`));
-      renderAllCompanies();
-    }
-  }
-
-  // Nueva empresa
-  document.getElementById('addCompanyBtn')?.addEventListener('click', () => {
-    const newCompany = prompt('Nombre de la nueva empresa:', 'NEW_COMPANY');
-    if (!newCompany) return;
-    
-    showModal('Crear Empresa', `
-      <input id="newCompanyUser" class="modal-input" placeholder="Usuario" value="ADMIN">
-      <input id="newCompanyPass" class="modal-input" placeholder="Password" value="123456">
-      <input id="newCompanyRCP" class="modal-input" placeholder="Código RCP inicial (ej: 12:IW:87:18)" value="12:IW:87:18">
-      <label>Trainings asignados:</label>
-      <div class="trainings-list" id="newCompanyTrainings"></div>
-    `, async () => {
-      const user = document.getElementById('newCompanyUser').value;
-      const pass = document.getElementById('newCompanyPass').value;
-      const rcpValue = document.getElementById('newCompanyRCP').value.trim() || "12:IW:87:18";
-      const selectedTrainings = window.selectedNewCompanyTrainings || [];
-      
-      const newCompanyData = {
-        RCP: [rcpValue],
-        credentiales: {
-          TRAININGS: selectedTrainings,
-          password: parseInt(pass) || pass,
-          user: user
-        },
-        devices: {}
-      };
-      await set(ref(db, `${COMPANIES_REF}/${newCompany}`), newCompanyData);
-      renderAllCompanies();
+      }
+      setTimeout(renderNewCompanyTrainings, 100);
     });
-    
-    window.selectedNewCompanyTrainings = [];
-    function renderNewCompanyTrainings() {
-      const container = document.getElementById('newCompanyTrainings');
-      if (!container) return;
-      container.innerHTML = globalTrainings.map(training => `
-        <div class="training-tag ${window.selectedNewCompanyTrainings.includes(training) ? 'selected' : ''}" data-training="${training}">
-          ${training}
-        </div>
-      `).join('');
-      container.querySelectorAll('.training-tag').forEach(tag => {
-        tag.addEventListener('click', () => {
-          const training = tag.getAttribute('data-training');
-          const idx = window.selectedNewCompanyTrainings.indexOf(training);
-          if (idx === -1) window.selectedNewCompanyTrainings.push(training);
-          else window.selectedNewCompanyTrainings.splice(idx, 1);
-          renderNewCompanyTrainings();
-        });
-      });
-    }
-    setTimeout(renderNewCompanyTrainings, 100);
-  });
 
-  // Agregar training global
-  document.getElementById('addTrainingBtn')?.addEventListener('click', () => {
-    const newTraining = prompt('Nuevo training (ej: ConfinedSpaces):');
-    if (newTraining && !globalTrainings.includes(newTraining)) {
-      saveGlobalTrainings([...globalTrainings, newTraining]);
-    }
-  });
-
-  // Modal genérico
-  function showModal(title, contentHtml, onSave) {
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.innerHTML = `
-      <div class="modal-content">
-        <h3>${title}</h3>
-        ${contentHtml}
-        <div class="modal-buttons">
-          <button class="save-btn" id="modalSave">💾 GUARDAR</button>
-          <button class="cancel-btn" id="modalCancel">❌ CANCELAR</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(modal);
-    document.getElementById('modalSave').onclick = () => { onSave(); modal.remove(); };
-    document.getElementById('modalCancel').onclick = () => modal.remove();
-  }
-
-  // Navegación entre secciones
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const section = e.currentTarget.dataset.section;
-      if (section) {
-        Object.keys(sections).forEach(s => sections[s].style.display = 'none');
-        sections[section].style.display = 'block';
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        e.currentTarget.classList.add('active');
-        if (section === 'users') renderUsersList();
+    // ---------- AGREGAR TRAINING GLOBAL ----------
+    document.getElementById('addTrainingBtn')?.addEventListener('click', () => {
+      const newTraining = prompt('Nuevo training (ej: ConfinedSpaces):');
+      if (newTraining && !globalTrainings.includes(newTraining)) {
+        saveGlobalTrainings([...globalTrainings, newTraining]);
       }
     });
-  });
 
-  document.getElementById('logoutDashboard')?.addEventListener('click', () => {
-    currentAdmin = null;
-    dashboardContent.style.display = 'none';
-    loginOverlay.style.display = 'flex';
-  });
+    // ---------- MODAL GENÉRICO ----------
+    function showModal(title, contentHtml, onSave) {
+      const modal = document.createElement('div');
+      modal.className = 'modal';
+      modal.innerHTML = `
+        <div class="modal-content">
+          <h3>${title}</h3>
+          ${contentHtml}
+          <div class="modal-buttons">
+            <button class="save-btn" id="modalSave">💾 GUARDAR</button>
+            <button class="cancel-btn" id="modalCancel">❌ CANCELAR</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      document.getElementById('modalSave').onclick = () => { onSave(); modal.remove(); };
+      document.getElementById('modalCancel').onclick = () => modal.remove();
+    }
 
-  // Login con el nodo ADMIN (sin autenticación de Firebase)
-  async function loginAdmin(username, password) {
-    try {
-      const snapshot = await get(ref(db, 'ADMIN'));
-      const adminData = snapshot.val();
-      if (adminData && adminData.user === username && adminData.password == parseInt(password)) {
-        currentAdmin = username;
-        loginOverlay.style.display = 'none';
-        dashboardContent.style.display = 'block';
-        await loadGlobalTrainings();
-        await renderAllCompanies();
-        renderUsersList();
-        return true;
-      } else {
-        document.getElementById('loginError').textContent = 'ERROR: Credenciales incorrectas';
+    // ---------- NAVEGACIÓN ----------
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const section = e.currentTarget.dataset.section;
+        if (section) {
+          Object.keys(sections).forEach(s => sections[s].style.display = 'none');
+          sections[section].style.display = 'block';
+          document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+          e.currentTarget.classList.add('active');
+          if (section === 'users') renderUsersList();
+        }
+      });
+    });
+
+    document.getElementById('logoutDashboard')?.addEventListener('click', () => {
+      currentAdmin = null;
+      dashboardContent.style.display = 'none';
+      loginOverlay.style.display = 'flex';
+    });
+
+    // ---------- LOGIN ----------
+    async function loginAdmin(username, password) {
+      try {
+        const snapshot = await get(ref(db, 'ADMIN'));
+        const adminData = snapshot.val();
+        if (adminData && adminData.user === username && adminData.password == parseInt(password)) {
+          currentAdmin = username;
+          loginOverlay.style.display = 'none';
+          dashboardContent.style.display = 'block';
+          await loadGlobalTrainings();
+          await renderAllCompanies();
+          renderUsersList();
+          return true;
+        } else {
+          document.getElementById('loginError').textContent = 'ERROR: Credenciales incorrectas';
+          return false;
+        }
+      } catch (error) {
+        console.error(error);
+        document.getElementById('loginError').textContent = 'ERROR DE CONEXIÓN';
         return false;
       }
-    } catch (error) {
-      console.error(error);
-      document.getElementById('loginError').textContent = 'ERROR DE CONEXIÓN';
-      return false;
     }
-  }
 
-  async function renderUsersList() {
-    const snapshot = await get(ref(db, COMPANIES_REF));
-    const companies = snapshot.val() || {};
-    const container = document.getElementById('usersList');
-    if (!container) return;
-    container.innerHTML = Object.entries(companies).map(([companyName, companyData]) => {
-      const cleanRCP = cleanRCPArray(companyData.RCP);
-      const rcpString = JSON.stringify(cleanRCP).replace(/'/g, "\\'");
-      return `
-      <div style="border:1px solid rgba(0,242,255,0.2); padding:15px; margin-bottom:15px;">
-        <h3 style="color:#00F2FF;">🏢 ${companyName}</h3>
-        <p><strong>Usuario:</strong> ${companyData.credentiales?.user || 'N/A'}</p>
-        <p><strong>Password:</strong> ${companyData.credentiales?.password || 'N/A'}</p>
-        <p><strong>RCPs:</strong> ${cleanRCP.map(r => `<code style="background:#000; padding:2px 6px; margin:2px; display:inline-block;">${r}</code>`).join(', ') || 'Ninguno'}</p>
-        <p><strong>Trainings asignados:</strong> ${(companyData.credentiales?.TRAININGS || []).length} trainings</p>
-        <button class="edit-company-creds" data-company="${companyName}">✏️ EDITAR CREDENCIALES</button>
-        <button class="edit-rcp" data-company="${companyName}" data-rcp='${rcpString}'>🔢 EDITAR RCP</button>
-      </div>
-    `}).join('');
-    
-    // Eventos para botones dentro de usuarios
-    document.querySelectorAll('.edit-company-creds').forEach(btn => {
-      btn.addEventListener('click', () => editCompany(btn.getAttribute('data-company')));
-    });
-    document.querySelectorAll('.edit-rcp').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const company = btn.getAttribute('data-company');
-        const rcpRaw = btn.getAttribute('data-rcp');
-        let rcpArray = [];
-        try { rcpArray = JSON.parse(rcpRaw); } catch(e) { rcpArray = []; }
-        editRCP(company, rcpArray);
+    // ---------- RENDER USUARIOS ----------
+    async function renderUsersList() {
+      const snapshot = await get(ref(db, COMPANIES_REF));
+      const companies = snapshot.val() || {};
+      const container = document.getElementById('usersList');
+      if (!container) return;
+      container.innerHTML = Object.entries(companies).map(([companyName, companyData]) => {
+        const cleanRCP = cleanRCPArray(companyData.RCP);
+        const rcpString = JSON.stringify(cleanRCP).replace(/'/g, "\\'");
+        return `
+        <div style="border:1px solid rgba(0,242,255,0.2); padding:15px; margin-bottom:15px;">
+          <h3 style="color:#00F2FF;">🏢 ${companyName}</h3>
+          <p><strong>Usuario:</strong> ${companyData.credentiales?.user || 'N/A'}</p>
+          <p><strong>Password:</strong> ${companyData.credentiales?.password || 'N/A'}</p>
+          <p><strong>RCPs:</strong> ${cleanRCP.map(r => `<code style="background:#000; padding:2px 6px; margin:2px; display:inline-block;">${r}</code>`).join(', ') || 'Ninguno'}</p>
+          <p><strong>Trainings asignados:</strong> ${(companyData.credentiales?.TRAININGS || []).length} trainings</p>
+          <button class="edit-company-creds" data-company="${companyName}">✏️ EDITAR CREDENCIALES</button>
+          <button class="edit-rcp" data-company="${companyName}" data-rcp='${rcpString}'>🔢 EDITAR RCP</button>
+        </div>
+      `}).join('');
+
+      document.querySelectorAll('.edit-company-creds').forEach(btn => {
+        btn.addEventListener('click', () => editCompany(btn.getAttribute('data-company')));
       });
-    });
-  }
+      document.querySelectorAll('.edit-rcp').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const company = btn.getAttribute('data-company');
+          const rcpRaw = btn.getAttribute('data-rcp');
+          let rcpArray = [];
+          try { rcpArray = JSON.parse(rcpRaw); } catch (e) { rcpArray = []; }
+          editRCP(company, rcpArray);
+        });
+      });
+    }
 
-  // Eventos login
-  document.getElementById('adminLoginBtn').addEventListener('click', () => {
-    const user = document.getElementById('adminUser').value.trim();
-    const pass = document.getElementById('adminPass').value.trim();
-    loginAdmin(user, pass);
-  });
-  document.getElementById('adminUser').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') document.getElementById('adminLoginBtn').click();
-  });
-  document.getElementById('adminPass').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') document.getElementById('adminLoginBtn').click();
-  });
-</script>
+    // ---------- EVENTOS DE LOGIN ----------
+    document.getElementById('adminLoginBtn').addEventListener('click', () => {
+      const user = document.getElementById('adminUser').value.trim();
+      const pass = document.getElementById('adminPass').value.trim();
+      loginAdmin(user, pass);
+    });
+    document.getElementById('adminUser').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') document.getElementById('adminLoginBtn').click();
+    });
+    document.getElementById('adminPass').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') document.getElementById('adminLoginBtn').click();
+    });
+  </script>
 </body>
 </html>
